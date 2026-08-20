@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Política de privacidad | Doctoc Health</title>
+	<meta name="description" content="Política de privacidad general de Doctoc Health.">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="styles.css">
+	<style>
+		.privacy-page { min-height: 100vh; background: var(--cream); }
+
+		.privacy-hero {
+			padding: 72px 0 56px;
+			background: radial-gradient(circle at 85% 20%, #e6f4eb 0, transparent 38%);
+		}
+
+		.privacy-hero h1 { max-width: 760px; font-size: clamp(2.4rem, 5vw, 4rem); }
+		.privacy-hero p:last-child { max-width: 670px; margin-top: 18px; color: var(--muted); }
+
+		.privacy-layout {
+			display: grid;
+			grid-template-columns: 220px minmax(0, 720px);
+			align-items: start;
+			gap: 64px;
+			padding-bottom: 80px;
+		}
+
+		.privacy-index {
+			position: sticky;
+			top: 100px;
+			padding: 20px;
+			border-left: 3px solid var(--green);
+			background: var(--mint);
+		}
+
+		.privacy-index strong { display: block; margin-bottom: 10px; font-family: Manrope, sans-serif; }
+		.privacy-index a { display: block; padding: 5px 0; color: var(--green-dark); font-size: .9rem; }
+		.privacy-index a:hover { text-decoration: underline; }
+
+		.privacy-content {
+			padding: 38px 42px;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: var(--white);
+		}
+
+		.privacy-content section { scroll-margin-top: 100px; }
+		.privacy-content section + section { margin-top: 34px; padding-top: 30px; border-top: 1px solid var(--line); }
+		.privacy-content h2 { margin-bottom: 12px; font-size: 1.35rem; }
+		.privacy-content p { margin: 0 0 12px; color: var(--muted); }
+		.privacy-content ul { margin: 0 0 12px; padding-left: 22px; color: var(--muted); }
+		.privacy-content li + li { margin-top: 7px; }
+		.privacy-content a { color: var(--green-dark); font-weight: 700; }
+		.privacy-content a:hover { text-decoration: underline; }
+
+		.privacy-note {
+			margin-top: 36px;
+			padding: 16px 18px;
+			border-radius: 7px;
+			color: var(--green-dark);
+			background: var(--mint);
+			font-size: .9rem;
+		}
+
+		.privacy-footer { padding: 24px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: .88rem; }
+		.privacy-footer .container { display: flex; justify-content: space-between; gap: 20px; }
+
+		@media (max-width: 800px) {
+			.nav-links { gap: 16px; }
+			.privacy-layout { grid-template-columns: 1fr; gap: 28px; }
+			.privacy-index { position: static; }
+			.privacy-index a { display: inline-block; margin-right: 15px; }
+		}
+
+		@media (max-width: 620px) {
+			.container { width: min(100% - 28px, 720px); }
+			.nav-links { display: none; }
+			.privacy-hero { padding: 52px 0 38px; }
+			.privacy-content { padding: 28px 20px; }
+			.privacy-footer .container { align-items: flex-start; flex-direction: column; gap: 5px; }
+		}
+	</style>
+</head>
+<body class="privacy-page">
+	<header class="header">
+		<div class="container nav">
+			<a class="brand" href="Index.html#inicio" aria-label="Doctoc Health, inicio">
+				<img src="img/logo.png" alt="Logo de Doctoc Health" class="brand-logo">
+				doctoc health
+			</a>
+
+			<!-- Esta navegación replica las rutas principales de Index.html. -->
+			<nav class="nav-links" aria-label="Navegación principal">
+				<div class="dropdown">
+					<a href="Index.html#funciones" class="dropdown-toggle">Funciones <span class="arrow">⌄</span></a>
+					<div class="dropdown-menu">
+						<a href="sub/historia-clinica.html">Historia Clínica</a>
+						<a href="sub/agenda.html">Agenda</a>
+						<a href="sub/finanzas.html">Finanzas</a>
+					</div>
+				</div>
+				<a href="sub/nosotros.html">Nosotros</a>
+				<a href="sub/blog.html">Blog</a>
+				<a href="sub/soporte.html">Soporte</a>
+				<a class="button button-login" href="ingresar.html">Ingresar</a>
+				<a class="button button-register" href="registrarse.html">Registrarse</a>
+			</nav>
+		</div>
+	</header>
+
+	<main>
+		<section class="privacy-hero">
+			<div class="container">
+				<p class="eyebrow">Información legal</p>
+				<h1>Política de privacidad</h1>
+				<p>En Doctoc Health nos tomamos en serio la privacidad. Esta política explica qué información podemos recopilar, para qué la utilizamos y cuáles son tus opciones.</p>
+			</div>
+		</section>
+
+		<div class="container privacy-layout">
+			<aside class="privacy-index" aria-label="Índice de la política de privacidad">
+				<strong>En este documento</strong>
+				<a href="#alcance">1. Alcance</a>
+				<a href="#recopilacion">2. Datos que recopilamos</a>
+				<a href="#finalidades">3. Para qué usamos los datos</a>
+				<a href="#salud">4. Datos de salud</a>
+				<a href="#compartir">5. Compartir información</a>
+				<a href="#cookies">6. Cookies</a>
+				<a href="#seguridad">7. Seguridad y conservación</a>
+				<a href="#derechos">8. Tus derechos</a>
+				<a href="#cambios">9. Cambios y contacto</a>
+			</aside>
+
+			<article class="privacy-content">
+				<section id="alcance">
+					<h2>1. Alcance</h2>
+					<p>Esta política aplica a los sitios web, formularios y servicios digitales operados por Doctoc Health. Al utilizar la plataforma, reconoces que has leído esta política y aceptas el tratamiento de información descrito en ella.</p>
+					<p>La entidad responsable, domicilio, autoridad de control y requisitos específicos pueden variar según el país donde se utilice el servicio.</p>
+				</section>
+
+				<section id="recopilacion">
+					<h2>2. Datos que recopilamos</h2>
+					<p>Podemos recopilar la información que nos proporcionas directamente, la que se genera al utilizar el servicio y la que nos entrega la institución que administra tu cuenta.</p>
+					<ul>
+						<li>Datos de cuenta: nombre, correo electrónico, teléfono y credenciales de acceso.</li>
+						<li>Datos de la organización: clínica, especialidad, roles y preferencias de configuración.</li>
+						<li>Datos de uso: acciones dentro de la plataforma, dispositivo, navegador, dirección IP y registros técnicos.</li>
+						<li>Mensajes y solicitudes que envías al equipo de soporte.</li>
+					</ul>
+				</section>
+
+				<section id="finalidades">
+					<h2>3. Para qué usamos los datos</h2>
+					<p>Usamos la información para prestar, mantener y mejorar el servicio, gestionar las cuentas y responder consultas. También podemos utilizarla para:</p>
+					<ul>
+						<li>Autenticar usuarios y proteger las cuentas contra accesos no autorizados.</li>
+						<li>Enviar avisos operativos, actualizaciones y comunicaciones relacionadas con el servicio.</li>
+						<li>Detectar errores, abusos, fraudes o incidentes de seguridad.</li>
+						<li>Cumplir obligaciones legales y atender solicitudes de autoridades competentes.</li>
+					</ul>
+				</section>
+
+				<section id="salud">
+					<h2>4. Información relacionada con la salud</h2>
+					<p>La información clínica puede contener datos sensibles y debe registrarse únicamente cuando exista autorización y una base legal válida. La clínica y los profesionales que utilizan el servicio son responsables de la exactitud, confidencialidad y legalidad de esos datos.</p>
+					<p>Doctoc Health utiliza la información clínica para proporcionar las funciones contratadas y según las instrucciones de la institución responsable. No utilizamos estos datos para publicidad dirigida sin autorización válida.</p>
+				</section>
+
+				<section id="compartir">
+					<h2>5. Cuándo compartimos información</h2>
+					<p>No vendemos información personal. Podemos compartirla únicamente cuando sea necesario para prestar el servicio o cuando exista una obligación válida para hacerlo, por ejemplo:</p>
+					<ul>
+						<li>Con proveedores tecnológicos que alojan, mantienen o protegen la plataforma.</li>
+						<li>Con administradores autorizados de la clínica u organización correspondiente.</li>
+						<li>Para cumplir una ley, orden judicial o requerimiento oficial.</li>
+						<li>Para proteger los derechos, seguridad y propiedad de usuarios o de Doctoc Health.</li>
+					</ul>
+				</section>
+
+				<section id="cookies">
+					<h2>6. Cookies y tecnologías similares</h2>
+					<p>Podemos utilizar cookies necesarias para mantener la sesión, recordar preferencias y proteger el servicio. También podríamos utilizar herramientas de medición para comprender el uso de la plataforma y mejorarla.</p>
+					<p>Puedes administrar o bloquear cookies desde la configuración de tu navegador. Algunas funciones podrían no operar correctamente si desactivas las cookies necesarias.</p>
+				</section>
+
+				<section id="seguridad">
+					<h2>7. Seguridad y conservación</h2>
+					<p>Aplicamos medidas técnicas y organizativas razonables para proteger la información contra pérdida, acceso no autorizado, alteración o divulgación. Ningún sistema conectado a internet puede garantizar seguridad absoluta.</p>
+					<p>Conservamos la información durante el tiempo necesario para prestar el servicio, cumplir obligaciones legales, resolver disputas y hacer valer acuerdos. Los periodos concretos pueden depender del tipo de dato y de la relación con la clínica.</p>
+				</section>
+
+				<section id="derechos">
+					<h2>8. Tus derechos</h2>
+					<p>Según la legislación aplicable, puedes solicitar acceso, corrección, actualización, eliminación, limitación u oposición al tratamiento de tus datos, así como la portabilidad cuando corresponda.</p>
+					<p>Para proteger la información, podemos solicitar datos que permitan verificar tu identidad. Si tu cuenta pertenece a una clínica, algunas solicitudes deberán gestionarse con la institución administradora.</p>
+				</section>
+
+				<section id="cambios">
+					<h2>9. Cambios y contacto</h2>
+					<p>Podemos actualizar esta política para reflejar cambios legales, técnicos o del servicio. Publicaremos la versión vigente en esta página y actualizaremos la fecha indicada a continuación.</p>
+					<p>Para preguntas, solicitudes sobre tus datos o reportes de privacidad, escríbenos a <a href="mailto:soporte@doctoc.health">soporte@doctoc.health</a>.</p>
+					<p><strong>Última actualización:</strong> 20 de agosto de 2026</p>
+				</section>
+
+				<!-- Este aviso recuerda que la política debe ajustarse a la legislación del país antes de publicarse. -->
+				<p class="privacy-note"><strong>Nota:</strong> Este documento es una plantilla general de referencia y debe ser revisado y adaptado por un profesional legal y de privacidad según el país, el tipo de datos tratados y el modelo de negocio.</p>
+			</article>
+		</div>
+	</main>
+
+	<footer class="privacy-footer">
+		<div class="container">
+			<span>© 2026 Doctoc Health</span>
+			<a href="terminos-condiciones.html">Términos y condiciones</a>
+		</div>
+	</footer>
+</body>
+</html>

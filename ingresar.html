@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Ingresar | Doctoc Health</title>
+	<meta name="description" content="Ingresa a tu cuenta de Doctoc Health.">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="styles.css">
+	<style>
+		.login-page {
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+			background: radial-gradient(circle at 85% 15%, #e6f4eb 0, transparent 35%);
+		}
+
+		.login-header {
+			padding: 22px 0;
+			border-bottom: 1px solid var(--line);
+			background: rgba(251, 250, 245, .9);
+		}
+
+		.login-header .container {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 20px;
+		}
+
+		.back-link {
+			color: var(--muted);
+			font-size: .95rem;
+		}
+
+		.back-link:hover { color: var(--green-dark); }
+
+		.login-main {
+			flex: 1;
+			display: grid;
+			place-items: center;
+			padding: 56px 0;
+		}
+
+		.login-card {
+			width: min(100%, 440px);
+			padding: 40px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--white);
+			box-shadow: 0 18px 50px rgba(33, 96, 79, .1);
+		}
+
+		.login-card h1 {
+			margin-bottom: 10px;
+			font-size: 2rem;
+		}
+
+		.login-intro {
+			margin-bottom: 28px;
+			color: var(--muted);
+		}
+
+		.login-form { display: grid; gap: 18px; }
+
+		.field { display: grid; gap: 7px; }
+
+		.field label { font-weight: 700; font-size: .92rem; }
+
+		.field input {
+			width: 100%;
+			padding: 13px 14px;
+			border: 1px solid #c8d9d2;
+			border-radius: 7px;
+			color: var(--ink);
+			background: var(--cream);
+			font: inherit;
+			outline: none;
+		}
+
+		.field input:focus {
+			border-color: var(--green);
+			box-shadow: 0 0 0 3px var(--mint);
+		}
+
+		.login-options {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 12px;
+			font-size: .9rem;
+		}
+
+		.remember { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+		.remember input { accent-color: var(--green); }
+		.forgot-link { color: var(--green-dark); font-weight: 700; }
+		.forgot-link:hover { text-decoration: underline; }
+		.login-submit { width: 100%; margin-top: 4px; }
+
+		.register-prompt {
+			margin: 26px 0 0;
+			color: var(--muted);
+			text-align: center;
+			font-size: .92rem;
+		}
+
+		.register-prompt a { color: var(--green-dark); font-weight: 700; }
+
+		@media (max-width: 520px) {
+			.container { width: min(100% - 28px, 440px); }
+			.login-card { padding: 28px 22px; }
+			.login-options { align-items: flex-start; flex-direction: column; }
+		}
+	</style>
+</head>
+<body class="login-page">
+	<header class="login-header">
+		<div class="container">
+			<a class="brand" href="index.html" aria-label="Doctoc Health, inicio">
+				<img src="img/logo.png" alt="Logo de Doctoc Health" class="brand-logo">
+				doctoc health
+			</a>
+			<a class="back-link" href="index.html">Volver al inicio</a>
+		</div>
+	</header>
+
+	<main class="login-main">
+		<section class="login-card" aria-labelledby="login-title">
+			<p class="eyebrow">Bienvenido de nuevo</p>
+			<h1 id="login-title">Iniciar sesión</h1>
+			<p class="login-intro">Ingresa tus datos para acceder a tu cuenta.</p>
+
+			<form class="login-form" action="#" method="post">
+				<div class="field">
+					<label for="email">Correo electrónico</label>
+					<input type="email" id="email" name="email" autocomplete="email" placeholder="tu@correo.com" required>
+				</div>
+
+				<div class="field">
+					<label for="password">Contraseña</label>
+					<input type="password" id="password" name="password" autocomplete="current-password" placeholder="Ingresa tu contraseña" required>
+				</div>
+
+				<div class="login-options">
+					<label class="remember" for="remember">
+						<input type="checkbox" id="remember" name="remember">
+						Recordar sesión
+					</label>
+					<a class="forgot-link" href="mailto:soporte@doctoc.health?subject=Recuperar%20contraseña">¿Olvidaste tu contraseña?</a>
+				</div>
+
+				<button class="button login-submit" type="submit">Iniciar sesión</button>
+			</form>
+
+			<p class="register-prompt">¿Aún no tienes una cuenta? <a href="registrarse.html">Regístrate</a></p>
+		</section>
+	</main>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctoc Health | Gestión clínica sencilla</title>
+  <meta name="description" content="La forma sencilla de organizar tu clínica y cuidar mejor a tus pacientes.">
+  
+  <!-- Preconexión para cargar las fuentes de Google más rápido -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- AQUÍ ENLAZAMOS TU NUEVO ARCHIVO CSS EXTERNO -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  
+  <!-- HEADER: Contiene la barra de navegación -->
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="#inicio" aria-label="Doctoc Health, inicio">
+        <!-- 
+            Usa la etiqueta <img> para tu logo. 
+            En el atributo "src" debes poner la ruta de tu imagen. 
+            Si la descargaste en tu carpeta, pon el nombre del archivo.
+        -->
+        <img src="img/logo.png" alt="Logo de Doctoc Health" class="brand-logo">
+        doctoc health
+        </a>
+      
+      <!-- Navegación principal (se oculta en móviles) -->
+<nav class="nav-links" aria-label="Navegación principal">
+    <!-- Menú desplegable -->
+        <div class="dropdown">
+            <a href="#funciones" class="dropdown-toggle">
+                Funciones <span class="arrow">⌄</span>
+            </a>
+
+            <div class="dropdown-menu">
+                <a href="sub/historia-clinica.html">Historia Clínica</a>
+                <a href="sub/agenda.html">Agenda</a>
+                <a href="sub/finanzas.html">Finanzas</a>
+            </div>
+        </div>
+
+    <a href="sub/nosotros.html">Nosotros</a>
+
+    <a href="sub/blog.html">Blog</a>
+
+    <a href="sub/soporte.html">Soporte</a>
+
+    <!-- Botones independientes -->
+    <a class="button button-login" href="ingresar.html">
+        Ingresar
+    </a>
+
+    <a class="button button-register" href="registrarse.html">
+        Registrarse
+    </a>
+
+</nav>
+    </div>
+  </header>
+
+  <!-- MAIN: Etiqueta semántica que indica el contenido principal de la página -->
+  <main>
+    
+    <!-- SECCIÓN HERO: La primera vista que tiene el usuario al entrar -->
+    <section class="hero" id="inicio">
+      <div class="container hero-grid">
+        <!-- Bloque de texto del Hero -->
+        <div class="hero-content">
+          <p class="eyebrow">Tecnología para cuidar mejor</p>
+          <h1>Tu clínica, más simple y organizada.</h1>
+          <p class="hero-copy">Gestiona pacientes, historias clínicas y citas desde un solo lugar. Menos tiempo en tareas administrativas, más tiempo para tus pacientes.</p>
+          
+          <div class="hero-actions">
+            <a class="button" href="#contacto">Quiero conocerlo</a>
+            <a class="button button-light" href="#servicios">Ver servicios</a>
+          </div>
+        </div>
+        
+        <!-- Bloque de imagen del Hero -->
+        <div class="hero-image">
+          <img src="img/Personal-organizado.jpg" alt="Profesional de salud atendiendo una consulta">
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN SERVICIOS: Grilla con las características principales -->
+    <section class="services" id="servicios">
+      <div class="container">
+        
+        <div class="section-heading">
+          <p class="eyebrow">Todo en un solo lugar</p>
+          <h2>Lo esencial para tu día a día</h2>
+          <p>Herramientas claras para que tu equipo trabaje con menos fricción.</p>
+        </div>
+        
+        <!-- Contenedor que usará CSS Grid para alinear las tarjetas -->
+        <div class="service-grid">
+          <!-- Tarjeta 1 -->
+          <article class="service">
+            <div class="service-icon">⌕</div>
+            <h3>Historia clínica</h3>
+            <p>Consulta la información de tus pacientes de forma rápida y segura.</p>
+          </article>
+          
+          <!-- Tarjeta 2 -->
+          <article class="service">
+            <div class="service-icon">□</div>
+            <h3>Agenda inteligente</h3>
+            <p>Organiza tus citas y mantén tu calendario siempre actualizado.</p>
+          </article>
+          
+          <!-- Tarjeta 3 -->
+          <article class="service">
+            <div class="service-icon">✓</div>
+            <h3>Equipo conectado</h3>
+            <p>Centraliza el trabajo de tu clínica y toma mejores decisiones.</p>
+          </article>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECCIÓN CONTACTO: Llamado a la acción (Call to action) -->
+    <section class="contact" id="contacto">
+      <div class="container">
+        <div class="contact-box">
+          <div class="contact-text">
+            <h2>¿Hablamos?</h2>
+            <p>Cuéntanos sobre tu clínica y te mostraremos cómo empezar hoy mismo.</p>
+          </div>
+          <a class="button button-inverted" href="mailto:hola@doctoc.health">Escribir ahora</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER: Pie de página -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <span>© 2026 Doctoc Health</span>
+      <span>Salud más humana, gestión más simple.</span>
+    </div>
+  </footer>
+
+</body>
+</html>
