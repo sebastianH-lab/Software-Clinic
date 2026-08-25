@@ -1,1 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Nosotros | Doctoc Health</title>
+	<meta name="description" content="Conoce la misión, el equipo y los valores de Doctoc Health.">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../styles.css">
+	<style>
+		.about-page { min-height: 100vh; background: var(--cream); }
 
+		.about-hero {
+			padding: 82px 0 100px;
+			background: radial-gradient(circle at 82% 15%, #e6f4eb 0, transparent 38%);
+		}
+
+		.about-hero-grid {
+			display: grid;
+			grid-template-columns: 1fr .92fr;
+			align-items: center;
+			gap: 70px;
+		}
+
+		.about-hero h1 { max-width: 650px; font-size: clamp(2.8rem, 5vw, 4.8rem); }
+		.about-lead { max-width: 550px; margin: 24px 0 30px; color: var(--muted); font-size: 1.1rem; }
+		.about-hero-image { position: relative; }
+		.about-hero-image img { display: block; width: 100%; height: 470px; object-fit: cover; border-radius: 20px; box-shadow: -20px 20px 0 var(--mint); }
+
+		.mission { padding: 96px 0; background: var(--white); }
+		.mission-grid { display: grid; grid-template-columns: .7fr 1.3fr; gap: 80px; align-items: start; }
+		.mission h2, .team-heading h2, .values-heading h2, .about-cta h2 { font-size: clamp(2rem, 4vw, 3rem); }
+		.mission-copy { max-width: 680px; color: var(--muted); font-size: 1.12rem; }
+		.mission-copy p + p { margin-top: 20px; }
+
+		.team { padding: 96px 0; }
+		.team-heading { max-width: 620px; margin-bottom: 42px; }
+		.team-heading p, .values-heading p { margin-top: 14px; color: var(--muted); }
+		.team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+		.team-card { padding: 28px; border: 1px solid var(--line); border-radius: 10px; background: var(--white); }
+		.team-avatar { display: grid; place-items: center; width: 64px; height: 64px; margin-bottom: 22px; border-radius: 50%; color: var(--white); background: var(--green); font-family: Manrope, sans-serif; font-size: 1.2rem; font-weight: 800; }
+		.team-card h3 { font-family: Manrope, sans-serif; font-size: 1.15rem; }
+		.team-role { margin: 3px 0 14px; color: var(--green); font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+		.team-card p:last-child { color: var(--muted); font-size: .94rem; }
+
+		.values { padding: 96px 0; background: var(--white); }
+		.values-heading { max-width: 610px; margin-bottom: 40px; }
+		.values-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+		.value { padding: 22px 18px; border-top: 3px solid var(--green); background: var(--cream); }
+		.value h3 { margin-bottom: 10px; font-family: Manrope, sans-serif; font-size: 1rem; }
+		.value p { color: var(--muted); font-size: .9rem; }
+
+		.about-cta { padding: 86px 0 100px; }
+		.about-cta-box { display: flex; justify-content: space-between; align-items: center; gap: 35px; padding: 50px; border-radius: 20px; color: var(--white); background: var(--green-dark); background-image: linear-gradient(135deg, var(--green-dark), var(--green)); }
+		.about-cta h2 { color: var(--white); }
+		.about-cta p { max-width: 600px; margin-top: 12px; color: var(--mint); font-size: 1.1rem; }
+		.about-cta .button { flex-shrink: 0; color: var(--green-dark); border-color: var(--white); background: var(--white); }
+
+		.about-footer { padding: 28px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+		.about-footer .container { display: flex; justify-content: space-between; gap: 20px; }
+
+		@media (max-width: 850px) {
+			.nav-links { gap: 16px; }
+			.about-hero-grid, .mission-grid { grid-template-columns: 1fr; gap: 45px; }
+			.team-grid { grid-template-columns: repeat(2, 1fr); }
+			.values-grid { grid-template-columns: repeat(2, 1fr); }
+			.about-hero-image { max-width: 620px; }
+		}
+
+		@media (max-width: 620px) {
+			.container { width: min(100% - 28px, 1100px); }
+			.nav-links { display: none; }
+			.about-hero { padding: 58px 0 75px; }
+			.about-hero-image img { height: 330px; box-shadow: 0 18px 0 var(--mint); }
+			.team-grid, .values-grid { grid-template-columns: 1fr; }
+			.about-cta-box { align-items: flex-start; flex-direction: column; padding: 32px 24px; }
+			.about-footer .container { align-items: flex-start; flex-direction: column; gap: 5px; }
+		}
+	</style>
+</head>
+<body class="about-page">
+	<header class="header">
+		<div class="container nav">
+			<a class="brand" href="../Index.html#inicio" aria-label="Doctoc Health, inicio">
+				<img src="../img/logo.png" alt="Logo de Doctoc Health" class="brand-logo">
+				doctoc health
+			</a>
+
+			<!-- La navegación mantiene las rutas principales del Index.html. -->
+			<nav class="nav-links" aria-label="Navegación principal">
+				<div class="dropdown">
+					<a href="../Index.html#funciones" class="dropdown-toggle">Funciones <span class="arrow">⌄</span></a>
+					<div class="dropdown-menu">
+						<a href="historia-clinica.html">Historia Clínica</a>
+						<a href="agenda.html">Agenda</a>
+						<a href="finanzas.html">Finanzas</a>
+					</div>
+				</div>
+				<a href="nosotros.html" aria-current="page">Nosotros</a>
+				<a href="blog.html">Blog</a>
+				<a href="soporte.html">Soporte</a>
+				<a class="button button-login" href="../ingresar.html">Ingresar</a>
+				<a class="button button-register" href="../registrarse.html">Registrarse</a>
+			</nav>
+		</div>
+	</header>
+
+	<main>
+		<section class="about-hero">
+			<div class="container about-hero-grid">
+				<div>
+					<p class="eyebrow">Sobre nosotros</p>
+					<h1>La salud como debe ser.</h1>
+					<p class="about-lead">El avance en la atención médica ha mejorado la calidad de vida de las personas. En Doctoc Health trabajamos para que la tecnología también mejore la relación entre médicos y pacientes.</p>
+					<a class="button" href="#mision">Conoce nuestra misión</a>
+				</div>
+				<div class="about-hero-image">
+					<img src="../img/personal-escuchando.jpg" alt="Profesional de la salud organizando su trabajo">
+				</div>
+			</div>
+		</section>
+
+		<section class="mission" id="mision">
+			<div class="container mission-grid">
+				<div>
+					<p class="eyebrow">Nuestra misión</p>
+					<h2>Más tiempo para lo humano.</h2>
+				</div>
+				<div class="mission-copy">
+					<p>Crear un ecosistema que conecte a médicos con sus pacientes para brindar la mejor atención con la mejor tecnología.</p>
+					<p>Queremos democratizar el acceso a servicios de salud de calidad, facilitando una atención médica integral, eficiente y personalizada.</p>
+					<p>Nuestro trabajo se centra en ayudar a los profesionales de la salud a dejar atrás el papeleo y concentrarse en lo que realmente importa: cuidar a sus pacientes.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="team" id="equipo">
+			<div class="container">
+				<div class="team-heading">
+					<p class="eyebrow">Conoce a</p>
+					<h2>Nuestro equipo</h2>
+					<p>Personas apasionadas por construir herramientas que ayuden a los profesionales de la salud a hacer lo correcto por sus pacientes.</p>
+				</div>
+				<div class="team-grid">
+					<article class="team-card">
+						<div class="team-avatar">DM</div>
+						<h3>Diego Malpartida</h3>
+						<p class="team-role">CEO</p>
+						<p>Médico enfocado en la transformación digital de la salud y en crear mejores experiencias para pacientes y profesionales.</p>
+					</article>
+					<article class="team-card">
+						<div class="team-avatar">SV</div>
+						<h3>Santiago Velásquez</h3>
+						<p class="team-role">UX &amp; UI</p>
+						<p>Diseñador especializado en experiencias digitales simples, claras y centradas en las personas.</p>
+					</article>
+					<article class="team-card">
+						<div class="team-avatar">JR</div>
+						<h3>José David Romero</h3>
+						<p class="team-role">CTO</p>
+						<p>Apasionado por la tecnología y su capacidad para resolver problemas y mejorar la calidad de vida.</p>
+					</article>
+				</div>
+			</div>
+		</section>
+
+		<section class="values" id="valores">
+			<div class="container">
+				<div class="values-heading">
+					<p class="eyebrow">Nuestros valores</p>
+					<h2>Empoderamos a los médicos para brindar la mejor atención.</h2>
+					<p>Estos principios guían cada decisión que tomamos.</p>
+				</div>
+				<div class="values-grid">
+					<article class="value"><h3>Los doctores primero</h3><p>Diseñamos para médicos y sus flujos de trabajo reales.</p></article>
+					<article class="value"><h3>Diseño humano</h3><p>La tecnología debe adaptarse a la vida de las personas.</p></article>
+					<article class="value"><h3>Empatía</h3><p>Escuchamos a médicos y pacientes para crear soluciones útiles.</p></article>
+					<article class="value"><h3>Consentimiento</h3><p>La privacidad y el control sobre la información son fundamentales.</p></article>
+					<article class="value"><h3>Colaboración</h3><p>Combinamos fortalezas para construir una mejor salud.</p></article>
+				</div>
+			</div>
+		</section>
+
+		<section class="about-cta">
+			<div class="container">
+				<div class="about-cta-box">
+					<div>
+						<h2>¿Qué estás esperando?</h2>
+						<p>Digitaliza tu consultorio y atiende a tus pacientes con tecnología pensada para ti.</p>
+					</div>
+					<a class="button" href="../registrarse.html">Regístrate</a>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<footer class="about-footer">
+		<div class="container">
+			<span>© 2026 Doctoc Health</span>
+			<a href="../politica-privacidad.html">Política de privacidad</a>
+		</div>
+	</footer>
+</body>
+</html>
