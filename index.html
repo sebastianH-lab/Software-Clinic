@@ -28,9 +28,13 @@
         <img src="img/logo.png" alt="Logo de Doctoc Health" class="brand-logo">
         doctoc health
         </a>
+
+      <button class="mobile-menu-toggle" type="button" aria-controls="main-navigation" aria-expanded="false">
+        <span class="mobile-menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
       
       <!-- Navegación principal (se oculta en móviles) -->
-<nav class="nav-links" aria-label="Navegación principal">
+<nav class="nav-links" id="main-navigation" aria-label="Navegación principal">
     <!-- Menú desplegable -->
         <div class="dropdown">
             <a href="#funciones" class="dropdown-toggle">
@@ -62,6 +66,25 @@
 </nav>
     </div>
   </header>
+
+  <script>
+    const menuToggle = document.querySelector('.mobile-menu-toggle');
+    const mainNavigation = document.querySelector('#main-navigation');
+
+    menuToggle.addEventListener('click', () => {
+      const isOpen = mainNavigation.classList.toggle('is-open');
+      menuToggle.setAttribute('aria-expanded', String(isOpen));
+      menuToggle.classList.toggle('is-open', isOpen);
+    });
+
+    mainNavigation.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        mainNavigation.classList.remove('is-open');
+        menuToggle.classList.remove('is-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  </script>
 
   <!-- MAIN: Etiqueta semántica que indica el contenido principal de la página -->
   <main>
