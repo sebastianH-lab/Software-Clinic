@@ -1,1 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Blog | Doctoc Health</title>
+	<meta name="description" content="Publicaciones y novedades de Doctoc Health para profesionales de la salud.">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../styles.css">
+	<style>
+		.blog-page { min-height: 100vh; background: var(--cream); }
 
+		.blog-hero {
+			padding: 82px 0 74px;
+			background: radial-gradient(circle at 84% 18%, #e6f4eb 0, transparent 38%);
+		}
+
+		.blog-hero h1 { max-width: 650px; font-size: clamp(2.8rem, 5vw, 4.7rem); }
+		.blog-lead { max-width: 600px; margin-top: 22px; color: var(--muted); font-size: 1.1rem; }
+
+		.posts-section { padding: 82px 0 100px; background: var(--white); }
+		.posts-heading { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 42px; }
+		.posts-heading h2 { font-size: clamp(2rem, 4vw, 3rem); }
+		.posts-heading p { max-width: 360px; color: var(--muted); }
+
+		.posts-list { display: grid; gap: 24px; }
+		.post-card {
+			display: grid;
+			grid-template-columns: minmax(250px, .72fr) 1.28fr;
+			min-height: 260px;
+			overflow: hidden;
+			border: 1px solid var(--line);
+			border-radius: 10px;
+			background: var(--cream);
+			transition: transform .25s ease, box-shadow .25s ease;
+			color: inherit;
+			text-decoration: none;
+		}
+
+		.post-card:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(23, 53, 50, .08); }
+		.post-image { width: 100%; height: 100%; min-height: 260px; object-fit: cover; }
+		.post-content { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 34px 38px; }
+		.post-category { margin-bottom: 13px; color: var(--green); font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+		.post-content h3 { margin-bottom: 12px; font-family: Manrope, sans-serif; font-size: clamp(1.35rem, 2.5vw, 1.8rem); line-height: 1.2; }
+		.post-summary { max-width: 620px; color: var(--muted); }
+		.post-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; color: var(--green-dark); font-weight: 700; }
+		.post-link:hover { text-decoration: underline; }
+		.post-link::after { content: "→"; font-size: 1.2rem; }
+
+		.blog-cta { padding: 0 0 90px; background: var(--white); }
+		.blog-cta-box { display: flex; justify-content: space-between; align-items: center; gap: 35px; padding: 46px; border-radius: 16px; color: var(--white); background: var(--green-dark); background-image: linear-gradient(135deg, var(--green-dark), var(--green)); }
+		.blog-cta-box h2 { color: var(--white); font-size: 2rem; }
+		.blog-cta-box p { max-width: 540px; margin-top: 10px; color: var(--mint); }
+		.blog-cta-box .button { flex-shrink: 0; color: var(--green-dark); border-color: var(--white); background: var(--white); }
+
+		.blog-footer { padding: 28px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+		.blog-footer .container { display: flex; justify-content: space-between; gap: 20px; }
+
+		@media (max-width: 800px) {
+			.nav-links { gap: 16px; }
+			.post-card { grid-template-columns: 1fr; }
+			.post-image { height: 250px; min-height: 0; }
+		}
+
+		@media (max-width: 620px) {
+			.container { width: min(100% - 28px, 1100px); }
+			.nav-links { display: none; }
+			.blog-hero { padding: 58px 0 68px; }
+			.posts-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
+			.post-content { padding: 28px 22px; }
+			.blog-cta-box { align-items: flex-start; flex-direction: column; padding: 32px 24px; }
+			.blog-footer .container { align-items: flex-start; flex-direction: column; gap: 5px; }
+		}
+	</style>
+</head>
+<body class="blog-page">
+	<header class="header">
+		<div class="container nav">
+			<a class="brand" href="../index.html#inicio" aria-label="Doctoc Health, inicio">
+				<img src="../img/logo.png" alt="Logo de Doctoc Health" class="brand-logo">
+				doctoc health
+			</a>
+
+			<!-- La navegación conserva las mismas rutas principales del index.html. -->
+			<nav class="nav-links" aria-label="Navegación principal">
+				<div class="dropdown">
+					<a href="../index.html#funciones" class="dropdown-toggle">Funciones <span class="arrow">⌄</span></a>
+					<div class="dropdown-menu">
+						<a href="historia-clinica.html">Historia Clínica</a>
+						<a href="agenda.html">Agenda</a>
+						<a href="finanzas.html">Finanzas</a>
+					</div>
+				</div>
+				<a href="nosotros.html">Nosotros</a>
+				<a href="blog.html" aria-current="page">Blog</a>
+				<a href="soporte.html">Soporte</a>
+				<a class="button button-login" href="../ingresar.html">Ingresar</a>
+				<a class="button button-register" href="../registrarse.html">Registrarse</a>
+			</nav>
+		</div>
+	</header>
+
+	<main>
+		<section class="blog-hero">
+			<div class="container">
+				<p class="eyebrow">Ideas para cuidar mejor</p>
+				<h1>Historias, consejos y novedades.</h1>
+				<p class="blog-lead">Conoce las publicaciones de Doctoc Health sobre tecnología, organización y el futuro de la atención médica.</p>
+			</div>
+		</section>
+
+		<section class="posts-section" id="publicaciones">
+			<div class="container">
+				<div class="posts-heading">
+					<div>
+						<p class="eyebrow">Últimas publicaciones</p>
+						<h2>Lo que estamos compartiendo</h2>
+					</div>
+					<p>Una selección de contenidos para profesionales y equipos de salud.</p>
+				</div>
+
+				<div class="posts-list">
+					<!-- Para publicar: cambia únicamente el href de cada tarjeta por la URL de Facebook. -->
+					<a class="post-card" href="https://www.facebook.com/Rene.Neurorrehabilitacion?locale=es_LA" target="_blank" rel="noopener noreferrer" aria-label="Ver publicación: Más tiempo para tus pacientes">
+						<img class="post-image" src="../img/Personal-organizado.jpg" alt="Profesional de la salud organizando su trabajo">
+						<div class="post-content">
+							<p class="post-category">Gestión clínica</p>
+							<h3>Más tiempo para tus pacientes</h3>
+							<p class="post-summary">Descubre cómo una gestión clínica más ordenada puede ayudarte a reducir tareas repetitivas y concentrarte en la atención.</p>
+							<span class="post-link">Ver publicación</span>
+						</div>
+						</a>
+
+						<a class="post-card" href="https://www.facebook.com/Rene.Neurorrehabilitacion?locale=es_LA" target="_blank" rel="noopener noreferrer" aria-label="Ver publicación: La tecnología al servicio de la salud">
+							<img class="post-image" src="../img/paciente.jpg" alt="Paciente durante una atención médica">
+						<div class="post-content">
+							<p class="post-category">Atención médica</p>
+							<h3>La tecnología al servicio de la salud</h3>
+							<p class="post-summary">La innovación tiene sentido cuando facilita el trabajo del personal de salud y mejora la experiencia de cada paciente.</p>
+							<span class="post-link">Ver publicación</span>
+						</div>
+						</a>
+
+						<a class="post-card" href="https://www.facebook.com/Rene.Neurorrehabilitacion?locale=es_LA" target="_blank" rel="noopener noreferrer" aria-label="Ver publicación: Una historia clínica más clara">
+							<img class="post-image" src="../img/paciente 2.jpg" alt="Profesional conversando con un paciente">
+						<div class="post-content">
+							<p class="post-category">Historias clínicas</p>
+							<h3>Una historia clínica más clara</h3>
+							<p class="post-summary">Cuando la información está disponible y organizada, los equipos pueden tomar decisiones con más contexto y confianza.</p>
+							<span class="post-link">Ver publicación</span>
+						</div>
+						</a>
+
+						<a class="post-card" href="https://www.facebook.com/Rene.Neurorrehabilitacion?locale=es_LA" target="_blank" rel="noopener noreferrer" aria-label="Ver publicación: Escuchar también es cuidar">
+							<img class="post-image" src="../img/personal-escuchando.jpg" alt="Profesional de salud escuchando a un paciente">
+						<div class="post-content">
+							<p class="post-category">Experiencia del paciente</p>
+							<h3>Escuchar también es cuidar</h3>
+							<p class="post-summary">La atención humana comienza con una buena conversación. Te contamos cómo recuperar ese espacio en la consulta.</p>
+							<span class="post-link">Ver publicación</span>
+						</div>
+						</a>
+				</div>
+			</div>
+		</section>
+
+		<section class="blog-cta">
+			<div class="container">
+				<div class="blog-cta-box">
+					<div>
+						<h2>¿Quieres conocer Doctoc Health?</h2>
+						<p>Digitaliza tu consultorio y organiza tu atención médica desde un solo lugar.</p>
+					</div>
+					<a class="button" href="../registrarse.html">Crea tu cuenta</a>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<footer class="blog-footer">
+		<div class="container">
+			<span>© 2026 Doctoc Health</span>
+			<a href="../politica-privacidad.html">Política de privacidad</a>
+		</div>
+	</footer>
+</body>
+</html>
