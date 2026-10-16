@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Perfil de Paciente | RENE Health</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="paciente-detalle.css">
+	<link rel="stylesheet" href="../agenda.css">
+</head>
+<body class="dashboard-page">
+	<div class="dashboard-shell">
+		<aside class="sidebar" aria-label="Navegación principal">
+			<a class="agenda-brand" href="../pacientes.html"><span class="brand-mark">+</span><span>RENE <em>health</em></span></a>
+			<nav class="sidebar-nav">
+				<a class="sidebar-link active" href="pacientes.html" aria-current="page"><span class="nav-icon" aria-hidden="true">◉</span><span>Pacientes</span></a>
+				<a class="sidebar-link" href="sub/agenda.html"><span class="nav-icon" aria-hidden="true">▣</span><span>Agenda</span></a>
+				<a class="sidebar-link" href="sub/estadisticas.html"><span class="nav-icon" aria-hidden="true">↗</span><span>Estadísticas</span></a>
+				<a class="sidebar-link" href="sub/finanzas.html"><span class="nav-icon" aria-hidden="true">$</span><span>Finanzas</span></a>
+				<a class="sidebar-link" href="sub/soporte.html"><span class="nav-icon" aria-hidden="true">⚙</span><span>Ajustes</span></a>
+			</nav>
+			<div class="sidebar-spacer"></div>
+			<div class="sidebar-section-label">Soporte</div>
+			<a class="sidebar-link" href="sub/soporte.html"><span class="nav-icon" aria-hidden="true">?</span><span>Ayuda</span></a>
+			<div class="profile">
+				<div class="avatar" id="profile-avatar" aria-hidden="true">?</div>
+				<div class="profile-copy"><strong id="profile-name">Cargando...</strong><small>Administrador</small></div>
+			</div>
+			<button class="logout-button" id="logout-button" type="button"><span class="nav-icon" aria-hidden="true">↪</span><span>Cerrar sesión</span></button>
+		</aside>
+
+		<main class="dashboard-main">
+			<section class="content-panel patient-detail-container">
+				<!-- Migas de pan -->
+				<div class="breadcrumb">
+					<a href="pacientes.html">Pacientes</a> / <span id="bread-nombre">Cargando...</span>
+				</div>
+
+				<!-- Cabecera del Paciente -->
+				<div class="patient-header">
+					<div class="header-left">
+						<div class="avatar-large" id="patient-avatar">--</div>
+						<div>
+							<div class="name-row">
+								<h1 id="patient-name">Cargando...</h1>
+								<a href="#" class="link-perfil">Ver perfil completo</a>
+							</div>
+							<div class="patient-meta">
+								<span>📅 <span id="patient-gender-age">--</span></span>
+								<span>🪪 <span id="patient-dni">--</span></span>
+								<span>✉️ <span id="patient-email">--</span></span>
+							</div>
+						</div>
+					</div>
+					<div class="header-right">
+						<button class="btn-mic" type="button">🎙️</button>
+						<button class="btn-primary" id="new-attention-button" type="button">+ Nueva Atención</button>
+					</div>
+				</div>
+
+				<!-- Pestañas de navegación -->
+				<div class="tabs" role="tablist" aria-label="Secciones del paciente">
+					<button class="tab-btn active" id="resumen-tab" type="button" role="tab" aria-controls="tab-resumen" aria-selected="true">Resumen</button>
+					<button class="tab-btn" id="history-tab" type="button" role="tab" aria-controls="tab-historial" aria-selected="false">Historial</button>
+					<button class="tab-btn" id="finanzas-tab" type="button" role="tab" aria-controls="tab-finanzas" aria-selected="false">Finanzas</button>
+					<button class="tab-btn" id="agenda-tab" type="button" role="tab" aria-controls="tab-agenda" aria-selected="false">Agenda</button>
+					<button class="tab-btn" id="ajustes-tab" type="button" role="tab" aria-controls="tab-ajustes" aria-selected="false">Ajustes</button>
+				</div>
+
+				<div class="tab-panes">
+					<div id="tab-resumen" class="tab-pane active" role="tabpanel" aria-labelledby="resumen-tab">
+						<div class="dashboard-grid">
+							<div class="card latest-attention-card">
+								<div class="card-header"><h3>🩺 Última atención</h3><span class="badge-sub" id="latest-attention-date">Sin registro</span><span class="attention-edited-badge" id="latest-attention-edited-badge" hidden>Editado</span></div>
+								<div class="latest-attention-body" id="latest-attention-body"><p class="empty-text">Todavía no hay atenciones registradas.</p></div>
+							</div>
+						</div>
+					</div>
+
+					<div id="tab-historial" class="tab-pane" role="tabpanel" aria-labelledby="history-tab" hidden>
+						<section class="history-panel">
+							<div class="history-heading"><div><span class="drawer-kicker">Seguimiento clínico</span><h2>Historial de atenciones</h2></div><span id="history-count">0 consultas</span></div>
+							<div id="history-list" class="history-list"></div>
+						</section>
+					</div>
+
+					<div id="tab-finanzas" class="tab-pane" role="tabpanel" aria-labelledby="finanzas-tab" hidden>
+						<section class="patient-finance-panel">
+							<div class="history-heading"><div><span class="drawer-kicker">Cuenta del paciente</span><h2>Finanzas</h2></div><span id="patient-receipt-count">0 comprobantes</span></div>
+							<div class="patient-finance-summary">
+								<article><span>Total facturado</span><strong id="patient-finance-billed">S/. 0.00 · $ 0.00</strong></article>
+								<article><span>Total pagado</span><strong id="patient-finance-paid">S/. 0.00 · $ 0.00</strong></article>
+								<article><span>Saldo pendiente</span><strong id="patient-finance-pending">S/. 0.00 · $ 0.00</strong></article>
+							</div>
+							<div id="patient-finance-content"><p class="empty-text">Selecciona Finanzas para cargar los comprobantes.</p></div>
+						</section>
+					</div>
+
+					<div id="tab-agenda" class="tab-pane" role="tabpanel" aria-labelledby="agenda-tab" hidden>
+						<section class="patient-agenda-panel"><div class="history-heading"><div><span class="drawer-kicker">Citas médicas</span><h2>Agenda del paciente</h2></div><span id="agenda-count">0 citas</span></div><div id="patient-agenda-list" class="patient-agenda-list"><p class="empty-text">Selecciona Agenda para cargar las citas.</p></div></section>
+					</div>
+
+					<div id="tab-ajustes" class="tab-pane" role="tabpanel" aria-labelledby="ajustes-tab" hidden>
+						<section class="danger-zone-panel" id="archive-patient-zone">
+							<div><span class="danger-zone-kicker">Zona de peligro</span><h2>Archivar paciente</h2><p>El paciente será archivado del sistema y dejará de aparecer en la lista principal. Su historial se conservará por motivos legales.</p></div>
+							<button class="danger-zone-button" id="delete-patient-button" type="button">Archivar paciente</button>
+						</section>
+						<section class="recovery-zone-panel" id="restore-patient-zone" hidden>
+							<div><span class="recovery-zone-kicker">Paciente archivado</span><h2>Restaurar acceso clínico</h2><p>Este paciente no aparece en la lista activa. Puedes reactivarlo cuando regrese a la clínica.</p></div>
+							<button class="recovery-zone-button" id="restore-patient-button" type="button">Reactivar paciente</button>
+						</section>
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
+
+	<div class="drawer-backdrop" id="attention-backdrop" hidden></div>
+	<div class="attention-validation-toast" id="attention-validation-toast" role="alert" aria-live="assertive"></div>
+	<div class="detail-modal-backdrop" id="detail-modal-backdrop" hidden></div>
+	<article class="detail-modal" id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-modal-title" aria-hidden="true">
+		<header class="detail-modal-header">
+			<div><span class="drawer-kicker">Seguimiento clínico</span><h2 id="detail-modal-title">Detalle de la atención</h2><span class="attention-edited-badge" id="attention-edited-badge" hidden></span></div>
+			<div class="detail-modal-header-actions"><button class="detail-edit-button" id="edit-attention-button" type="button">Editar</button><button class="drawer-close" id="close-detail-modal" type="button" aria-label="Cerrar">&times;</button></div>
+		</header>
+		<div class="detail-modal-content" id="detail-modal-content"></div>
+		<footer class="detail-modal-footer" id="detail-modal-footer" hidden><button class="cancel-button" id="cancel-edit-attention" type="button">Cancelar</button><button class="btn-primary" id="save-edit-attention" type="button">Guardar cambios</button></footer>
+	</article>
+	<aside class="attention-drawer" id="attention-drawer" aria-labelledby="attention-title" aria-hidden="true">
+		<div class="attention-drawer-header">
+			<div>
+				<span class="drawer-kicker">Nueva consulta</span>
+				<h2 id="attention-title">Atención de paciente</h2>
+			</div>
+			<button class="drawer-close" id="close-attention-button" type="button" aria-label="Cerrar">&times;</button>
+		</div>
+		<nav class="attention-steps" aria-label="Pasos de la atención">
+			<button class="attention-step active" type="button" data-step="anamnesis">Anamnesis</button>
+			<button class="attention-step" type="button" data-step="examen">EF</button>
+			<button class="attention-step" type="button" data-step="diagnostico">Dx</button>
+			<button class="attention-step" type="button" data-step="plan">PI</button>
+		</nav>
+		<form class="attention-form" id="attention-form">
+			<section class="attention-section active" data-section="anamnesis">
+				<div class="drawer-section-heading"><h3>Anamnesis</h3><span>01 / 04</span></div>
+				<label class="drawer-label" for="relato-editor">Relato</label>
+				<div class="rich-editor">
+					<div class="editor-toolbar" aria-label="Formato del relato">
+						<button type="button" data-command="bold"><strong>B</strong></button>
+						<button type="button" data-command="italic"><em>I</em></button>
+						<button type="button" data-command="formatBlock" data-value="h1">H1</button>
+						<button type="button" data-command="formatBlock" data-value="h2">H2</button>
+						<button type="button" data-command="insertUnorderedList">&#8226; Lista</button>
+						<button type="button" data-command="insertOrderedList">1. Lista</button>
+					</div>
+					<div id="relato-editor" class="editor-content" contenteditable="true" role="textbox" aria-label="Relato de la consulta" data-placeholder="Describe el motivo de consulta, síntomas y antecedentes relevantes..."></div>
+				</div>
+				<label class="drawer-label" for="attention-files">Archivos</label>
+				<label class="file-dropzone" for="attention-files"><span class="dropzone-icon">＋</span><strong>Arrastra archivos aquí</strong><small>o haz clic para seleccionar imágenes y documentos</small><input id="attention-files" type="file" multiple></label>
+				<div class="selected-files" id="selected-files"></div>
+			</section>
+
+			<section class="attention-section" data-section="examen" hidden>
+				<div class="drawer-section-heading"><h3>Examen físico</h3><span>02 / 04</span></div>
+				<p class="drawer-hint">Registra las funciones vitales tomadas durante la consulta.</p>
+				<div class="vitals-grid">
+					<label class="drawer-field">P. Arterial <span>mmHg</span><input name="pa_presion" type="text" inputmode="numeric" placeholder="Ej:120/80"></label>
+					<label class="drawer-field">F. cardiaca <span>lpm</span><input name="f_cardiaca" type="number" min="0" placeholder="Ej:72"></label>
+					<label class="drawer-field">F. respiratoria <span>rpm</span><input name="f_respiratoria" type="number" min="0" placeholder="Ej:16"></label>
+					<label class="drawer-field">Saturación <span>%</span><input name="saturacion" type="number" min="0" max="100" placeholder="Ej:98"></label>
+					<label class="drawer-field">Temperatura <span>°C</span><input name="temperatura" type="number" min="25" max="45" step="0.1" placeholder="Ej:36.5"></label>
+				</div>
+			</section>
+
+			<section class="attention-section" data-section="diagnostico" hidden>
+				<div class="drawer-section-heading"><h3>Diagnósticos</h3><span>03 / 04</span></div>
+				<div class="dynamic-list" id="diagnosis-list"></div>
+				<button class="add-row-button" id="add-diagnosis-button" type="button">＋ Agregar diagnóstico</button>
+			</section>
+
+			<section class="attention-section" data-section="plan" hidden>
+				<div class="drawer-section-heading"><h3>Plan e indicaciones</h3><span>04 / 04</span></div>
+				<label class="drawer-field">Plan de tratamiento<textarea name="plan_tratamiento" rows="3" placeholder="Indicaciones generales y objetivos del tratamiento..."></textarea></label>
+				<label class="drawer-field">Exámenes auxiliares<textarea name="examenes_auxiliares" rows="3" placeholder="Laboratorio, imágenes u otros estudios..."></textarea></label>
+				<div class="subsection-heading"><h4>Tratamiento / Receta</h4><button class="add-row-button compact" id="add-treatment-button" type="button">＋ Agregar tratamiento</button></div>
+				<div class="dynamic-list" id="treatment-list"></div>
+			</section>
+		</form>
+		<div class="attention-footer"><button class="cancel-button" id="cancel-attention-button" type="button">Cancelar</button><button class="btn-primary drawer-action" id="next-attention-button" type="button">Siguiente</button></div>
+	</aside>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	<script type="module" src="paciente-detalle.js"></script>
+</body>
+</html>
