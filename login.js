@@ -2,6 +2,17 @@ import { supabase } from './supabase.js'
 
 const formLogin = document.getElementById('form-login')
 
+document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+	button.addEventListener('click', () => {
+		const input = document.getElementById(button.getAttribute('aria-controls'))
+		if (!input) return
+		const showing = input.type === 'password'
+		input.type = showing ? 'text' : 'password'
+		button.setAttribute('aria-pressed', String(showing))
+		button.setAttribute('aria-label', showing ? 'Ocultar contraseña' : 'Mostrar contraseña')
+	})
+})
+
 formLogin.addEventListener('submit', async (event) => {
 	event.preventDefault()
 
