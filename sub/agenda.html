@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Agenda | RENE Health</title>	
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../agenda.css">
+</head>
+<body class="agenda-page">
+	<div class="agenda-shell">
+		<aside class="agenda-sidebar">
+			<a class="agenda-brand" href="../pacientes.html"><span class="brand-mark">+</span><span>RENE <em>health</em></span></a>
+			<nav class="agenda-nav" aria-label="Navegación principal">
+				<a href="../pacientes.html"><span>◉</span> Pacientes</a>
+				<a class="is-active" href="agenda.html" aria-current="page"><span>▣</span> Agenda</a>
+				<a href="estadisticas.html"><span>↗</span> Estadísticas</a>
+				<a href="finanzas.html"><span>$</span> Finanzas</a>
+				<a href="ajustes.html"><span>⚙</span> Ajustes</a>
+			</nav>
+			<div class="agenda-sidebar-bottom"><small>SOPORTE</small><a href="soporte.html"><span>?</span> Ayuda</a><div class="agenda-user"><span id="sidebar-avatar">?</span><div><strong id="sidebar-name">Cargando...</strong><small>Administrador</small></div></div><button class="agenda-logout" id="sidebar-logout" type="button"><span>↪</span> Cerrar sesión</button></div>
+		</aside>
+
+		<main class="agenda-main">
+			<header class="agenda-header">
+				<div><p class="eyebrow">AGENDA CLÍNICA</p><h1 id="selected-date-title">Hoy</h1><p id="selected-day-title">Cargando fecha...</p></div>
+				<div class="agenda-actions"><button class="icon-button" id="export-button" title="Exportar a Excel" type="button">📥</button><select class="select-control" id="view-select" aria-label="Vista"><option value="day">Día</option><option value="week">Semana</option></select><button class="primary-button" id="new-appointment-button" type="button">+ Nueva cita</button></div>
+			</header>
+
+			<section class="agenda-toolbar" aria-label="Controles de agenda">
+				<div class="date-navigation"><button class="square-button" id="previous-date" type="button" aria-label="Día anterior">‹</button><button class="today-button" id="today-button" type="button">Hoy</button><button class="square-button" id="next-date" type="button" aria-label="Día siguiente">›</button><input class="date-input" id="date-picker" type="date" aria-label="Seleccionar fecha"></div>
+				<label class="doctor-control"><span>Doctor</span><select class="select-control" id="doctor-select"><option>Cargando doctores...</option></select></label>
+			</section>
+
+			<div class="agenda-layout">
+				<section class="appointments-panel">
+					<div id="day-view" class="day-view">
+						<article class="appointment-group"><button class="group-heading is-collapsed" data-group="pending" type="button" aria-expanded="false"><span><span class="group-chevron">⌄</span> Pendientes</span><strong id="pending-count">0 citas</strong></button><div class="group-content" id="pending-list"></div></article>
+						<article class="appointment-group"><button class="group-heading is-collapsed" data-group="attended" type="button" aria-expanded="false"><span><span class="group-chevron">⌄</span> Atendidas</span><strong id="attended-count">0 citas</strong></button><div class="group-content" id="attended-list"></div></article>
+						<article class="appointment-group"><button class="group-heading is-collapsed" data-group="no-show" type="button" aria-expanded="false"><span><span class="group-chevron">⌄</span> No asistió</span><strong id="no-show-count">0 citas</strong></button><div class="group-content" id="no-show-list"></div></article>
+						<article class="appointment-group"><button class="group-heading is-collapsed" data-group="closed" type="button" aria-expanded="false"><span><span class="group-chevron">⌄</span> Canceladas / Reprogramadas</span><strong id="closed-count">0 citas</strong></button><div class="group-content" id="closed-list"></div></article>
+					</div>
+					<div id="week-view" class="week-view" hidden></div>
+				</section>
+
+				<aside class="agenda-filters">
+					<label class="field-label" for="sidebar-doctor">Profesional</label><select class="select-control" id="sidebar-doctor"></select>
+					<div class="mini-calendar" id="mini-calendar"></div>
+					<div class="filter-section"><h2>Tipos de cita</h2><label><input type="checkbox" value="Consulta" checked> <span class="filter-dot dot-blue"></span> Consulta</label><label><input type="checkbox" value="Teleconsulta" checked> <span class="filter-dot dot-purple"></span> Teleconsulta</label><label><input type="checkbox" value="Seguimiento" checked> <span class="filter-dot dot-orange"></span> Seguimiento</label><label><input type="checkbox" value="Procedimiento" checked> <span class="filter-dot dot-green"></span> Procedimiento</label></div>
+				</aside>
+			</div>
+		</main>
+	</div>
+
+	<div class="modal-overlay" id="appointment-modal" hidden>
+		<section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+			<button class="modal-close" id="close-modal" type="button" aria-label="Cerrar">×</button>
+			<div class="step-indicator"><span class="is-current" data-step-dot="1">1</span><i></i><span data-step-dot="2">2</span></div>
+			<div id="patient-step"><p class="eyebrow">NUEVA CITA · PASO 1 DE 2</p><h2 id="modal-title">Seleccionar paciente</h2><p class="modal-intro">Busca un paciente por nombre o documento para continuar.</p><label class="modal-search"><span>⌕</span><input id="patient-search" type="search" placeholder="Nombre o DNI" autocomplete="off"></label><div class="patient-picker" id="patient-picker"></div></div>
+			<div id="datetime-step" hidden><p class="eyebrow">NUEVA CITA · PASO 2 DE 2</p><h2>Seleccionar fecha y hora</h2><div class="selection-summary" id="selection-summary"></div><div class="datetime-grid"><div><label class="field-label" for="appointment-date">Fecha</label><input class="date-input full-width" id="appointment-date" type="date"><div class="time-slots" id="time-slots"></div></div><div><label class="field-label" for="appointment-type">Tipo de cita</label><select class="select-control full-width" id="appointment-type"><option>Consulta</option><option>Teleconsulta</option><option>Seguimiento</option><option>Procedimiento</option></select><label class="field-label" for="appointment-reason">Motivo</label><textarea class="textarea-control" id="appointment-reason" rows="4" placeholder="Motivo de la cita"></textarea></div></div><div class="modal-footer"><button class="secondary-button" id="back-to-patient" type="button">Atrás</button><button class="primary-button" id="save-appointment" type="button">Guardar cita</button></div></div>
+		</section>
+	</div>
+	<div class="toast" id="toast" role="status"></div>
+	<!-- Modal para Editar Cita -->
+	<div id="modal-editar-cita" class="modal-oculto">
+		<div class="modal-contenido" role="dialog" aria-modal="true" aria-labelledby="titulo-editar-cita">
+			<div class="modal-header">
+				<h3 id="titulo-editar-cita">Modificar Cita</h3>
+				<button type="button" id="btn-cerrar-edicion" class="btn-cerrar" aria-label="Cerrar">&times;</button>
+			</div>
+			<form id="form-editar-cita">
+				<input type="hidden" id="edit-cita-id">
+				<div class="paciente-info-resumen"><p><strong>Paciente:</strong> <span id="edit-paciente-nombre"></span></p></div>
+				<div class="field"><label for="edit-estado">Estado de la cita</label><select id="edit-estado" name="estado" required><option value="Pendiente">Pendiente</option><option value="Atendida">Atendida</option><option value="No asistió">No asistió</option><option value="Reprogramada">Reprogramada</option><option value="Cancelada">Cancelada</option></select></div>
+				<div class="field-row"><div class="field"><label for="edit-fecha">Nueva Fecha</label><input type="date" id="edit-fecha" name="fecha" required></div><div class="field"><label for="edit-hora">Hora de inicio</label><input type="time" id="edit-hora" name="hora_inicio" required></div></div>
+				<button type="submit" class="button btn-verde">Guardar Cambios</button>
+			</form>
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+	<script type="module" src="../agenda.js"></script>
+</body>
+</html>

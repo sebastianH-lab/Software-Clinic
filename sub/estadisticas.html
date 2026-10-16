@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Estadísticas | RENE Health</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../agenda.css">
+	<style>
+		body.statistics-page { min-height: 100vh; background: #f5f8f6; }
+		.statistics-main { width: calc(100% - 248px); margin-left: 248px; padding: 34px clamp(24px, 4vw, 64px); }
+		.statistics-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+		.statistics-header h1 { margin: 0 0 5px; color: var(--agenda-ink); font: 800 clamp(1.7rem, 2.7vw, 2.35rem) Manrope, sans-serif; }
+		.statistics-header p { margin: 0; color: var(--agenda-muted); }
+		.statistics-action { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 17px; border: 1px solid var(--agenda-green); border-radius: 7px; color: #fff; background: var(--agenda-green); font: 700 .88rem "DM Sans", sans-serif; cursor: pointer; white-space: nowrap; }
+		.statistics-action:hover { background: #059669; }
+		.filters-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; padding: 13px 16px; border: 1px solid var(--agenda-line); border-radius: 12px; background: #fff; box-shadow: var(--agenda-shadow); }
+		.date-range-control { display: flex; align-items: center; gap: 9px; min-width: min(390px, 100%); min-height: 40px; padding: 0 11px; border: 1px solid #cbdad3; border-radius: 7px; color: var(--agenda-ink); background: #fff; cursor: pointer; }
+		.date-range-control span:first-child { color: var(--agenda-muted); font-size: 1rem; }
+		.date-range-control strong { flex: 1; font-size: .86rem; font-weight: 500; text-align: left; }
+		.clear-date { border: 0; color: var(--agenda-muted); background: transparent; font-size: 1.2rem; line-height: 1; cursor: pointer; }
+		.filter-button { min-height: 40px; padding: 0 13px; border: 1px solid #cbdad3; border-radius: 7px; color: var(--agenda-ink); background: #fff; font: 700 .88rem "DM Sans", sans-serif; cursor: pointer; }
+		.filter-button:hover { border-color: var(--agenda-green); color: #08764f; background: #f1fbf6; }
+		.advanced-filter-button { width: 42px; padding: 0; font-size: 1.1rem; }
+		.statistics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+		.statistics-card { min-height: 270px; padding: 20px 24px; border: 1px solid var(--agenda-line); border-radius: 12px; background: #fff; box-shadow: var(--agenda-shadow); }
+		.statistics-card.full-width { grid-column: 1 / -1; }
+		.statistics-card-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--agenda-line); }
+		.statistics-card-header h2 { margin: 0; color: var(--agenda-ink); font: 700 1rem Manrope, sans-serif; }
+		.download-button { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--agenda-line); border-radius: 7px; color: var(--agenda-muted); background: #fff; font-size: 1rem; cursor: pointer; }
+		.download-button:hover { color: #08764f; border-color: #9bd6b9; background: #f1fbf6; }
+		.chart-placeholder { display: grid; min-height: 190px; place-items: center; color: var(--agenda-muted); font-size: .9rem; }
+		.kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
+		.kpi-card { min-height: 126px; padding: 18px 20px; border: 1px solid var(--agenda-line); border-radius: 12px; background: #fff; box-shadow: var(--agenda-shadow); }
+		.kpi-label { display: block; color: var(--agenda-muted); font-size: .78rem; font-weight: 700; }
+		.kpi-value { display: block; margin-top: 12px; color: var(--agenda-ink); font: 800 2rem Manrope, sans-serif; }
+		.kpi-accent { color: #08764f; }
+		.chart-placeholder { position: relative; min-height: 265px; }
+		.chart-placeholder canvas { width: 100% !important; height: 250px !important; }
+		.empty-chart { max-width: 250px; color: var(--agenda-muted); text-align: center; }
+		.patient-section { margin-top: 20px; padding: 20px 24px; border: 1px solid var(--agenda-line); border-radius: 12px; background: #fff; box-shadow: var(--agenda-shadow); }
+		.patient-section-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+		.patient-section-title { display: flex; align-items: center; gap: 9px; }
+		.patient-section-title h2 { margin: 0; color: var(--agenda-ink); font: 700 1rem Manrope, sans-serif; }
+		.record-badge { padding: 4px 8px; border-radius: 999px; color: #257151; background: #e9f8f0; font-size: .72rem; font-weight: 700; }
+		.table-tools { display: flex; gap: 8px; margin-bottom: 16px; }
+		.table-search { display: flex; flex: 1; align-items: center; min-height: 40px; border: 1px solid #cbdad3; border-radius: 7px; overflow: hidden; }
+		.table-search select, .table-search input { min-height: 38px; border: 0; outline: 0; color: var(--agenda-ink); background: #fff; font: .86rem "DM Sans", sans-serif; }
+		.table-search select { padding: 0 10px; border-right: 1px solid var(--agenda-line); }
+		.table-search input { flex: 1; min-width: 0; padding: 0 11px; }
+		.table-tool-button { display: grid; width: 42px; place-items: center; border: 1px solid #cbdad3; border-radius: 7px; color: var(--agenda-ink); background: #fff; font-size: 1rem; cursor: pointer; }
+		.table-tool-button:hover { border-color: var(--agenda-green); color: #08764f; }
+		.table-wrapper { overflow-x: auto; }
+		.patient-table { width: 100%; min-width: 850px; border-collapse: collapse; }
+		.patient-table th, .patient-table td { padding: 13px 10px; border-bottom: 1px solid #edf3ef; color: var(--agenda-ink); font-size: .82rem; text-align: left; white-space: nowrap; }
+		.patient-table th { color: var(--agenda-muted); font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+		.patient-table th button { padding: 0; border: 0; color: inherit; background: transparent; font: inherit; cursor: pointer; }
+		.patient-table tbody tr:hover { background: #f7fbf9; }
+		.table-empty { padding: 28px 10px !important; color: var(--agenda-muted) !important; text-align: center !important; }
+		.pagination { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; }
+		.pagination button { min-height: 36px; padding: 0 12px; border: 1px solid var(--agenda-line); border-radius: 7px; color: var(--agenda-ink); background: #fff; font: 700 .8rem "DM Sans", sans-serif; cursor: pointer; }
+		.pagination button:disabled { color: #a5b4ae; background: #f6f9f7; cursor: not-allowed; }
+		.page-number { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 6px; color: var(--agenda-ink); background: #eef3f0; font-size: .82rem; font-weight: 700; }
+		.modal-backdrop { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(23, 53, 50, .42); }
+		.modal-backdrop[hidden] { display: none; }
+		.statistics-modal { width: min(460px, 100%); padding: 26px; border-radius: 12px; background: #fff; box-shadow: 0 25px 60px rgba(23, 53, 50, .24); }
+		.modal-title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+		.modal-title-row h2 { margin: 0; color: var(--agenda-ink); font: 800 1.35rem Manrope, sans-serif; }
+		.modal-close { border: 0; color: var(--agenda-muted); background: transparent; font-size: 1.6rem; cursor: pointer; }
+		.date-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+		.modal-field { display: grid; gap: 7px; color: var(--agenda-muted); font-size: .8rem; font-weight: 700; }
+		.modal-field input { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid #cbdad3; border-radius: 7px; color: var(--agenda-ink); font: .86rem "DM Sans", sans-serif; }
+		.age-section { display: grid; gap: 12px; margin-top: 22px; }
+		.age-section h3 { margin: 0; color: var(--agenda-ink); font: 700 1rem Manrope, sans-serif; }
+		.age-field { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 7px; }
+		.age-field label { color: var(--agenda-muted); font-size: .8rem; font-weight: 700; }
+		.age-input { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid #cbdad3; border-radius: 7px; color: var(--agenda-ink); font: .86rem "DM Sans", sans-serif; }
+		.stepper { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid #cbdad3; border-radius: 6px; color: var(--agenda-ink); background: #fff; cursor: pointer; }
+		.modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--agenda-line); }
+		.modal-actions button { min-height: 40px; padding: 0 16px; border-radius: 7px; font: 700 .86rem "DM Sans", sans-serif; cursor: pointer; }
+		.clear-button { border: 1px solid #c85b5b; color: #ad4040; background: #fff; }
+		.apply-button { border: 1px solid var(--agenda-green); color: #fff; background: var(--agenda-green); }
+		.date-picker-popover { position: absolute; z-index: 10; width: min(360px, calc(100vw - 32px)); margin-top: 8px; padding: 18px; border: 1px solid var(--agenda-line); border-radius: 10px; background: #fff; box-shadow: 0 20px 40px rgba(23, 53, 50, .18); }
+		.date-picker-popover[hidden] { display: none; }
+		.date-picker-popover h3 { margin: 0 0 14px; color: var(--agenda-ink); font: 700 1rem Manrope, sans-serif; }
+		.date-picker-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px; }
+		.date-picker-actions button { min-height: 36px; padding: 0 12px; border: 1px solid var(--agenda-line); border-radius: 6px; color: var(--agenda-ink); background: #fff; font: 700 .8rem "DM Sans", sans-serif; cursor: pointer; }
+		.date-picker-actions .date-apply { color: #fff; border-color: var(--agenda-green); background: var(--agenda-green); }
+		.date-filter-wrap { position: relative; }
+		@media (max-width: 850px) { .statistics-main { width: calc(100% - 74px); margin-left: 0; padding: 24px 16px; }.statistics-header { flex-direction: column; }.statistics-action { width: 100%; justify-content: center; }.filters-bar { align-items: stretch; flex-direction: column; }.date-range-control { min-width: 0; }.advanced-filter-button { width: 100%; }.kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.statistics-grid { grid-template-columns: 1fr; }.statistics-card.full-width { grid-column: auto; }.patient-section { padding: 18px 16px; }.patient-section-header { align-items: flex-start; }.table-tools { flex-wrap: wrap; }.table-search { min-width: 100%; }.table-tool-button { flex: 1; }.date-fields { grid-template-columns: 1fr; } }
+		@media (max-width: 560px) { .statistics-main { padding: 16px 12px; }.statistics-card { padding: 18px 16px; }.patient-section-header { flex-direction: column; }.pagination button { padding: 0 9px; } }
+	</style>
+</head>
+<body class="agenda-page statistics-page">
+	<div class="agenda-shell">
+		<aside class="agenda-sidebar" aria-label="Navegación principal">
+			<a class="agenda-brand" href="../pacientes.html"><span class="brand-mark">+</span><span>RENE <em>health</em></span></a>
+			<nav class="agenda-nav" aria-label="Navegación principal">
+				<a href="../pacientes.html"><span>◉</span> Pacientes</a>
+				<a href="agenda.html"><span>▣</span> Agenda</a>
+				<a class="is-active" href="estadisticas.html" aria-current="page"><span>↗</span> Estadísticas</a>
+				<a href="finanzas.html"><span>$</span> Finanzas</a>
+				<a href="ajustes.html"><span>⚙</span> Ajustes</a>
+			</nav>
+			<div class="agenda-sidebar-bottom"><small>SOPORTE</small><a href="soporte.html"><span>?</span> Ayuda</a><div class="agenda-user"><span id="sidebar-avatar">?</span><div><strong id="sidebar-name">Cargando...</strong><small>Administrador</small></div></div><button class="agenda-logout" id="sidebar-logout" type="button"><span>↪</span> Cerrar sesión</button></div>
+		</aside>
+
+		<main class="statistics-main">
+			<header class="statistics-header">
+				<div><p class="eyebrow">ANÁLISIS CLÍNICO</p><h1>Estadísticas</h1><p>Consulta el rendimiento de tus atenciones e informes.</p></div>
+				<button class="statistics-action" id="export-attentions" type="button"><span aria-hidden="true">⇩</span> Exportar Atenciones (<span id="attention-count">0</span>)</button>
+			</header>
+
+			<section class="filters-bar" aria-label="Filtros de estadísticas">
+				<div class="date-filter-wrap">
+					<button class="date-range-control" id="date-range-button" type="button" aria-expanded="false"><span aria-hidden="true">▣</span><strong id="date-range-label">Seleccionar rango de fechas</strong><span class="clear-date" id="clear-date" aria-label="Limpiar fechas">×</span></button>
+					<div class="date-picker-popover" id="date-picker-popover" hidden><h3>Rango de fechas</h3><div class="date-fields"><label class="modal-field">Desde<input id="date-from" type="date"></label><label class="modal-field">Hasta<input id="date-to" type="date"></label></div><div class="date-picker-actions"><button id="cancel-date-filter" type="button">Cancelar</button><button class="date-apply" id="apply-date-filter" type="button">Aplicar</button></div></div>
+				</div>
+				<button class="filter-button" id="select-date-button" type="button">Seleccionar</button>
+				<button class="filter-button advanced-filter-button" id="advanced-filter-button" type="button" aria-label="Abrir filtros avanzados" title="Filtros avanzados">☰</button>
+			</section>
+
+			<section class="kpi-grid" aria-label="Indicadores principales">
+				<article class="kpi-card"><span class="kpi-label">Total de citas agendadas</span><strong class="kpi-value" id="kpi-total-appointments">0</strong></article>
+				<article class="kpi-card"><span class="kpi-label">Tasa de ausentismo</span><strong class="kpi-value kpi-accent" id="kpi-no-show-rate">0%</strong></article>
+				<article class="kpi-card"><span class="kpi-label">Pacientes nuevos</span><strong class="kpi-value" id="kpi-new-patients">0</strong></article>
+				<article class="kpi-card"><span class="kpi-label">Citas atendidas</span><strong class="kpi-value" id="kpi-attended">0</strong></article>
+			</section>
+
+			<section class="statistics-grid" aria-label="Gráficos e informes">
+				<article class="statistics-card full-width" data-report="attentions-by-doctor"><header class="statistics-card-header"><h2>Atenciones por médico</h2><button class="download-button" type="button" data-export-report="attentions-by-doctor" aria-label="Descargar Atenciones por médico">⇩</button></header><div class="chart-placeholder" id="chart-attentions-by-doctor"></div></article>
+				<article class="statistics-card" data-report="appointment-types"><header class="statistics-card-header"><h2>Citas por tipo</h2><button class="download-button" type="button" data-export-report="appointment-types" aria-label="Descargar Citas por tipo">⇩</button></header><div class="chart-placeholder" id="chart-appointment-types"></div></article>
+				<article class="statistics-card" data-report="appointment-status"><header class="statistics-card-header"><h2>Citas por estado</h2><button class="download-button" type="button" data-export-report="appointment-status" aria-label="Descargar Citas por estado">⇩</button></header><div class="chart-placeholder" id="chart-appointment-status"></div></article>
+				<article class="statistics-card full-width" data-report="diagnoses"><header class="statistics-card-header"><h2>Diagnósticos más comunes</h2><button class="download-button" type="button" data-export-report="diagnoses" aria-label="Descargar Diagnósticos más comunes">⇩</button></header><div class="chart-placeholder" id="chart-diagnoses"></div></article>
+			</section>
+
+			<section class="patient-section" aria-labelledby="patients-heading">
+				<header class="patient-section-header"><div class="patient-section-title"><h2 id="patients-heading">Lista de pacientes</h2><span class="record-badge" id="patient-count">0 registros</span></div><button class="download-button" id="export-patients" type="button" aria-label="Descargar lista de pacientes">⇩</button></header>
+				<div class="table-tools"><label class="table-search"><select id="patient-search-field" aria-label="Campo de búsqueda"><option value="nombre_completo">Nombre completo</option><option value="documento_identidad">Documento</option><option value="correo">Correo</option></select><input id="patient-search" type="search" placeholder="Buscar..." aria-label="Buscar pacientes"></label><button class="table-tool-button" id="patient-search-button" type="button" aria-label="Buscar">⌕</button><button class="table-tool-button" id="patient-filter-button" type="button" aria-label="Abrir filtros avanzados">☰</button></div>
+				<div class="table-wrapper"><table class="patient-table"><thead><tr><th>Nombre completo</th><th>Fecha de nacimiento</th><th><button id="sort-age" type="button">Edad ↕</button></th><th>Documento</th><th>País</th><th>Teléfono</th><th>Correo</th></tr></thead><tbody id="patient-table-body"><tr><td>ARMANDO PUERTAS JOSE CARLOS</td><td>1990-02-01</td><td>36</td><td>72345678</td><td>-</td><td>942345678</td><td>armando.puertas@gmail.com</td></tr></tbody></table></div>
+				<footer class="pagination"><button id="previous-page" type="button">← Anterior</button><span class="page-number" id="current-page">1</span><button id="next-page" type="button">Siguiente →</button></footer>
+			</section>
+		</main>
+	</div>
+
+	<div class="modal-backdrop" id="advanced-filter-modal" hidden><section class="statistics-modal" role="dialog" aria-modal="true" aria-labelledby="advanced-filter-title"><header class="modal-title-row"><h2 id="advanced-filter-title">Filtros</h2><button class="modal-close" id="close-advanced-filter" type="button" aria-label="Cerrar">×</button></header><div class="age-section"><h3>Edad</h3><div class="age-field"><label for="age-from">Desde</label><button class="stepper" data-step-target="age-from" data-step="-1" type="button">−</button><input class="age-input" id="age-from" type="number" min="0" max="120" placeholder="0"><button class="stepper" data-step-target="age-from" data-step="1" type="button">+</button></div><div class="age-field"><label for="age-to">Hasta</label><button class="stepper" data-step-target="age-to" data-step="-1" type="button">−</button><input class="age-input" id="age-to" type="number" min="0" max="120" placeholder="120"><button class="stepper" data-step-target="age-to" data-step="1" type="button">+</button></div></div><div class="modal-actions"><button class="clear-button" id="clear-advanced-filter" type="button">Limpiar</button><button class="apply-button" id="apply-advanced-filter" type="button">Filtrar</button></div></section></div>
+
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+	<script type="module">
+		import { clearClientStorage, requireAuthenticatedUser, supabase } from '../supabase.js'
+
+		const state = { appointments: [], patients: [], diagnoses: [], filteredPatients: [], charts: {}, dateFrom: null, dateTo: null, totalAppointments: 0, attendedAppointments: 0, noShowAppointments: 0, newPatients: 0, ageFrom: null, ageTo: null, sortAscending: true }
+		const $ = (selector) => document.querySelector(selector)
+		const $$ = (selector) => [...document.querySelectorAll(selector)]
+		const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
+		const calculateAge = (birthDate) => { if (!birthDate) return null; const birth = new Date(`${birthDate}T12:00:00`); const today = new Date(); let result = today.getFullYear() - birth.getFullYear(); if (today < new Date(today.getFullYear(), birth.getMonth(), birth.getDate())) result--; return result }
+		const formatDate = (date) => date ? new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${date}T12:00:00`)).replace('.', '') : ''
+		const getDateValue = (appointment) => appointment.fecha || appointment.created_at?.slice(0, 10) || ''
+		const inSelectedRange = (appointment) => (!state.dateFrom || getDateValue(appointment) >= state.dateFrom) && (!state.dateTo || getDateValue(appointment) <= state.dateTo)
+		const normalize = (value = '') => String(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+		const normalizeStatus = (value = '') => normalize(value).replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim()
+		const selectedDiagnoses = () => state.diagnoses
+		const emptyMessage = '<span class="empty-chart">No hay datos suficientes para este período</span>'
+		const dateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+		function setCurrentMonthRange() { const now = new Date(); state.dateFrom = dateKey(new Date(now.getFullYear(), now.getMonth(), 1)); state.dateTo = dateKey(new Date(now.getFullYear(), now.getMonth() + 1, 0)) }
+		function timestampRange(dateFrom, dateTo) {
+			const start = dateFrom ? new Date(`${dateFrom}T00:00:00`).toISOString() : null
+			const endDate = dateTo ? new Date(`${dateTo}T00:00:00`) : null
+			if (endDate) endDate.setDate(endDate.getDate() + 1)
+			return { start, end: endDate?.toISOString() || null }
+		}
+
+		function destroyCharts() { Object.values(state.charts).forEach((chart) => chart.destroy()); state.charts = {} }
+		function prepareChart(id) { const container = $(`#${id}`); container.innerHTML = ''; const canvas = document.createElement('canvas'); container.appendChild(canvas); return canvas.getContext('2d') }
+		function hasData(values) { return values.some((value) => value > 0) }
+		function showEmpty(id) { $(`#${id}`).innerHTML = emptyMessage }
+		function chartOptions(indexAxis = 'x') { return { responsive: true, maintainAspectRatio: false, indexAxis, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { beginAtZero: true, ticks: { precision: 0 } } } } }
+
+		function updateDateLabel() { $('#date-range-label').textContent = state.dateFrom || state.dateTo ? `${formatDate(state.dateFrom) || 'Sin inicio'} - ${formatDate(state.dateTo) || 'Sin fin'}` : 'Seleccionar rango de fechas' }
+		function renderPatients() {
+			const term = $('#patient-search').value.trim().toLowerCase(); const field = $('#patient-search-field').value
+			state.filteredPatients = state.patients.filter((patient) => { const age = calculateAge(patient.fecha_nacimiento); const matchesAge = (state.ageFrom === null || (age !== null && age >= state.ageFrom)) && (state.ageTo === null || (age !== null && age <= state.ageTo)); const value = String(patient[field] || '').toLowerCase(); return matchesAge && (!term || value.includes(term)) }).sort((first, second) => { const firstAge = calculateAge(first.fecha_nacimiento) ?? -1; const secondAge = calculateAge(second.fecha_nacimiento) ?? -1; return state.sortAscending ? firstAge - secondAge : secondAge - firstAge })
+			$('#patient-count').textContent = `${state.filteredPatients.length} ${state.filteredPatients.length === 1 ? 'registro' : 'registros'}`
+			$('#patient-table-body').innerHTML = state.filteredPatients.length ? state.filteredPatients.map((patient) => `<tr><td>${escapeHtml(patient.nombre_completo || '-')}</td><td>${escapeHtml(patient.fecha_nacimiento || '-')}</td><td>${calculateAge(patient.fecha_nacimiento) ?? '-'}</td><td>${escapeHtml(patient.documento_identidad || '-')}</td><td>${escapeHtml(patient.pais || '-')}</td><td>${escapeHtml(patient.telefono || '-')}</td><td>${escapeHtml(patient.correo || '-')}</td></tr>`).join('') : '<tr><td class="table-empty" colspan="7">No hay pacientes que coincidan con los filtros.</td></tr>'
+		}
+
+		function reportRows(report) {
+			const appointments = state.appointments.filter(inSelectedRange)
+			if (report === 'attentions-by-doctor') return appointments.map((appointment) => ({ Fecha: getDateValue(appointment), Médico: appointment.doctor?.nombre_completo || appointment.doctor?.full_name || 'Sin asignar', Paciente: appointment.pacientes?.nombre_completo || 'Sin paciente', Estado: appointment.estado || '' }))
+			if (report === 'appointment-types') return appointments.map((appointment) => ({ Fecha: getDateValue(appointment), 'Tipo de cita': appointment.tipo_cita || appointment.tipo || 'Sin tipo', Paciente: appointment.pacientes?.nombre_completo || 'Sin paciente', Estado: appointment.estado || '' }))
+			if (report === 'appointment-status') return appointments.map((appointment) => ({ Fecha: getDateValue(appointment), Estado: appointment.estado || 'Pendiente', Paciente: appointment.pacientes?.nombre_completo || 'Sin paciente' }))
+			if (report === 'diagnoses') return selectedDiagnoses().map((item) => ({ Fecha: item.date, Diagnóstico: item.descripcion, Frecuencia: item.count }))
+			return []
+		}
+		function downloadExcel(rows, filename) { if (!window.XLSX) { alert('No se pudo cargar el exportador de Excel.'); return } const sheet = XLSX.utils.json_to_sheet(rows.length ? rows : [{ Información: 'No hay datos para el rango seleccionado' }]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, sheet, 'Estadísticas'); XLSX.writeFile(workbook, filename) }
+
+		// Exporta a Excel el informe general de atenciones, respetando estrictamente el rango seleccionado.
+		function exportAllAttentions() { downloadExcel(reportRows('attentions-by-doctor'), 'Atenciones_filtradas.xlsx') }
+		// Exporta a Excel los datos correspondientes a cada tarjeta del dashboard.
+		function exportIndividualReport(report) { downloadExcel(reportRows(report), `${report}.xlsx`) }
+		function renderKpis() {
+			$('#kpi-total-appointments').textContent = state.totalAppointments
+			$('#kpi-no-show-rate').textContent = `${state.totalAppointments ? Math.round((state.noShowAppointments / state.totalAppointments) * 100) : 0}%`
+			$('#kpi-new-patients').textContent = state.newPatients
+			$('#kpi-attended').textContent = state.attendedAppointments
+		}
+
+		function renderDoctorChart(appointments) {
+			const byDoctorAndDate = appointments.reduce((groups, appointment) => { const doctor = appointment.doctor?.nombre_completo || appointment.doctor?.full_name || 'Sin asignar'; const date = getDateValue(appointment); groups[doctor] ??= {}; groups[doctor][date] = (groups[doctor][date] || 0) + 1; return groups }, {})
+			const dates = [...new Set(appointments.map(getDateValue))].sort(); const doctors = Object.keys(byDoctorAndDate)
+			if (!dates.length) return showEmpty('chart-attentions-by-doctor')
+			const context = prepareChart('chart-attentions-by-doctor'); state.charts.doctor = new Chart(context, { type: 'line', data: { labels: dates, datasets: doctors.map((doctor, index) => ({ label: doctor, data: dates.map((date) => byDoctorAndDate[doctor][date] || 0), borderColor: ['#08764f', '#d97706', '#2563eb', '#be185d', '#7c3aed'][index % 5], backgroundColor: 'transparent', tension: .25 })) }, options: { ...chartOptions(), plugins: { legend: { display: true, position: 'bottom' } } } })
+		}
+
+		function renderTypeChart(appointments) {
+			const labels = ['Consulta', 'Teleconsulta', 'Seguimiento', 'Procedimiento']; const values = labels.map((label) => appointments.filter((appointment) => normalize(appointment.tipo_cita || appointment.tipo) === normalize(label)).length)
+			if (!hasData(values)) return showEmpty('chart-appointment-types')
+			const context = prepareChart('chart-appointment-types'); state.charts.types = new Chart(context, { type: 'doughnut', data: { labels, datasets: [{ data: values, backgroundColor: ['#08764f', '#2f8068', '#d97706', '#2563eb'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } })
+		}
+
+		function renderStatusChart(appointments) {
+			const labels = ['Pendientes', 'Atendidas', 'No asistió', 'Reprogramadas', 'Canceladas']; const statusKeys = ['pendiente', 'atendida', 'no asistio', 'reprogramada', 'cancelada']; const values = statusKeys.map((key) => appointments.filter((appointment) => normalizeStatus(appointment.estado) === key).length)
+			if (!hasData(values)) return showEmpty('chart-appointment-status')
+			const context = prepareChart('chart-appointment-status'); state.charts.status = new Chart(context, { type: 'bar', data: { labels, datasets: [{ data: values, backgroundColor: ['#94a3b8', '#08764f', '#dc2626', '#d97706', '#64748b'], borderRadius: 4 }] }, options: { ...chartOptions('y'), plugins: { legend: { display: false } } } })
+		}
+
+		function renderDiagnosesChart() {
+			const diagnoses = selectedDiagnoses().sort((first, second) => second.count - first.count).slice(0, 10); const labels = diagnoses.map((item) => item.descripcion.length > 34 ? `${item.descripcion.slice(0, 34)}...` : item.descripcion); const values = diagnoses.map((item) => item.count)
+			if (!hasData(values)) return showEmpty('chart-diagnoses')
+			const context = prepareChart('chart-diagnoses'); state.charts.diagnoses = new Chart(context, { type: 'bar', data: { labels, datasets: [{ data: values, backgroundColor: '#2f8068', borderRadius: 4 }] }, options: { ...chartOptions('y'), plugins: { legend: { display: false }, tooltip: { callbacks: { title: (items) => diagnoses[items[0].dataIndex].descripcion } } } } })
+		}
+
+		function refreshDateDependentReports() { const appointments = state.appointments.filter(inSelectedRange); destroyCharts(); renderKpis(); $('#attention-count').textContent = state.totalAppointments; renderDoctorChart(appointments); renderTypeChart(appointments); renderStatusChart(appointments); renderDiagnosesChart() }
+
+		async function loadData() {
+			if (!await requireAuthenticatedUser('../ingresar.html')) return
+			if (state.dateFrom && state.dateTo && state.dateFrom > state.dateTo) {
+				alert('La fecha inicial no puede ser posterior a la fecha final.')
+				return
+			}
+			const { start, end } = timestampRange(state.dateFrom, state.dateTo)
+			let appointmentsQuery = supabase.from('citas').select('*, pacientes(*), doctor:profiles!citas_doctor_id_fkey(full_name)', { count: 'exact' })
+			let attendedQuery = supabase.from('citas').select('id', { count: 'exact', head: true }).in('estado', ['Atendida', 'atendida'])
+			let noShowQuery = supabase.from('citas').select('id', { count: 'exact', head: true }).in('estado', ['No asistió', 'No Asistió', 'No asistio', 'no asistio', 'no_asistio', 'no_asistió', 'no-asistio', 'no-asistió'])
+			let newPatientsQuery = supabase.from('pacientes').select('id', { count: 'exact', head: true })
+			let diagnosesQuery = supabase.from('atenciones').select('created_at, atencion_diagnosticos(descripcion)').order('created_at')
+			if (state.dateFrom) {
+				appointmentsQuery = appointmentsQuery.gte('fecha', state.dateFrom)
+				attendedQuery = attendedQuery.gte('fecha', state.dateFrom)
+				noShowQuery = noShowQuery.gte('fecha', state.dateFrom)
+				newPatientsQuery = newPatientsQuery.gte('created_at', start)
+				diagnosesQuery = diagnosesQuery.gte('created_at', start)
+			}
+			if (state.dateTo) {
+				appointmentsQuery = appointmentsQuery.lte('fecha', state.dateTo)
+				attendedQuery = attendedQuery.lte('fecha', state.dateTo)
+				noShowQuery = noShowQuery.lte('fecha', state.dateTo)
+				newPatientsQuery = newPatientsQuery.lt('created_at', end)
+				diagnosesQuery = diagnosesQuery.lt('created_at', end)
+			}
+			const [appointmentsResult, patientsResult, diagnosesResult, attendedResult, noShowResult, newPatientsResult] = await Promise.all([
+				appointmentsQuery.order('fecha').order('hora_inicio'),
+				supabase.from('pacientes').select('*').order('nombre_completo'),
+				diagnosesQuery,
+				attendedQuery,
+				noShowQuery,
+				newPatientsQuery
+			])
+			const errors = [appointmentsResult, patientsResult, diagnosesResult, attendedResult, noShowResult, newPatientsResult].filter((result) => result.error)
+			if (errors.length) {
+				errors.forEach((result) => console.error('Error cargando estadísticas:', result.error))
+				alert(`No se pudieron cargar todas las estadísticas: ${errors.map((result) => result.error.message).join('; ')}`)
+				return
+			}
+			state.appointments = appointmentsResult.data || []; state.patients = patientsResult.data || []
+			state.totalAppointments = appointmentsResult.count || 0
+			state.attendedAppointments = attendedResult.count || 0
+			state.noShowAppointments = noShowResult.count || 0
+			state.newPatients = newPatientsResult.count || 0
+			state.diagnoses = (diagnosesResult.data || []).flatMap((attention) => (attention.atencion_diagnosticos || []).map((diagnosis) => ({ date: attention.created_at?.slice(0, 10) || '', descripcion: diagnosis.descripcion || 'Sin descripción' }))).reduce((groups, item) => { const key = normalize(item.descripcion); groups[key] ??= { ...item, count: 0 }; groups[key].count++; return groups }, {})
+			state.diagnoses = Object.values(state.diagnoses); renderPatients(); refreshDateDependentReports()
+		}
+		async function logout() { const { error } = await supabase.auth.signOut(); if (error) { console.error('No se pudo cerrar la sesión:', error.message); return } state.appointments = []; state.patients = []; state.diagnoses = []; state.filteredPatients = []; state.dateFrom = null; state.dateTo = null; state.totalAppointments = 0; state.attendedAppointments = 0; state.noShowAppointments = 0; state.newPatients = 0; state.ageFrom = null; state.ageTo = null; state.sortAscending = true; Object.values(state.charts).forEach((chart) => chart?.destroy()); state.charts = {}; document.body.replaceChildren(); clearClientStorage(); window.location.href = '../ingresar.html' }
+		function bindEvents() {
+			$('#sidebar-logout').addEventListener('click', logout); $('#export-attentions').addEventListener('click', exportAllAttentions); $('#export-patients').addEventListener('click', () => downloadExcel(state.filteredPatients, 'Lista_de_pacientes.xlsx')); $$('#advanced-filter-button, #patient-filter-button').forEach((button) => button.addEventListener('click', () => { $('#advanced-filter-modal').hidden = false })); $('#close-advanced-filter').addEventListener('click', () => { $('#advanced-filter-modal').hidden = true }); $('#advanced-filter-modal').addEventListener('click', (event) => { if (event.target.id === 'advanced-filter-modal') $('#advanced-filter-modal').hidden = true }); $$('.download-button[data-export-report]').forEach((button) => button.addEventListener('click', () => exportIndividualReport(button.dataset.exportReport)))
+			$('#date-range-button').addEventListener('click', () => { $('#date-picker-popover').hidden = !$('#date-picker-popover').hidden; $('#date-range-button').setAttribute('aria-expanded', String(!$('#date-picker-popover').hidden)) }); $('#select-date-button').addEventListener('click', () => $('#date-picker-popover').hidden = false); $('#cancel-date-filter').addEventListener('click', () => $('#date-picker-popover').hidden = true); $('#clear-date').addEventListener('click', (event) => { event.stopPropagation(); setCurrentMonthRange(); $('#date-from').value = state.dateFrom; $('#date-to').value = state.dateTo; updateDateLabel(); loadData() }); $('#apply-date-filter').addEventListener('click', () => { state.dateFrom = $('#date-from').value || null; state.dateTo = $('#date-to').value || null; updateDateLabel(); $('#date-picker-popover').hidden = true; loadData() })
+			$('#apply-advanced-filter').addEventListener('click', () => { state.ageFrom = $('#age-from').value === '' ? null : Number($('#age-from').value); state.ageTo = $('#age-to').value === '' ? null : Number($('#age-to').value); $('#advanced-filter-modal').hidden = true; renderPatients() }); $('#clear-advanced-filter').addEventListener('click', () => { state.ageFrom = null; state.ageTo = null; $('#age-from').value = ''; $('#age-to').value = ''; renderPatients() }); $$('.stepper').forEach((button) => button.addEventListener('click', () => { const input = $(`#${button.dataset.stepTarget}`); input.value = Math.max(0, Number(input.value || 0) + Number(button.dataset.step)); })); $$('.age-input').forEach((input) => input.addEventListener('input', renderPatients)); $('#patient-search').addEventListener('input', renderPatients); $('#patient-search-button').addEventListener('click', renderPatients); $('#patient-search-field').addEventListener('change', renderPatients); $('#sort-age').addEventListener('click', () => { state.sortAscending = !state.sortAscending; renderPatients() })
+		}
+
+		async function init() { const user = await requireAuthenticatedUser('../ingresar.html'); if (!user) return; const profileName = user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'Usuario'; $('#sidebar-name').textContent = profileName; $('#sidebar-avatar').textContent = profileName.trim().charAt(0).toUpperCase(); setCurrentMonthRange(); $('#date-from').value = state.dateFrom; $('#date-to').value = state.dateTo; updateDateLabel(); bindEvents(); await loadData() }
+		init()
+	</script>
+</body>
+</html>
