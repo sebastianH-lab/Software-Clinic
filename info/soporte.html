@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Soporte | RENE Health</title>
+	<meta name="description" content="Encuentra ayuda para usar RENE Health y contacta con nuestro equipo de soporte.">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../styles.css">
+	<style>
+		.support-page { min-height: 100vh; background: var(--cream); }
+
+		.support-hero {
+			padding: 88px 0 96px;
+			background: radial-gradient(circle at 84% 18%, #e6f4eb 0, transparent 36%);
+		}
+
+		.support-hero-grid {
+			display: grid;
+			grid-template-columns: 1fr .78fr;
+			align-items: center;
+			gap: 80px;
+		}
+
+		.support-hero h1 { max-width: 650px; font-size: clamp(2.7rem, 5vw, 4.6rem); }
+		.support-copy { max-width: 560px; margin: 24px 0 30px; color: var(--muted); font-size: 1.1rem; }
+		.support-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+		.support-panel {
+			padding: 30px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--white);
+			box-shadow: 18px 18px 0 var(--mint);
+		}
+
+		.support-panel-label { margin-bottom: 18px; color: var(--green); font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+		.support-panel h2 { font-size: 1.8rem; }
+		.support-panel p { margin: 12px 0 22px; color: var(--muted); }
+		.support-status { display: flex; align-items: center; gap: 8px; margin-top: 18px; color: var(--muted); font-size: .88rem; }
+		.support-status::before { width: 9px; height: 9px; border-radius: 50%; background: #4caf76; content: ""; }
+
+		.support-topics { padding: 82px 0; background: var(--white); }
+		.support-heading { max-width: 610px; margin-bottom: 38px; }
+		.support-heading h2 { margin-bottom: 12px; }
+		.support-heading p { color: var(--muted); }
+
+		.topic-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+		.topic { padding: 26px; border: 1px solid var(--line); border-radius: 8px; background: var(--cream); }
+		.topic-icon { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 20px; border-radius: 12px; color: var(--green-dark); background: var(--mint); font-size: 1.3rem; }
+		.topic h3 { margin-bottom: 8px; font-family: Manrope, sans-serif; font-size: 1.08rem; }
+		.topic p { color: var(--muted); font-size: .94rem; }
+		.topic a { display: inline-block; margin-top: 14px; color: var(--green-dark); font-weight: 700; font-size: .9rem; }
+		.topic a:hover { text-decoration: underline; }
+
+		.faq-section { padding: 84px 0; }
+		.faq-grid { display: grid; grid-template-columns: .7fr 1.3fr; gap: 70px; align-items: start; }
+		.faq-intro h2 { margin-bottom: 14px; }
+		.faq-intro p { color: var(--muted); }
+		.faq-list { border-top: 1px solid var(--line); }
+		.faq-list details { padding: 18px 0; border-bottom: 1px solid var(--line); }
+		.faq-list summary { cursor: pointer; font-family: Manrope, sans-serif; font-weight: 700; list-style-position: outside; }
+		.faq-list details p { max-width: 650px; margin: 12px 0 0 20px; color: var(--muted); }
+
+		.support-contact { padding: 0 0 84px; }
+		.support-contact-box { display: flex; justify-content: space-between; align-items: center; gap: 35px; padding: 44px; border-radius: 12px; color: var(--white); background: var(--green-dark); }
+		.support-contact-box h2 { color: var(--white); font-size: 2rem; }
+		.support-contact-box p { max-width: 560px; margin-top: 10px; color: var(--mint); }
+		.support-contact-box .button { flex-shrink: 0; color: var(--green-dark); border-color: var(--white); background: var(--white); }
+
+		.support-footer { padding: 26px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+		.support-footer .container { display: flex; justify-content: space-between; gap: 20px; }
+
+		@media (max-width: 800px) {
+			.nav-links { gap: 16px; }
+			.support-hero-grid, .faq-grid { grid-template-columns: 1fr; gap: 42px; }
+			.topic-grid { grid-template-columns: 1fr; }
+			.support-panel { max-width: 560px; }
+		}
+
+		@media (max-width: 620px) {
+			.container { width: min(100% - 28px, 1100px); }
+			.nav-links { display: none; }
+			.support-hero { padding: 58px 0 70px; }
+			.support-contact-box { align-items: flex-start; flex-direction: column; padding: 30px; }
+			.support-footer .container { align-items: flex-start; flex-direction: column; gap: 5px; }
+		}
+	</style>
+</head>
+<body class="support-page">
+	<header class="header">
+		<div class="container nav">
+			<a class="brand" href="../Index.html#inicio" aria-label="RENE Health, inicio">
+				<img src="../img/logo.png" alt="Logo de RENE Health" class="brand-logo">
+				RENE Health
+			</a>
+
+			<!-- La navegación conserva las mismas rutas principales del Index.html. -->
+			<nav class="nav-links" aria-label="Navegación principal">
+				<div class="dropdown">
+					<a href="../Index.html#funciones" class="dropdown-toggle">Funciones <span class="arrow">⌄</span></a>
+					<div class="dropdown-menu">
+						<a href="historia-clinica.html">Historia Clínica</a>
+						<a href="agenda.html">Agenda</a>
+						<a href="finanzas.html">Finanzas</a>
+					</div>
+				</div>
+				<a href="nosotros.html">Nosotros</a>
+				<a href="blog.html">Blog</a>
+				<a href="soporte.html" aria-current="page">Soporte</a>
+				<a class="button button-login" href="../ingresar.html">Ingresar</a>
+				<a class="button button-register" href="../registrarse.html">Registrarse</a>
+			</nav>
+		</div>
+	</header>
+
+	<main>
+		<section class="support-hero">
+			<div class="container support-hero-grid">
+				<div>
+					<p class="eyebrow">Estamos para ayudarte</p>
+					<h1>No estudiaste medicina para perder los papeles.</h1>
+					<p class="support-copy">Nuestro equipo está aquí para ayudarte a sacar el máximo provecho de RENE Health y resolver tus dudas de forma rápida y sencilla.</p>
+					<div class="support-actions">
+						<!-- Sustituye esta URL por el enlace definitivo del chat cuando esté disponible. -->
+						<a class="button" href="mailto:soporte@renehealth.com?subject=Necesito%20ayuda">Hablar con soporte</a>
+						<a class="button button-light" href="#preguntas">Preguntas frecuentes</a>
+					</div>
+				</div>
+				<aside class="support-panel" aria-label="Atención de soporte">
+					<p class="support-panel-label">Soporte RENE Health</p>
+					<h2>¿En qué podemos ayudarte?</h2>
+					<p>Cuéntanos qué necesitas y te orientaremos para que puedas concentrarte en tus pacientes.</p>
+					<a class="button" href="mailto:soporte@renehealth.com">Enviar consulta</a>
+					<div class="support-status">Respuesta del equipo en horario de atención</div>
+				</aside>
+			</div>
+		</section>
+
+		<section class="support-topics">
+			<div class="container">
+				<div class="support-heading">
+					<p class="eyebrow">Ayuda rápida</p>
+					<h2>Encuentra lo que necesitas</h2>
+					<p>Accede a las áreas principales de RENE Health para aprender, configurar y aprovechar mejor la plataforma.</p>
+				</div>
+				<div class="topic-grid">
+					<article class="topic">
+						<div class="topic-icon">⌕</div>
+						<h3>Historia clínica</h3>
+						<p>Organiza atenciones, diagnósticos, notas y antecedentes en un solo lugar.</p>
+						<a href="historia-clinica.html">Conocer función</a>
+					</article>
+					<article class="topic">
+						<div class="topic-icon">□</div>
+						<h3>Agenda y citas</h3>
+						<p>Personaliza tu calendario y mantén tus citas organizadas.</p>
+						<a href="agenda.html">Conocer función</a>
+					</article>
+					<article class="topic">
+						<div class="topic-icon">✓</div>
+						<h3>Cuenta y configuración</h3>
+						<p>Gestiona usuarios, permisos y la información de tu clínica.</p>
+						<a href="../registrarse.html">Crear una cuenta</a>
+					</article>
+				</div>
+			</div>
+		</section>
+
+		<section class="faq-section" id="preguntas">
+			<div class="container faq-grid">
+				<div class="faq-intro">
+					<p class="eyebrow">Respuestas claras</p>
+					<h2>Preguntas frecuentes</h2>
+					<p>Si no encuentras la respuesta que buscas, escríbenos y nuestro equipo te ayudará.</p>
+				</div>
+				<div class="faq-list">
+					<details>
+						<summary>¿Cómo empiezo a usar RENE Health?</summary>
+						<p>Crea tu cuenta desde la opción “Registrarse” y sigue los pasos para configurar tu clínica y tus usuarios.</p>
+					</details>
+					<details>
+						<summary>¿Puedo usar la plataforma desde mi celular?</summary>
+						<p>Sí. Puedes acceder desde cualquier dispositivo con conexión a internet utilizando un navegador compatible.</p>
+					</details>
+					<details>
+						<summary>¿Cómo solicito ayuda con mi cuenta?</summary>
+						<p>Escríbenos a soporte@renehealth.com indicando tu correo y una breve descripción del problema.</p>
+					</details>
+					<details>
+						<summary>¿La información de mis pacientes está protegida?</summary>
+						<p>Aplicamos medidas de seguridad para proteger la plataforma. Revisa nuestra política de privacidad y administra cuidadosamente los permisos de cada usuario.</p>
+					</details>
+				</div>
+			</div>
+		</section>
+
+		<section class="support-contact">
+			<div class="container">
+				<div class="support-contact-box">
+					<div>
+						<h2>¿Qué estás esperando?</h2>
+						<p>Empieza a manejar tu atención médica con herramientas simples y poderosas.</p>
+					</div>
+					<a class="button" href="../registrarse.html">Crea tu cuenta</a>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<footer class="support-footer">
+		<div class="container">
+			<span>© 2026 RENE Health</span>
+			<a href="../politica-privacidad.html">Política de privacidad</a>
+		</div>
+	</footer>
+</body>
+</html>
