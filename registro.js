@@ -4,6 +4,17 @@ const formRegistro = document.getElementById('form-registro')
 const password = document.getElementById('password')
 const confirmPassword = document.getElementById('confirm-password')
 
+document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+	button.addEventListener('click', () => {
+		const input = document.getElementById(button.getAttribute('aria-controls'))
+		if (!input) return
+		const showing = input.type === 'password'
+		input.type = showing ? 'text' : 'password'
+		button.setAttribute('aria-pressed', String(showing))
+		button.setAttribute('aria-label', showing ? 'Ocultar contraseña' : 'Mostrar contraseña')
+	})
+})
+
 const validatePasswords = () => {
 	confirmPassword.setCustomValidity(
 		password.value === confirmPassword.value ? '' : 'Las contraseñas no coinciden.'
