@@ -3,218 +3,130 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Soporte | Doctoc Health</title>
-	<meta name="description" content="Encuentra ayuda para usar Doctoc Health y contacta con nuestro equipo de soporte.">
+	<title>Soporte y Ayuda | RENE Health</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../agenda.css">
 	<style>
-		.support-page { min-height: 100vh; background: var(--cream); }
-
-		.support-hero {
-			padding: 88px 0 96px;
-			background: radial-gradient(circle at 84% 18%, #e6f4eb 0, transparent 36%);
-		}
-
-		.support-hero-grid {
-			display: grid;
-			grid-template-columns: 1fr .78fr;
-			align-items: center;
-			gap: 80px;
-		}
-
-		.support-hero h1 { max-width: 650px; font-size: clamp(2.7rem, 5vw, 4.6rem); }
-		.support-copy { max-width: 560px; margin: 24px 0 30px; color: var(--muted); font-size: 1.1rem; }
-		.support-actions { display: flex; flex-wrap: wrap; gap: 12px; }
-
-		.support-panel {
-			padding: 30px;
-			border: 1px solid var(--line);
-			border-radius: 12px;
-			background: var(--white);
-			box-shadow: 18px 18px 0 var(--mint);
-		}
-
-		.support-panel-label { margin-bottom: 18px; color: var(--green); font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-		.support-panel h2 { font-size: 1.8rem; }
-		.support-panel p { margin: 12px 0 22px; color: var(--muted); }
-		.support-status { display: flex; align-items: center; gap: 8px; margin-top: 18px; color: var(--muted); font-size: .88rem; }
-		.support-status::before { width: 9px; height: 9px; border-radius: 50%; background: #4caf76; content: ""; }
-
-		.support-topics { padding: 82px 0; background: var(--white); }
-		.support-heading { max-width: 610px; margin-bottom: 38px; }
-		.support-heading h2 { margin-bottom: 12px; }
-		.support-heading p { color: var(--muted); }
-
-		.topic-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-		.topic { padding: 26px; border: 1px solid var(--line); border-radius: 8px; background: var(--cream); }
-		.topic-icon { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 20px; border-radius: 12px; color: var(--green-dark); background: var(--mint); font-size: 1.3rem; }
-		.topic h3 { margin-bottom: 8px; font-family: Manrope, sans-serif; font-size: 1.08rem; }
-		.topic p { color: var(--muted); font-size: .94rem; }
-		.topic a { display: inline-block; margin-top: 14px; color: var(--green-dark); font-weight: 700; font-size: .9rem; }
-		.topic a:hover { text-decoration: underline; }
-
-		.faq-section { padding: 84px 0; }
-		.faq-grid { display: grid; grid-template-columns: .7fr 1.3fr; gap: 70px; align-items: start; }
-		.faq-intro h2 { margin-bottom: 14px; }
-		.faq-intro p { color: var(--muted); }
-		.faq-list { border-top: 1px solid var(--line); }
-		.faq-list details { padding: 18px 0; border-bottom: 1px solid var(--line); }
-		.faq-list summary { cursor: pointer; font-family: Manrope, sans-serif; font-weight: 700; list-style-position: outside; }
-		.faq-list details p { max-width: 650px; margin: 12px 0 0 20px; color: var(--muted); }
-
-		.support-contact { padding: 0 0 84px; }
-		.support-contact-box { display: flex; justify-content: space-between; align-items: center; gap: 35px; padding: 44px; border-radius: 12px; color: var(--white); background: var(--green-dark); }
-		.support-contact-box h2 { color: var(--white); font-size: 2rem; }
-		.support-contact-box p { max-width: 560px; margin-top: 10px; color: var(--mint); }
-		.support-contact-box .button { flex-shrink: 0; color: var(--green-dark); border-color: var(--white); background: var(--white); }
-
-		.support-footer { padding: 26px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
-		.support-footer .container { display: flex; justify-content: space-between; gap: 20px; }
-
-		@media (max-width: 800px) {
-			.nav-links { gap: 16px; }
-			.support-hero-grid, .faq-grid { grid-template-columns: 1fr; gap: 42px; }
-			.topic-grid { grid-template-columns: 1fr; }
-			.support-panel { max-width: 560px; }
-		}
-
-		@media (max-width: 620px) {
-			.container { width: min(100% - 28px, 1100px); }
-			.nav-links { display: none; }
-			.support-hero { padding: 58px 0 70px; }
-			.support-contact-box { align-items: flex-start; flex-direction: column; padding: 30px; }
-			.support-footer .container { align-items: flex-start; flex-direction: column; gap: 5px; }
-		}
+		.support-header { margin-bottom:24px; }
+		.support-header h1 { margin-bottom:6px; }
+		.support-header p { color:var(--agenda-muted); }
+		.support-search { display:flex; align-items:center; gap:12px; min-height:52px; margin-bottom:22px; padding:0 16px; border:1px solid var(--agenda-line); border-radius:10px; background:#fff; box-shadow:var(--agenda-shadow); }
+		.support-search span { color:var(--agenda-muted); font-size:1.2rem; }
+		.support-search input { flex:1; min-width:0; min-height:48px; border:0; outline:0; color:var(--agenda-ink); background:transparent; font:500 .92rem "DM Sans",sans-serif; }
+		.support-search:focus-within { border-color:var(--agenda-green); box-shadow:0 0 0 3px #d6f5e9; }
+		.support-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px; margin-bottom:28px; }
+		.support-card { display:flex; align-items:flex-start; gap:13px; min-height:132px; padding:20px; border:1px solid var(--agenda-line); border-radius:11px; color:var(--agenda-ink); background:#fff; box-shadow:var(--agenda-shadow); text-decoration:none; transition:transform .18s,border-color .18s; }
+		a.support-card:hover { transform:translateY(-2px); border-color:#9bd6b9; }
+		.support-card-icon { display:grid; flex:0 0 40px; width:40px; height:40px; place-items:center; border-radius:10px; color:#08764f; background:#e9f8f0; font-size:1.15rem; font-weight:700; }
+		.support-card h2 { margin:1px 0 6px; font:800 .98rem Manrope,sans-serif; }
+		.support-card p { margin:0; color:var(--agenda-muted); font-size:.82rem; line-height:1.55; }
+		.support-card-link { display:inline-block; margin-top:9px; color:#08764f; font-size:.8rem; font-weight:700; }
+		.faq-section { padding:23px; border:1px solid var(--agenda-line); border-radius:12px; background:#fff; box-shadow:var(--agenda-shadow); }
+		.faq-section > header { margin-bottom:20px; }
+		.faq-section > header h2 { margin:0 0 5px; color:var(--agenda-ink); font:800 1.2rem Manrope,sans-serif; }
+		.faq-section > header p { margin:0; color:var(--agenda-muted); font-size:.86rem; }
+		.faq-group + .faq-group { margin-top:23px; }
+		.faq-group h3 { margin:0 0 8px; color:#08764f; font:800 .82rem Manrope,sans-serif; letter-spacing:.04em; text-transform:uppercase; }
+		.faq-item { border-bottom:1px solid #e9f0ec; }
+		.faq-item summary { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 3px; color:var(--agenda-ink); font-size:.9rem; font-weight:700; list-style:none; cursor:pointer; }
+		.faq-item summary::-webkit-details-marker { display:none; }
+		.faq-item summary::after { content:"⌄"; flex:0 0 auto; color:#08764f; font-size:1.1rem; transition:transform .18s; }
+		.faq-item[open] summary::after { transform:rotate(180deg); }
+		.faq-answer { max-width:900px; padding:0 30px 16px 3px; color:var(--agenda-muted); font-size:.86rem; line-height:1.7; }
+		.faq-empty { margin:14px 0 0; padding:18px; border-radius:8px; color:var(--agenda-muted); background:#f5f8f6; font-size:.88rem; text-align:center; }
+		.quick-guide-list { margin:10px 0 0; padding-left:18px; color:var(--agenda-muted); font-size:.82rem; line-height:1.7; }
+		@media(max-width:850px) { .support-cards { grid-template-columns:1fr; }.support-card { min-height:0; } }
+		@media(max-width:560px) { .faq-section { padding:17px; }.faq-item summary { font-size:.84rem; }.faq-answer { font-size:.82rem; } }
 	</style>
 </head>
-<body class="support-page">
-	<header class="header">
-		<div class="container nav">
-			<a class="brand" href="../Index.html#inicio" aria-label="Doctoc Health, inicio">
-				<img src="../img/logo.png" alt="Logo de Doctoc Health" class="brand-logo">
-				doctoc health
-			</a>
-
-			<!-- La navegación conserva las mismas rutas principales del Index.html. -->
-			<nav class="nav-links" aria-label="Navegación principal">
-				<div class="dropdown">
-					<a href="../Index.html#funciones" class="dropdown-toggle">Funciones <span class="arrow">⌄</span></a>
-					<div class="dropdown-menu">
-						<a href="historia-clinica.html">Historia Clínica</a>
-						<a href="agenda.html">Agenda</a>
-						<a href="finanzas.html">Finanzas</a>
-					</div>
-				</div>
-				<a href="nosotros.html">Nosotros</a>
-				<a href="blog.html">Blog</a>
-				<a href="soporte.html" aria-current="page">Soporte</a>
-				<a class="button button-login" href="../ingresar.html">Ingresar</a>
-				<a class="button button-register" href="../registrarse.html">Registrarse</a>
+<body class="agenda-page">
+	<div class="agenda-shell">
+		<aside class="agenda-sidebar">
+			<a class="agenda-brand" href="../pacientes.html"><span class="brand-mark">+</span><span>RENE <em>health</em></span></a>
+			<nav class="agenda-nav" aria-label="Navegación principal">
+				<a href="../pacientes.html"><span>◉</span> Pacientes</a>
+				<a href="agenda.html"><span>▣</span> Agenda</a>
+				<a href="estadisticas.html"><span>↗</span> Estadísticas</a>
+				<a href="finanzas.html"><span>$</span> Finanzas</a>
+				<a href="ajustes.html"><span>⚙</span> Ajustes</a>
 			</nav>
-		</div>
-	</header>
-
-	<main>
-		<section class="support-hero">
-			<div class="container support-hero-grid">
-				<div>
-					<p class="eyebrow">Estamos para ayudarte</p>
-					<h1>No estudiaste medicina para perder los papeles.</h1>
-					<p class="support-copy">Nuestro equipo está aquí para ayudarte a sacar el máximo provecho de Doctoc Health y resolver tus dudas de forma rápida y sencilla.</p>
-					<div class="support-actions">
-						<!-- Sustituye esta URL por el enlace definitivo del chat cuando esté disponible. -->
-						<a class="button" href="mailto:soporte@doctoc.health?subject=Necesito%20ayuda">Hablar con soporte</a>
-						<a class="button button-light" href="#preguntas">Preguntas frecuentes</a>
-					</div>
+			<div class="agenda-sidebar-bottom"><small>SOPORTE</small><a class="is-active" href="soporte.html" aria-current="page"><span>?</span> Ayuda</a><div class="agenda-user"><span id="sidebar-avatar">?</span><div><strong id="sidebar-name">Cargando...</strong><small>Administrador</small></div></div><button class="agenda-logout" id="sidebar-logout" type="button"><span>↪</span> Cerrar sesión</button></div>
+		</aside>
+		<main class="agenda-main">
+			<header class="agenda-header support-header"><div><p class="eyebrow">CENTRO DE AYUDA</p><h1>Soporte y Ayuda</h1><p>Centro de ayuda, preguntas frecuentes y contacto técnico</p></div></header>
+			<label class="support-search"><span aria-hidden="true">⌕</span><input id="faq-search" type="search" placeholder="Busca una respuesta (ej. proforma, ausentismo, comprobante)" autocomplete="off" aria-label="Buscar preguntas frecuentes"></label>
+			<section class="support-cards" aria-label="Contacto y documentación">
+				<a class="support-card" href="https://wa.me/51969500985?text=Hola%2C%20necesito%20ayuda%20con%20RENE%20Health" target="_blank" rel="noopener noreferrer">
+					<span class="support-card-icon" aria-hidden="true">☏</span><span><h2>Contacto por WhatsApp</h2><p>Comunícate con el equipo de soporte en vivo.</p><span class="support-card-link">Abrir WhatsApp ↗</span></span>
+				</a>
+				<a class="support-card" href="mailto:soporte@renehealth.com">
+					<span class="support-card-icon" aria-hidden="true">✉</span><span><h2>Correo de Soporte</h2><p>Escríbenos y cuéntanos cómo podemos ayudarte.</p><span class="support-card-link">soporte@renehealth.com</span></span>
+				</a>
+				<a class="support-card" href="#guia-rapida">
+					<span class="support-card-icon" aria-hidden="true">▤</span><span><h2>Documentación / Guía Rápida</h2><p>Consulta los pasos básicos para usar el sistema.</p><span class="support-card-link">Ver guía rápida ↓</span></span>
+				</a>
+			</section>
+			<section class="faq-section" aria-labelledby="faq-heading">
+				<header><h2 id="faq-heading">Preguntas frecuentes</h2><p>Selecciona una pregunta para consultar su respuesta.</p></header>
+				<div id="faq-groups">
+					<section class="faq-group" aria-labelledby="faq-patients-heading">
+						<h3 id="faq-patients-heading">Pacientes y Atenciones</h3>
+						<details class="faq-item" data-faq>
+							<summary>¿Cuáles son las restricciones para registrar a un nuevo paciente?</summary>
+							<div class="faq-answer">Por normativa del centro, la edad mínima permitida para el registro es de 5 años. Asimismo, los datos antropométricos deben ser reales (estatura entre 0.90 m y 2.30 m, peso mínimo de 12 kg).</div>
+						</details>
+						<details class="faq-item" data-faq>
+							<summary>¿Puedo modificar el historial de una atención registrada?</summary>
+							<div class="faq-answer">Sí. Al abrir el detalle de la atención desde el historial del paciente, puedes presionar el botón “Editar”. Toda modificación guardada generará automáticamente una etiqueta pública de “Editado” con la fecha de la última actualización.</div>
+						</details>
+					</section>
+					<section class="faq-group" aria-labelledby="faq-agenda-heading">
+						<h3 id="faq-agenda-heading">Agenda y Citas</h3>
+						<details class="faq-item" data-faq>
+							<summary>¿Cómo funciona el cambio automático a “No asistió”?</summary>
+							<div class="faq-answer">Si una cita programada en estado “Pendiente” supera su horario agendado sin haber sido marcada como “Atendida”, el sistema la moverá automáticamente a la sección “No asistió” al cargar la agenda.</div>
+						</details>
+						<details class="faq-item" data-faq>
+							<summary>¿Por qué las secciones de la agenda inician colapsadas?</summary>
+							<div class="faq-answer">Para optimizar el espacio visual, los bloques sin citas (0 citas) permanecen cerrados por defecto y se expandirán automáticamente cuando registres una cita o existan pacientes agendados.</div>
+						</details>
+					</section>
+					<section class="faq-group" aria-labelledby="faq-finance-heading">
+						<h3 id="faq-finance-heading">Finanzas y Proformas</h3>
+						<details class="faq-item" data-faq>
+							<summary>¿Qué diferencia existe entre un Comprobante de pago y una Proforma?</summary>
+							<div class="faq-answer">La Proforma es una cotización previa o presupuesto informativo sin valor tributario. El Comprobante de pago (Recibo) registra el ingreso real en caja.</div>
+						</details>
+						<details class="faq-item" data-faq>
+							<summary>¿Cómo convierto una Proforma a Comprobante de Pago?</summary>
+							<div class="faq-answer">Desde la pestaña “Proformas” en el módulo Finanzas, ubica la cotización aprobada y presiona el botón “Convertir a Comprobante”. Se generará el registro de pago heredando todos los conceptos automáticamente.</div>
+						</details>
+					</section>
+					<section class="faq-group" aria-labelledby="faq-stats-heading">
+						<h3 id="faq-stats-heading">Estadísticas</h3>
+						<details class="faq-item" data-faq>
+							<summary>¿Cómo se calcula la Tasa de Ausentismo?</summary>
+							<div class="faq-answer">La tasa representa el porcentaje de citas no concretadas dentro del rango de fechas seleccionado. Se calcula mediante la fórmula: (Total Citas No Asistió / Total Citas Agendadas) * 100.</div>
+						</details>
+					</section>
+					<p class="faq-empty" id="faq-empty" hidden>No se encontraron preguntas que coincidan con la búsqueda</p>
 				</div>
-				<aside class="support-panel" aria-label="Atención de soporte">
-					<p class="support-panel-label">Soporte Doctoc</p>
-					<h2>¿En qué podemos ayudarte?</h2>
-					<p>Cuéntanos qué necesitas y te orientaremos para que puedas concentrarte en tus pacientes.</p>
-					<a class="button" href="mailto:soporte@doctoc.health">Enviar consulta</a>
-					<div class="support-status">Respuesta del equipo en horario de atención</div>
-				</aside>
-			</div>
-		</section>
-
-		<section class="support-topics">
-			<div class="container">
-				<div class="support-heading">
-					<p class="eyebrow">Ayuda rápida</p>
-					<h2>Encuentra lo que necesitas</h2>
-					<p>Accede a las áreas principales de Doctoc Health para aprender, configurar y aprovechar mejor la plataforma.</p>
-				</div>
-				<div class="topic-grid">
-					<article class="topic">
-						<div class="topic-icon">⌕</div>
-						<h3>Historia clínica</h3>
-						<p>Organiza atenciones, diagnósticos, notas y antecedentes en un solo lugar.</p>
-						<a href="historia-clinica.html">Conocer función</a>
-					</article>
-					<article class="topic">
-						<div class="topic-icon">□</div>
-						<h3>Agenda y citas</h3>
-						<p>Personaliza tu calendario y mantén tus citas organizadas.</p>
-						<a href="agenda.html">Conocer función</a>
-					</article>
-					<article class="topic">
-						<div class="topic-icon">✓</div>
-						<h3>Cuenta y configuración</h3>
-						<p>Gestiona usuarios, permisos y la información de tu clínica.</p>
-						<a href="../registrarse.html">Crear una cuenta</a>
-					</article>
-				</div>
-			</div>
-		</section>
-
-		<section class="faq-section" id="preguntas">
-			<div class="container faq-grid">
-				<div class="faq-intro">
-					<p class="eyebrow">Respuestas claras</p>
-					<h2>Preguntas frecuentes</h2>
-					<p>Si no encuentras la respuesta que buscas, escríbenos y nuestro equipo te ayudará.</p>
-				</div>
-				<div class="faq-list">
-					<details>
-						<summary>¿Cómo empiezo a usar Doctoc Health?</summary>
-						<p>Crea tu cuenta desde la opción “Registrarse” y sigue los pasos para configurar tu clínica y tus usuarios.</p>
-					</details>
-					<details>
-						<summary>¿Puedo usar la plataforma desde mi celular?</summary>
-						<p>Sí. Puedes acceder desde cualquier dispositivo con conexión a internet utilizando un navegador compatible.</p>
-					</details>
-					<details>
-						<summary>¿Cómo solicito ayuda con mi cuenta?</summary>
-						<p>Escríbenos a soporte@doctoc.health indicando tu correo y una breve descripción del problema.</p>
-					</details>
-					<details>
-						<summary>¿La información de mis pacientes está protegida?</summary>
-						<p>Aplicamos medidas de seguridad para proteger la plataforma. Revisa nuestra política de privacidad y administra cuidadosamente los permisos de cada usuario.</p>
-					</details>
-				</div>
-			</div>
-		</section>
-
-		<section class="support-contact">
-			<div class="container">
-				<div class="support-contact-box">
-					<div>
-						<h2>¿Qué estás esperando?</h2>
-						<p>Empieza a manejar tu atención médica con herramientas simples y poderosas.</p>
-					</div>
-					<a class="button" href="../registrarse.html">Crea tu cuenta</a>
-				</div>
-			</div>
-		</section>
-	</main>
-
-	<footer class="support-footer">
-		<div class="container">
-			<span>© 2026 Doctoc Health</span>
-			<a href="../politica-privacidad.html">Política de privacidad</a>
-		</div>
-	</footer>
+			</section>
+			<section class="faq-section" id="guia-rapida" style="margin-top:20px" aria-labelledby="quick-guide-heading">
+				<header><h2 id="quick-guide-heading">Guía rápida</h2><p>Un recorrido breve por las funciones principales de RENE Health.</p></header>
+				<ul class="quick-guide-list">
+					<li><strong>Pacientes:</strong> busca o registra pacientes y revisa su historial clínico desde el detalle.</li>
+					<li><strong>Agenda:</strong> crea citas, consulta la programación y actualiza su estado después de la atención.</li>
+					<li><strong>Finanzas:</strong> registra comprobantes, pagos y cotizaciones desde las pestañas correspondientes.</li>
+					<li><strong>Estadísticas:</strong> usa el rango de fechas para consultar los indicadores y reportes del periodo.</li>
+					<li><strong>Ajustes:</strong> administra tu perfil, los datos del consultorio, el catálogo de servicios y la seguridad de la cuenta.</li>
+				</ul>
+			</section>
+		</main>
+	</div>
+	<script type="module" src="../soporte.js"></script>
 </body>
 </html>
