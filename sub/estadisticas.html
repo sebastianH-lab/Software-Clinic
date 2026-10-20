@@ -30,7 +30,7 @@
 		.statistics-card.full-width { grid-column: 1 / -1; }
 		.statistics-card-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--agenda-line); }
 		.statistics-card-header h2 { margin: 0; color: var(--agenda-ink); font: 700 1rem Manrope, sans-serif; }
-		.download-button { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--agenda-line); border-radius: 7px; color: var(--agenda-muted); background: #fff; font-size: 1rem; cursor: pointer; }
+		.download-button { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--agenda-line); border-radius: 7px; color: var(--agenda-muted); background: #f8fbf9; font-size: 1rem; cursor: pointer; }
 		.download-button:hover { color: #08764f; border-color: #9bd6b9; background: #f1fbf6; }
 		.chart-placeholder { display: grid; min-height: 190px; place-items: center; color: var(--agenda-muted); font-size: .9rem; }
 		.kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
@@ -54,7 +54,7 @@
 		.table-tool-button { display: grid; width: 42px; place-items: center; border: 1px solid #cbdad3; border-radius: 7px; color: var(--agenda-ink); background: #fff; font-size: 1rem; cursor: pointer; }
 		.table-tool-button:hover { border-color: var(--agenda-green); color: #08764f; }
 		.table-wrapper { overflow-x: auto; }
-		.patient-table { width: 100%; min-width: 850px; border-collapse: collapse; }
+		.patient-table { width: 100%; min-width: 760px; border-collapse: collapse; }
 		.patient-table th, .patient-table td { padding: 13px 10px; border-bottom: 1px solid #edf3ef; color: var(--agenda-ink); font-size: .82rem; text-align: left; white-space: nowrap; }
 		.patient-table th { color: var(--agenda-muted); font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
 		.patient-table th button { padding: 0; border: 0; color: inherit; background: transparent; font: inherit; cursor: pointer; }
@@ -111,7 +111,7 @@
 		<main class="statistics-main">
 			<header class="statistics-header">
 				<div><p class="eyebrow">ANÁLISIS CLÍNICO</p><h1>Estadísticas</h1><p>Consulta el rendimiento de tus atenciones e informes.</p></div>
-				<button class="statistics-action" id="export-attentions" type="button"><span aria-hidden="true">⇩</span> Exportar Atenciones (<span id="attention-count">0</span>)</button>
+				<button class="statistics-action" id="export-attentions" type="button"><span aria-hidden="true">📥</span> Exportar Atenciones (<span id="attention-count">0</span>)</button>
 			</header>
 
 			<section class="filters-bar" aria-label="Filtros de estadísticas">
@@ -131,16 +131,16 @@
 			</section>
 
 			<section class="statistics-grid" aria-label="Gráficos e informes">
-				<article class="statistics-card full-width" data-report="attentions-by-doctor"><header class="statistics-card-header"><h2>Atenciones por médico</h2><button class="download-button" type="button" data-export-report="attentions-by-doctor" aria-label="Descargar Atenciones por médico">⇩</button></header><div class="chart-placeholder" id="chart-attentions-by-doctor"></div></article>
-				<article class="statistics-card" data-report="appointment-types"><header class="statistics-card-header"><h2>Citas por tipo</h2><button class="download-button" type="button" data-export-report="appointment-types" aria-label="Descargar Citas por tipo">⇩</button></header><div class="chart-placeholder" id="chart-appointment-types"></div></article>
-				<article class="statistics-card" data-report="appointment-status"><header class="statistics-card-header"><h2>Citas por estado</h2><button class="download-button" type="button" data-export-report="appointment-status" aria-label="Descargar Citas por estado">⇩</button></header><div class="chart-placeholder" id="chart-appointment-status"></div></article>
-				<article class="statistics-card full-width" data-report="diagnoses"><header class="statistics-card-header"><h2>Diagnósticos más comunes</h2><button class="download-button" type="button" data-export-report="diagnoses" aria-label="Descargar Diagnósticos más comunes">⇩</button></header><div class="chart-placeholder" id="chart-diagnoses"></div></article>
+				<article class="statistics-card full-width" data-report="attentions-by-doctor"><header class="statistics-card-header"><h2>Atenciones por médico</h2><button class="download-button" type="button" data-export-report="attentions-by-doctor" aria-label="Descargar Atenciones por médico">📥</button></header><div class="chart-placeholder" id="chart-attentions-by-doctor"></div></article>
+				<article class="statistics-card" data-report="appointment-types"><header class="statistics-card-header"><h2>Citas por tipo</h2><button class="download-button" type="button" data-export-report="appointment-types" aria-label="Descargar Citas por tipo">📥</button></header><div class="chart-placeholder" id="chart-appointment-types"></div></article>
+				<article class="statistics-card" data-report="appointment-status"><header class="statistics-card-header"><h2>Citas por estado</h2><button class="download-button" type="button" data-export-report="appointment-status" aria-label="Descargar Citas por estado">📥</button></header><div class="chart-placeholder" id="chart-appointment-status"></div></article>
+				<article class="statistics-card full-width" data-report="diagnoses"><header class="statistics-card-header"><h2>Diagnósticos más comunes</h2><button class="download-button" type="button" data-export-report="diagnoses" aria-label="Descargar Diagnósticos más comunes">📥</button></header><div class="chart-placeholder" id="chart-diagnoses"></div></article>
 			</section>
 
 			<section class="patient-section" aria-labelledby="patients-heading">
-				<header class="patient-section-header"><div class="patient-section-title"><h2 id="patients-heading">Lista de pacientes</h2><span class="record-badge" id="patient-count">0 registros</span></div><button class="download-button" id="export-patients" type="button" aria-label="Descargar lista de pacientes">⇩</button></header>
+				<header class="patient-section-header"><div class="patient-section-title"><h2 id="patients-heading">Lista de pacientes</h2><span class="record-badge" id="patient-count">0 registros</span></div><button class="download-button" id="export-patients" type="button" aria-label="Descargar lista de pacientes">📥</button></header>
 				<div class="table-tools"><label class="table-search"><select id="patient-search-field" aria-label="Campo de búsqueda"><option value="nombre_completo">Nombre completo</option><option value="documento_identidad">Documento</option><option value="correo">Correo</option></select><input id="patient-search" type="search" placeholder="Buscar..." aria-label="Buscar pacientes"></label><button class="table-tool-button" id="patient-search-button" type="button" aria-label="Buscar">⌕</button><button class="table-tool-button" id="patient-filter-button" type="button" aria-label="Abrir filtros avanzados">☰</button></div>
-				<div class="table-wrapper"><table class="patient-table"><thead><tr><th>Nombre completo</th><th>Fecha de nacimiento</th><th><button id="sort-age" type="button">Edad ↕</button></th><th>Documento</th><th>País</th><th>Teléfono</th><th>Correo</th></tr></thead><tbody id="patient-table-body"><tr><td>ARMANDO PUERTAS JOSE CARLOS</td><td>1990-02-01</td><td>36</td><td>72345678</td><td>-</td><td>942345678</td><td>armando.puertas@gmail.com</td></tr></tbody></table></div>
+				<div class="table-wrapper"><table class="patient-table"><thead><tr><th>Nombre completo</th><th>Fecha de nacimiento</th><th><button id="sort-age" type="button">Edad ↕</button></th><th>Documento</th><th>Teléfono</th><th>Correo</th></tr></thead><tbody id="patient-table-body"><tr><td>ARMANDO PUERTAS JOSE CARLOS</td><td>1990-02-01</td><td>36</td><td>72345678</td><td>942345678</td><td>armando.puertas@gmail.com</td></tr></tbody></table></div>
 				<footer class="pagination"><button id="previous-page" type="button">← Anterior</button><span class="page-number" id="current-page">1</span><button id="next-page" type="button">Siguiente →</button></footer>
 			</section>
 		</main>
@@ -153,7 +153,7 @@
 	<script type="module">
 		import { clearClientStorage, requireAuthenticatedUser, supabase } from '../supabase.js'
 
-		const state = { appointments: [], patients: [], diagnoses: [], filteredPatients: [], charts: {}, dateFrom: null, dateTo: null, totalAppointments: 0, attendedAppointments: 0, noShowAppointments: 0, newPatients: 0, ageFrom: null, ageTo: null, sortAscending: true }
+		const state = { appointments: [], patients: [], diagnoses: [], attentionRecords: [], filteredPatients: [], charts: {}, dateFrom: null, dateTo: null, totalAppointments: 0, attendedAppointments: 0, noShowAppointments: 0, newPatients: 0, ageFrom: null, ageTo: null, sortAscending: true }
 		const $ = (selector) => document.querySelector(selector)
 		const $$ = (selector) => [...document.querySelectorAll(selector)]
 		const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
@@ -185,7 +185,7 @@
 			const term = $('#patient-search').value.trim().toLowerCase(); const field = $('#patient-search-field').value
 			state.filteredPatients = state.patients.filter((patient) => { const age = calculateAge(patient.fecha_nacimiento); const matchesAge = (state.ageFrom === null || (age !== null && age >= state.ageFrom)) && (state.ageTo === null || (age !== null && age <= state.ageTo)); const value = String(patient[field] || '').toLowerCase(); return matchesAge && (!term || value.includes(term)) }).sort((first, second) => { const firstAge = calculateAge(first.fecha_nacimiento) ?? -1; const secondAge = calculateAge(second.fecha_nacimiento) ?? -1; return state.sortAscending ? firstAge - secondAge : secondAge - firstAge })
 			$('#patient-count').textContent = `${state.filteredPatients.length} ${state.filteredPatients.length === 1 ? 'registro' : 'registros'}`
-			$('#patient-table-body').innerHTML = state.filteredPatients.length ? state.filteredPatients.map((patient) => `<tr><td>${escapeHtml(patient.nombre_completo || '-')}</td><td>${escapeHtml(patient.fecha_nacimiento || '-')}</td><td>${calculateAge(patient.fecha_nacimiento) ?? '-'}</td><td>${escapeHtml(patient.documento_identidad || '-')}</td><td>${escapeHtml(patient.pais || '-')}</td><td>${escapeHtml(patient.telefono || '-')}</td><td>${escapeHtml(patient.correo || '-')}</td></tr>`).join('') : '<tr><td class="table-empty" colspan="7">No hay pacientes que coincidan con los filtros.</td></tr>'
+			$('#patient-table-body').innerHTML = state.filteredPatients.length ? state.filteredPatients.map((patient) => `<tr><td>${escapeHtml(patient.nombre_completo || '-')}</td><td>${escapeHtml(patient.fecha_nacimiento || '-')}</td><td>${calculateAge(patient.fecha_nacimiento) ?? '-'}</td><td>${escapeHtml(patient.documento_identidad || '-')}</td><td>${escapeHtml(patient.telefono || '-')}</td><td>${escapeHtml(patient.correo || '-')}</td></tr>`).join('') : '<tr><td class="table-empty" colspan="6">No hay pacientes que coincidan con los filtros.</td></tr>'
 		}
 
 		function reportRows(report) {
@@ -198,8 +198,131 @@
 		}
 		function downloadExcel(rows, filename) { if (!window.XLSX) { alert('No se pudo cargar el exportador de Excel.'); return } const sheet = XLSX.utils.json_to_sheet(rows.length ? rows : [{ Información: 'No hay datos para el rango seleccionado' }]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, sheet, 'Estadísticas'); XLSX.writeFile(workbook, filename) }
 
-		// Exporta a Excel el informe general de atenciones, respetando estrictamente el rango seleccionado.
-		function exportAllAttentions() { downloadExcel(reportRows('attentions-by-doctor'), 'Atenciones_filtradas.xlsx') }
+		async function exportAllAttentions() {
+			if (!window.XLSX) { alert('No se pudo cargar el exportador de Excel.'); return }
+			try {
+				const user = await requireAuthenticatedUser('../ingresar.html')
+				if (!user) return
+
+				const { start, end } = timestampRange(state.dateFrom, state.dateTo)
+				let appointmentsQuery = supabase
+					.from('citas')
+					.select('*, pacientes(*), doctor:profiles!citas_doctor_id_fkey(full_name)', { count: 'exact' })
+					.eq('registrado_por', user.id)
+					.order('fecha', { ascending: true })
+					.order('hora_inicio', { ascending: true })
+				let attendedQuery = supabase.from('citas')
+					.select('id', { count: 'exact', head: true })
+					.eq('registrado_por', user.id)
+					.in('estado', ['Atendida', 'atendida'])
+				let noShowQuery = supabase.from('citas')
+					.select('id', { count: 'exact', head: true })
+					.eq('registrado_por', user.id)
+					.in('estado', ['No asistió', 'No Asistió', 'No asistio', 'no asistio', 'no_asistio', 'no_asistió', 'no-asistio', 'no-asistió'])
+				let newPatientsQuery = supabase.from('pacientes')
+					.select('id', { count: 'exact', head: true })
+					.eq('registrado_por', user.id)
+
+				if (state.dateFrom) {
+					appointmentsQuery = appointmentsQuery.gte('fecha', state.dateFrom)
+					attendedQuery = attendedQuery.gte('fecha', state.dateFrom)
+					noShowQuery = noShowQuery.gte('fecha', state.dateFrom)
+					newPatientsQuery = newPatientsQuery.gte('created_at', start)
+				}
+				if (state.dateTo) {
+					appointmentsQuery = appointmentsQuery.lte('fecha', state.dateTo)
+					attendedQuery = attendedQuery.lte('fecha', state.dateTo)
+					noShowQuery = noShowQuery.lte('fecha', state.dateTo)
+					newPatientsQuery = newPatientsQuery.lt('created_at', end)
+				}
+
+				const [appointmentsResult, attendedResult, noShowResult, newPatientsResult] = await Promise.all([
+					appointmentsQuery,
+					attendedQuery,
+					noShowQuery,
+					newPatientsQuery,
+				])
+				const results = [appointmentsResult, attendedResult, noShowResult, newPatientsResult]
+				const errors = results.filter((result) => result.error)
+				if (errors.length) throw new Error(errors.map((result) => result.error.message).join('; '))
+
+				const appointments = appointmentsResult.data || []
+				const patientIds = [...new Set(appointments.map((appointment) => appointment.paciente_id).filter(Boolean))]
+				let attentionRecords = []
+				if (patientIds.length) {
+					const { data, error } = await supabase
+						.from('atenciones')
+						.select('*, atencion_diagnosticos(descripcion, cie10)')
+						.eq('registrado_por', user.id)
+						.in('paciente_id', patientIds)
+						.order('created_at', { ascending: false })
+					if (error) throw error
+					attentionRecords = data || []
+				}
+
+				const totalAppointments = appointmentsResult.count || 0
+				const noShowAppointments = noShowResult.count || 0
+				const noShowRate = totalAppointments ? (noShowAppointments / totalAppointments) * 100 : 0
+				const rangeLabel = `${formatDate(state.dateFrom) || 'Sin inicio'} a ${formatDate(state.dateTo) || 'Sin fin'}`
+				const diagnosesByAppointment = new Map()
+				const latestDiagnosisByPatient = new Map()
+				attentionRecords.forEach((attention) => {
+					const patientId = String(attention.paciente_id || '')
+					const diagnoses = (attention.atencion_diagnosticos || [])
+						.filter((diagnosis) => diagnosis.descripcion || diagnosis.cie10)
+						.map((diagnosis) => diagnosis.cie10
+							? `${diagnosis.descripcion || 'Sin descripción'} (${diagnosis.cie10})`
+							: diagnosis.descripcion)
+					if (!diagnoses.length) return
+					const formattedDiagnosis = [...new Set(diagnoses)].join('; ')
+					if (attention.cita_id && !diagnosesByAppointment.has(String(attention.cita_id))) {
+						diagnosesByAppointment.set(String(attention.cita_id), formattedDiagnosis)
+					}
+					if (patientId && !latestDiagnosisByPatient.has(patientId)) {
+						latestDiagnosisByPatient.set(patientId, formattedDiagnosis)
+					}
+				})
+				const detailRows = appointments.map((appointment) => {
+					const patient = appointment.pacientes || {}
+					const patientId = String(patient.id || appointment.paciente_id || '')
+					const status = appointment.estado || 'Pendiente'
+					const diagnosis = diagnosesByAppointment.get(String(appointment.id))
+						|| latestDiagnosisByPatient.get(patientId)
+					return [
+						getDateValue(appointment),
+						appointment.hora_inicio || appointment.hora || '',
+						patient.nombre_completo || 'Sin paciente',
+						patient.documento_identidad || '',
+						patient.telefono || '',
+						appointment.doctor?.nombre_completo || appointment.doctor?.full_name || appointment.medico || 'Sin asignar',
+						appointment.tipo_cita || appointment.tipo || 'Sin tipo',
+						status,
+						appointment.motivo?.trim() || '-',
+						diagnosis || '-',
+						appointment.monto_atencion ?? appointment.importe_total ?? appointment.precio ?? appointment.monto ?? '',
+					]
+				})
+				const rows = [
+					['Reporte Consolidado de Estadísticas Clínicas - RENE Health'],
+					['Rango de Fechas', rangeLabel],
+					['Total Citas Agendadas', totalAppointments],
+					['Tasa de Ausentismo (%)', `${noShowRate.toFixed(2)}%`],
+					['Pacientes Nuevos', newPatientsResult.count || 0],
+					['Citas Atendidas', attendedResult.count || 0],
+					[],
+					[],
+					['FECHA', 'HORA', 'PACIENTE', 'DNI / DOCUMENTO', 'TELÉFONO', 'MÉDICO', 'TIPO DE CITA', 'ESTADO', 'MOTIVO DE CONSULTA', 'DIAGNÓSTICO CIE-10', 'MONTO'],
+					...detailRows,
+				]
+				const workbook = XLSX.utils.book_new()
+				XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(rows), 'Estadísticas clínicas')
+				const dateSuffix = (value) => value || 'sin_fecha'
+				XLSX.writeFile(workbook, `Estadisticas_Clinicas_${dateSuffix(state.dateFrom)}_${dateSuffix(state.dateTo)}.xlsx`)
+			} catch (error) {
+				console.error('No se pudo exportar el reporte de estadísticas:', error)
+				alert(`No se pudo exportar el reporte: ${error.message}`)
+			}
+		}
 		// Exporta a Excel los datos correspondientes a cada tarjeta del dashboard.
 		function exportIndividualReport(report) { downloadExcel(reportRows(report), `${report}.xlsx`) }
 		function renderKpis() {
@@ -239,7 +362,7 @@
 		async function loadData() {
 			const user = await requireAuthenticatedUser('../ingresar.html')
 			if (!user) return
-			state.appointments = []; state.patients = []; state.diagnoses = []; state.filteredPatients = []
+			state.appointments = []; state.patients = []; state.diagnoses = []; state.attentionRecords = []; state.filteredPatients = []
 			state.totalAppointments = 0; state.attendedAppointments = 0; state.noShowAppointments = 0; state.newPatients = 0
 			renderPatients(); refreshDateDependentReports()
 			if (state.dateFrom && state.dateTo && state.dateFrom > state.dateTo) {
@@ -251,7 +374,7 @@
 			let attendedQuery = supabase.from('citas').select('id', { count: 'exact', head: true }).eq('registrado_por', user.id).in('estado', ['Atendida', 'atendida'])
 			let noShowQuery = supabase.from('citas').select('id', { count: 'exact', head: true }).eq('registrado_por', user.id).in('estado', ['No asistió', 'No Asistió', 'No asistio', 'no asistio', 'no_asistio', 'no_asistió', 'no-asistio', 'no-asistió'])
 			let newPatientsQuery = supabase.from('pacientes').select('id', { count: 'exact', head: true }).eq('registrado_por', user.id)
-			let diagnosesQuery = supabase.from('atenciones').select('created_at, atencion_diagnosticos(descripcion)').eq('registrado_por', user.id).order('created_at')
+			let diagnosesQuery = supabase.from('atenciones').select('paciente_id, created_at, atencion_diagnosticos(descripcion)').eq('registrado_por', user.id).order('created_at')
 			if (state.dateFrom) {
 				appointmentsQuery = appointmentsQuery.gte('fecha', state.dateFrom)
 				attendedQuery = attendedQuery.gte('fecha', state.dateFrom)
@@ -285,10 +408,11 @@
 			state.attendedAppointments = attendedResult.count || 0
 			state.noShowAppointments = noShowResult.count || 0
 			state.newPatients = newPatientsResult.count || 0
+			state.attentionRecords = diagnosesResult.data || []
 			state.diagnoses = (diagnosesResult.data || []).flatMap((attention) => (attention.atencion_diagnosticos || []).map((diagnosis) => ({ date: attention.created_at?.slice(0, 10) || '', descripcion: diagnosis.descripcion || 'Sin descripción' }))).reduce((groups, item) => { const key = normalize(item.descripcion); groups[key] ??= { ...item, count: 0 }; groups[key].count++; return groups }, {})
 			state.diagnoses = Object.values(state.diagnoses); renderPatients(); refreshDateDependentReports()
 		}
-		async function logout() { const { error } = await supabase.auth.signOut(); if (error) { console.error('No se pudo cerrar la sesión:', error.message); return } state.appointments = []; state.patients = []; state.diagnoses = []; state.filteredPatients = []; state.dateFrom = null; state.dateTo = null; state.totalAppointments = 0; state.attendedAppointments = 0; state.noShowAppointments = 0; state.newPatients = 0; state.ageFrom = null; state.ageTo = null; state.sortAscending = true; Object.values(state.charts).forEach((chart) => chart?.destroy()); state.charts = {}; document.body.replaceChildren(); clearClientStorage(); window.location.href = '../ingresar.html' }
+		async function logout() { const { error } = await supabase.auth.signOut(); if (error) { console.error('No se pudo cerrar la sesión:', error.message); return } state.appointments = []; state.patients = []; state.diagnoses = []; state.attentionRecords = []; state.filteredPatients = []; state.dateFrom = null; state.dateTo = null; state.totalAppointments = 0; state.attendedAppointments = 0; state.noShowAppointments = 0; state.newPatients = 0; state.ageFrom = null; state.ageTo = null; state.sortAscending = true; Object.values(state.charts).forEach((chart) => chart?.destroy()); state.charts = {}; document.body.replaceChildren(); clearClientStorage(); window.location.href = '../ingresar.html' }
 		function bindEvents() {
 			$('#sidebar-logout').addEventListener('click', logout); $('#export-attentions').addEventListener('click', exportAllAttentions); $('#export-patients').addEventListener('click', () => downloadExcel(state.filteredPatients, 'Lista_de_pacientes.xlsx')); $$('#advanced-filter-button, #patient-filter-button').forEach((button) => button.addEventListener('click', () => { $('#advanced-filter-modal').hidden = false })); $('#close-advanced-filter').addEventListener('click', () => { $('#advanced-filter-modal').hidden = true }); $('#advanced-filter-modal').addEventListener('click', (event) => { if (event.target.id === 'advanced-filter-modal') $('#advanced-filter-modal').hidden = true }); $$('.download-button[data-export-report]').forEach((button) => button.addEventListener('click', () => exportIndividualReport(button.dataset.exportReport)))
 			$('#date-range-button').addEventListener('click', () => { $('#date-picker-popover').hidden = !$('#date-picker-popover').hidden; $('#date-range-button').setAttribute('aria-expanded', String(!$('#date-picker-popover').hidden)) }); $('#select-date-button').addEventListener('click', () => $('#date-picker-popover').hidden = false); $('#cancel-date-filter').addEventListener('click', () => $('#date-picker-popover').hidden = true); $('#clear-date').addEventListener('click', (event) => { event.stopPropagation(); setCurrentMonthRange(); $('#date-from').value = state.dateFrom; $('#date-to').value = state.dateTo; updateDateLabel(); loadData() }); $('#apply-date-filter').addEventListener('click', () => { state.dateFrom = $('#date-from').value || null; state.dateTo = $('#date-to').value || null; updateDateLabel(); $('#date-picker-popover').hidden = true; loadData() })
