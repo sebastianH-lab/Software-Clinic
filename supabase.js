@@ -9,7 +9,13 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 
 export async function requireAuthenticatedUser(loginPath = 'ingresar.html') {
 	const { data: { user }, error } = await supabase.auth.getUser()
-	if (error) throw error
+	if (error) {
+		if (error.name === 'AuthSessionMissingError' || error.code === 'session_not_found') {
+			window.location.href = loginPath
+			return null
+		}
+		throw error
+	}
 	if (!user) {
 		window.location.href = loginPath
 		return null
