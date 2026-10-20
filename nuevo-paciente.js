@@ -3,10 +3,12 @@ import { validarDatosClinicosPaciente } from './validaciones-clinicas.js'
 
 // ==================== CONTAR PACIENTES REGISTRADOS ====================
 export async function contarPacientes() {
-	if (!await requireAuthenticatedUser()) return null
+	const user = await requireAuthenticatedUser()
+	if (!user) return null
 	const { count, error } = await supabase
 		.from('pacientes')
 		.select('*', { count: 'exact', head: true })
+		.eq('registrado_por', user.id)
 
 	if (error) {
 		console.error('Error al contar pacientes:', error.message)
@@ -34,13 +36,8 @@ export async function registrarPaciente(datosFormulario) {
 	const validationError = validarDatosClinicosPaciente(datosFormulario)
 	if (validationError) return { success: false, error: validationError }
 
-	const { data: { user }, error: authError } = await supabase.auth.getUser()
-	if (authError) {
-		console.error('Error al verificar la sesión:', authError.message)
-		return { success: false, error: authError.message }
-	}
+	const user = await requireAuthenticatedUser()
 	if (!user) {
-		window.location.href = 'ingresar.html'
 		return { success: false, error: 'No hay una sesión activa' }
 	}
 
@@ -85,7 +82,8 @@ export async function registrarPaciente(datosFormulario) {
 
 // ==================== CARGAR PACIENTE DESDE SUPABASE ====================
 export async function cargarPaciente(pacienteId) {
-	if (!await requireAuthenticatedUser()) return { success: false, error: 'No hay una sesión activa' }
+	const user = await requireAuthenticatedUser()
+	if (!user) return { success: false, error: 'No hay una sesión activa' }
 	// Validar si tenemos un ID
 	if (!pacienteId) {
 		console.error('No se especificó ningún ID de paciente.')
@@ -97,6 +95,7 @@ export async function cargarPaciente(pacienteId) {
 		.from('pacientes')
 		.select('*')
 		.eq('id', pacienteId)
+		.eq('registrado_por', user.id)
 		.single()
 
 	if (error) {
@@ -205,10 +204,12 @@ export async function inicializarPaginaPacientes() {
 
 // Cargar el primer paciente registrado
 async function cargarPrimerPaciente() {
-	if (!await requireAuthenticatedUser()) return { success: false, error: 'No hay una sesión activa' }
+	const user = await requireAuthenticatedUser()
+	if (!user) return { success: false, error: 'No hay una sesión activa' }
 	const { data, error } = await supabase
 		.from('pacientes')
 		.select('*')
+		.eq('registrado_por', user.id)
 		.order('created_at', { ascending: false })
 		.limit(1)
 		.single()
