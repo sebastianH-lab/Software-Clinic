@@ -498,10 +498,12 @@
 
 		// ==================== CARGAR PACIENTES ORDENADOS ====================
 		async function cargarPacientesOrdenados() {
-			if (!await requireAuthenticatedUser()) return
+			const user = await requireAuthenticatedUser()
+			if (!user) return
 			const { data: pacientes, error } = await supabase
 				.from('pacientes')
 				.select('*')
+				.eq('registrado_por', user.id)
 				.eq('activo', !mostrarArchivados)
 				.order('nombre_completo', { ascending: true })
 
@@ -567,22 +569,24 @@
 		}
 
 		async function cargarConteosEstado() {
-			if (!await requireAuthenticatedUser()) return
+			const user = await requireAuthenticatedUser()
+			if (!user) return
 			const [{ count: activos }, { count: archivados }] = await Promise.all([
-				supabase.from('pacientes').select('*', { count: 'exact', head: true }).eq('activo', true),
-				supabase.from('pacientes').select('*', { count: 'exact', head: true }).eq('activo', false),
+				supabase.from('pacientes').select('*', { count: 'exact', head: true }).eq('registrado_por', user.id).eq('activo', true),
+				supabase.from('pacientes').select('*', { count: 'exact', head: true }).eq('registrado_por', user.id).eq('activo', false),
 			])
 			document.getElementById('active-patient-count').textContent = activos || 0
 			document.getElementById('archived-patient-count').textContent = archivados || 0
 		}
 
 		async function cambiarEstadoLista(mostrarArchivadosAhora) {
-			if (!await requireAuthenticatedUser()) return
+			const user = await requireAuthenticatedUser()
+			if (!user) return
 			mostrarArchivados = mostrarArchivadosAhora
 			searchInput.value = ''
 			actualizarSelectorEstado()
 			await cargarPacientesOrdenados()
-			const { data: pacientes } = await supabase.from('pacientes').select('*').eq('activo', !mostrarArchivados).order('nombre_completo', { ascending: true })
+			const { data: pacientes } = await supabase.from('pacientes').select('*').eq('registrado_por', user.id).eq('activo', !mostrarArchivados).order('nombre_completo', { ascending: true })
 			pacientesGlobal = pacientes || []
 		}
 
@@ -651,10 +655,12 @@
 		await cargarPacientesOrdenados()
 
 		// Guardar pacientes globalmente para búsqueda
-		if (await requireAuthenticatedUser()) {
+		const currentUser = await requireAuthenticatedUser()
+		if (currentUser) {
 			const { data: pacientes } = await supabase
 				.from('pacientes')
 				.select('*')
+				.eq('registrado_por', currentUser.id)
 				.eq('activo', !mostrarArchivados)
 				.order('nombre_completo', { ascending: true })
 			if (pacientes) pacientesGlobal = pacientes
@@ -741,10 +747,12 @@
 				await cargarConteosEstado()
 				
 				// Actualizar lista global
-				if (await requireAuthenticatedUser()) {
+				const currentUser = await requireAuthenticatedUser()
+				if (currentUser) {
 					const { data: pacientes } = await supabase
 						.from('pacientes')
 						.select('*')
+						.eq('registrado_por', currentUser.id)
 						.eq('activo', true)
 						.order('nombre_completo', { ascending: true })
 					if (pacientes) pacientesGlobal = pacientes
