@@ -5,6 +5,7 @@ import { validarDatosClinicosPaciente } from './validaciones-clinicas.js'
 const params = new URLSearchParams(window.location.search)
 const pacienteId = params.get('id')
 let comprobantesPaciente = []
+let citasPaciente = []
 let pacienteActual = null
 
 // Verificar sesión
@@ -58,11 +59,15 @@ function mostrarValor(value, suffix = '') {
 }
 
 async function cargarUltimaAtencion() {
-	if (!await requireAuthenticatedUser()) return null
-	const { data: atencion, error } = await supabase.from('atenciones').select('*').eq('paciente_id', pacienteId).order('created_at', { ascending: false }).limit(1).maybeSingle()
+	const activeUser = await requireAuthenticatedUser()
+	if (!activeUser) return null
+	const { data: atencion, error } = await supabase.from('atenciones').select('*').eq('paciente_id', pacienteId).eq('registrado_por', activeUser.id).order('created_at', { ascending: false }).limit(1).maybeSingle()
 
-	if (error || !atencion) return null
-	if (!await requireAuthenticatedUser()) return null
+	if (error) {
+		console.error('Error al cargar la última atención:', error.message)
+		return null
+	}
+	if (!atencion) return null
 	const [{ data: diagnosticos }, { data: tratamientos }] = await Promise.all([
 		supabase.from('atencion_diagnosticos').select('*').eq('atencion_id', atencion.id),
 		supabase.from('atencion_tratamientos').select('*').eq('atencion_id', atencion.id),
@@ -97,7 +102,8 @@ function renderizarArray(array, nombreIds) {
 // ==================== CARGAR PERFIL DEL PACIENTE ====================
 
 async function cargarPerfil() {
-	if (!await requireAuthenticatedUser()) return
+	const activeUser = await requireAuthenticatedUser()
+	if (!activeUser) return
 	if (!pacienteId) {
 		alert("ID de paciente no encontrado")
 		window.location.href = 'pacientes.html'
@@ -109,6 +115,7 @@ async function cargarPerfil() {
 		.from('pacientes')
 		.select('*')
 		.eq('id', pacienteId)
+		.eq('registrado_por', activeUser.id)
 		.single()
 
 	if (error) {
@@ -169,10 +176,13 @@ tabBtns.forEach(button => {
 })
 
 async function actualizarEstadoPaciente(activo) {
+	const activeUser = await requireAuthenticatedUser()
+	if (!activeUser) return false
 	const { error } = await supabase
 		.from('pacientes')
 		.update({ activo })
 		.eq('id', pacienteId)
+		.eq('registrado_por', activeUser.id)
 
 	if (error) {
 		console.error('Error de Supabase:', error)
@@ -227,13 +237,15 @@ function totalPagado(comprobante) {
 async function cargarFinanzasPaciente() {
 	const content = document.getElementById('patient-finance-content')
 	if (!pacienteId) return
-	if (!await requireAuthenticatedUser()) return
+	const activeUser = await requireAuthenticatedUser()
+	if (!activeUser) return
 	content.innerHTML = '<p class="empty-text">Cargando comprobantes...</p>'
 
 	const { data, error } = await supabase
 		.from('comprobantes')
 		.select('*, comprobante_detalles(*), comprobante_pagos(*)')
 		.eq('paciente_id', pacienteId)
+		.eq('registrado_por', activeUser.id)
 		.eq('estado', 'activo')
 		.order('fecha', { ascending: false })
 
@@ -284,7 +296,7 @@ async function cargarFinanzasPaciente() {
 				<td>${escaparHtml(formatoMoneda(paid, currency))}</td>
 				<td>${escaparHtml(formatoMoneda(pending, currency))}</td>
 				<td><span class="patient-receipt-status ${status.toLowerCase()}">${status}</span></td>
-				<td><button class="patient-receipt-pdf" type="button" data-receipt-id="${escaparHtml(receipt.id)}">Descargar PDF</button></td>
+				<td><div class="patient-receipt-actions"><button class="patient-receipt-pdf" type="button" data-receipt-pdf="${escaparHtml(receipt.id)}">Descargar PDF</button><button class="patient-receipt-view" type="button" data-open-receipt="${escaparHtml(receipt.id)}">Ver Recibo</button></div></td>
 			</tr>`
 		}).join('')}</tbody>
 	</table></div>`
@@ -332,22 +344,28 @@ function descargarNotaVenta(comprobante) {
 }
 
 document.getElementById('patient-finance-content').addEventListener('click', (event) => {
-	const button = event.target.closest('[data-receipt-id]')
+	const button = event.target.closest('[data-receipt-pdf], [data-open-receipt]')
 	if (!button) return
-	const receipt = comprobantesPaciente.find((item) => String(item.id) === button.dataset.receiptId)
-	if (receipt) descargarNotaVenta(receipt)
+	const receiptId = button.dataset.receiptPdf || button.dataset.openReceipt
+	const receipt = comprobantesPaciente.find((item) => String(item.id) === receiptId)
+	if (!receipt) return
+	if (button.hasAttribute('data-receipt-pdf')) descargarNotaVenta(receipt)
+	else window.location.href = `sub/finanzas.html?id=${encodeURIComponent(receipt.id)}`
 })
 
 async function cargarAgendaPaciente(id) {
-	if (!await requireAuthenticatedUser()) return
+	const activeUser = await requireAuthenticatedUser()
+	if (!activeUser) return
 	const list = document.getElementById('patient-agenda-list')
 	if (!id) return
+	citasPaciente = []
 	list.innerHTML = '<p class="empty-text">Cargando citas...</p>'
 
 	const { data: citas, error } = await supabase
 		.from('citas')
 		.select('*')
 		.eq('paciente_id', id)
+		.eq('registrado_por', activeUser.id)
 		.order('fecha', { ascending: false })
 		.order('hora_inicio', { ascending: false })
 
@@ -356,20 +374,89 @@ async function cargarAgendaPaciente(id) {
 		return
 	}
 
-	document.getElementById('agenda-count').textContent = `${citas.length} ${citas.length === 1 ? 'cita' : 'citas'}`
-	if (!citas.length) {
+	citasPaciente = citas || []
+	document.getElementById('agenda-count').textContent = `${citasPaciente.length} ${citasPaciente.length === 1 ? 'cita' : 'citas'}`
+	if (!citasPaciente.length) {
 		list.innerHTML = '<p class="empty-text">No hay citas registradas para este paciente</p>'
 		return
 	}
 
-	list.innerHTML = citas.map(cita => {
+	list.innerHTML = citasPaciente.map(cita => {
 		const estado = cita.estado || 'Pendiente'
 		const fecha = cita.fecha ? new Date(`${cita.fecha}T12:00:00`).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Fecha no registrada'
 		const hora = cita.hora_inicio || '--:--'
 		const horaFin = cita.hora_fin ? ` - ${cita.hora_fin}` : ''
-		return `<article class="patient-appointment"><div class="patient-appointment-date">${escaparHtml(fecha)}<small>${escaparHtml(hora)}${escaparHtml(horaFin)}</small></div><div class="patient-appointment-type">${escaparHtml(cita.tipo_cita || 'Consulta')}</div><span class="appointment-status ${normalizarEstadoCita(estado)}">${escaparHtml(estado)}</span></article>`
+		return `<article class="patient-appointment"><div class="patient-appointment-date">${escaparHtml(fecha)}<small>${escaparHtml(hora)}${escaparHtml(horaFin)}</small></div><div class="patient-appointment-type">${escaparHtml(cita.tipo_cita || 'Consulta')}</div><div class="patient-appointment-actions"><span class="appointment-status ${normalizarEstadoCita(estado)}">${escaparHtml(estado)}</span><button class="patient-appointment-edit" type="button" data-edit-appointment="${escaparHtml(cita.id)}">Modificar Cita</button></div></article>`
 	}).join('')
 }
+
+function abrirEdicionCita(cita) {
+	document.getElementById('edit-appointment-id').value = String(cita.id)
+	document.getElementById('edit-appointment-status').value = cita.estado || 'Pendiente'
+	document.getElementById('edit-appointment-date').value = cita.fecha || ''
+	document.getElementById('edit-appointment-time').value = (cita.hora_inicio || '').slice(0, 5)
+	const modal = document.getElementById('appointment-edit-modal')
+	modal.classList.add('is-open')
+	modal.setAttribute('aria-hidden', 'false')
+	document.getElementById('appointment-edit-backdrop').hidden = false
+	document.getElementById('edit-appointment-status').focus()
+}
+
+function cerrarEdicionCita() {
+	const modal = document.getElementById('appointment-edit-modal')
+	modal.classList.remove('is-open')
+	modal.setAttribute('aria-hidden', 'true')
+	document.getElementById('appointment-edit-backdrop').hidden = true
+}
+
+document.getElementById('patient-agenda-list').addEventListener('click', (event) => {
+	const button = event.target.closest('[data-edit-appointment]')
+	if (!button) return
+	const cita = citasPaciente.find((item) => String(item.id) === button.dataset.editAppointment)
+	if (cita) abrirEdicionCita(cita)
+})
+
+document.getElementById('appointment-edit-form').addEventListener('submit', async (event) => {
+	event.preventDefault()
+	const activeUser = await requireAuthenticatedUser()
+	if (!activeUser) return
+	const appointmentId = document.getElementById('edit-appointment-id').value
+	const fecha = document.getElementById('edit-appointment-date').value
+	const hora = document.getElementById('edit-appointment-time').value
+	if (!appointmentId || !fecha || !hora) return
+
+	const { data, error } = await supabase
+		.from('citas')
+		.update({
+			estado: document.getElementById('edit-appointment-status').value,
+			fecha,
+			hora_inicio: `${hora}:00`,
+		})
+		.eq('id', appointmentId)
+		.eq('paciente_id', pacienteId)
+		.eq('registrado_por', activeUser.id)
+		.select('id')
+		.maybeSingle()
+
+	if (error) {
+		console.error('Error al actualizar la cita:', error.message)
+		alert(`No se pudo actualizar la cita: ${error.message}`)
+		return
+	}
+	if (!data) {
+		alert('No se encontró la cita o no tienes permiso para modificarla.')
+		return
+	}
+	cerrarEdicionCita()
+	await cargarAgendaPaciente(pacienteId)
+})
+
+document.getElementById('close-appointment-edit').addEventListener('click', cerrarEdicionCita)
+document.getElementById('cancel-appointment-edit').addEventListener('click', cerrarEdicionCita)
+document.getElementById('appointment-edit-backdrop').addEventListener('click', cerrarEdicionCita)
+document.addEventListener('keydown', (event) => {
+	if (event.key === 'Escape') cerrarEdicionCita()
+})
 
 const drawer = document.getElementById('attention-drawer')
 const backdrop = document.getElementById('attention-backdrop')
@@ -619,6 +706,8 @@ function manejarErrorGuardado(error) {
 }
 
 async function actualizarFuncionesVitales(atencion) {
+	const activeUser = await requireAuthenticatedUser()
+	if (!activeUser) return
 	const vitales = Object.fromEntries(Object.entries({
 		presion_arterial: atencion.pa_presion,
 		frecuencia_cardiaca: atencion.f_cardiaca,
@@ -626,7 +715,10 @@ async function actualizarFuncionesVitales(atencion) {
 		saturacion_oxigeno: atencion.saturacion,
 		temperatura: atencion.temperatura,
 	}).filter(([, value]) => value !== null))
-	if (Object.keys(vitales).length) await supabase.from('pacientes').update(vitales).eq('id', pacienteId)
+	if (Object.keys(vitales).length) {
+		const { error } = await supabase.from('pacientes').update(vitales).eq('id', pacienteId).eq('registrado_por', activeUser.id)
+		if (error) console.error('No se pudieron actualizar los signos vitales del paciente:', error.message)
+	}
 }
 
 nextButton.addEventListener('click', () => {
@@ -635,21 +727,23 @@ nextButton.addEventListener('click', () => {
 })
 
 async function cargarHistorial() {
-	if (!await requireAuthenticatedUser()) return
+	const activeUser = await requireAuthenticatedUser()
+	if (!activeUser) return
 	const list = document.getElementById('history-list')
 	list.innerHTML = '<p class="empty-text">Cargando historial...</p>'
-	const { data, error } = await supabase.from('atenciones').select('*').eq('paciente_id', pacienteId).order('created_at', { ascending: false })
+	const { data, error } = await supabase.from('atenciones').select('*').eq('paciente_id', pacienteId).eq('registrado_por', activeUser.id).order('created_at', { ascending: false })
 	if (error) {
 		list.innerHTML = `<p class="empty-text">No se pudo cargar el historial: ${error.message}</p>`
 		return
 	}
-	document.getElementById('history-count').textContent = `${data.length} consulta${data.length === 1 ? '' : 's'}`
-	if (!data.length) {
+	const attentions = data || []
+	document.getElementById('history-count').textContent = `${attentions.length} consulta${attentions.length === 1 ? '' : 's'}`
+	if (!attentions.length) {
 		list.innerHTML = '<p class="empty-text">Todavía no hay atenciones registradas.</p>'
 		return
 	}
 	list.innerHTML = ''
-	data.forEach(item => {
+	attentions.forEach(item => {
 		const article = document.createElement('article')
 		article.className = 'history-item'
 		article.tabIndex = 0
@@ -676,9 +770,10 @@ async function cargarHistorial() {
 }
 
 async function abrirDetalleAtencion(atencionId) {
-	if (!await requireAuthenticatedUser()) return
+	const activeUser = await requireAuthenticatedUser()
+	if (!activeUser) return
 	const [{ data: atencion, error: attentionError }, { data: diagnosticos, error: diagnosisError }, { data: tratamientos, error: treatmentError }] = await Promise.all([
-		supabase.from('atenciones').select('*').eq('id', atencionId).single(),
+		supabase.from('atenciones').select('*').eq('id', atencionId).eq('registrado_por', activeUser.id).single(),
 		supabase.from('atencion_diagnosticos').select('*').eq('atencion_id', atencionId),
 		supabase.from('atencion_tratamientos').select('*').eq('atencion_id', atencionId),
 	])
@@ -951,6 +1046,7 @@ async function guardarEdicionAtencion() {
 			.from('atenciones')
 			.update(payload)
 			.eq('id', atencionDetalleActual.id)
+			.eq('registrado_por', user.id)
 			.select('*')
 			.single()
 		if (error) throw error
