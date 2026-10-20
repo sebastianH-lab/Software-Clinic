@@ -9,7 +9,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="styles.css">
-	<link rel="stylesheet" href="../agenda.css">
+	<link rel="stylesheet" href="agenda.css">
 	<style>
 		.dashboard-page { min-height: 100vh; background: #f3f7f4; }
 		.dashboard-shell { display: flex; min-height: 100vh; }
@@ -414,45 +414,50 @@
 			}
 		}
 		@media (max-width: 760px) {
-			.sidebar { position: static; width: 70px; padding: 20px 9px; }
-			.sidebar .brand { justify-content: center; padding: 0 0 28px; }
-			.sidebar .brand:not(.brand-logo) { font-size: 0; }
-			.sidebar-link, .logout-button { justify-content: center; padding: 12px 8px; }
-			.sidebar-link span:last-child, .logout-button span:last-child, .sidebar-section-label, .profile-copy { display: none; }
-			.profile { justify-content: center; padding-inline: 0; }
-			.dashboard-main { width: calc(100% - 70px); margin-left: 0; padding: 24px 16px; }
+			.dashboard-main { width: 100%; margin-left: 0; padding: 16px; }
 			.content-panel { min-height: calc(100vh - 32px); padding: 22px 16px; }
 			.page-heading { flex-direction: column; }
 			.primary-action { width: 100%; }
 			.toolbar { grid-template-columns: 1fr; }
 			.search-button { width: 100%; }
 			.patient-list-columns { display: none; }
-			.patient-item { grid-template-columns: minmax(0, 1fr) minmax(130px, auto); gap: 12px; padding-inline: 10px; }
-			.patient-data-cell { grid-column: 1 / -1; }
-			.patient-profile-action { justify-self: end; }
-			.patient-hover-card { left: 10px; width: min(360px, calc(100vw - 110px)); }
+			.patient-item { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 14px 10px; }
+			.patient-data-cell { grid-column: auto; }
+			.patient-finance-cell, .patient-attention-cell { justify-self: start; padding-left: 56px; }
+			.patient-profile-action { justify-self: stretch; width: 100%; text-align: center; }
+			.patient-hover-card { left: 10px; width: min(360px, calc(100vw - 40px)); }
+		}
+		@media (max-width: 768px) {
+			.dashboard-shell { display: block; }
+			.sidebar { position: fixed; inset: 0 auto 0 0; z-index: 10002; width: min(300px, 88vw); height: 100vh; height: 100dvh; padding: 24px 16px 20px; transform: translateX(-102%); transition: transform .24s ease; overflow-y: auto; }
+			.sidebar.active { transform: translateX(0); }
+			.sidebar .agenda-brand { justify-content: flex-start; padding: 0 42px 28px 8px; font-size: 1.1rem; }
+			.sidebar-link, .logout-button { justify-content: flex-start; padding: 12px; }
+			.sidebar-link span:last-child, .logout-button span:last-child, .sidebar-section-label, .profile-copy { display: initial; }
+			.sidebar-section-label { display: block; }
+			.profile { justify-content: flex-start; padding: 16px 8px 12px; }
 		}
 	</style>
 </head>
 <body class="dashboard-page">
 	<div class="dashboard-shell">
 		<aside class="sidebar" aria-label="Navegación principal">
-			<a class="agenda-brand" href="../pacientes.html"><span class="brand-mark">+</span><span>RENE <em>health</em></span></a>
+			<a class="agenda-brand" href="pacientes.html"><span class="brand-mark">+</span><span>RENE <em>health</em></span></a>
 			<nav class="sidebar-nav">
-				<a class="sidebar-link active" href="pacientes.html" aria-current="page"><span class="nav-icon" aria-hidden="true">◉</span><span>Pacientes</span></a>
-				<a class="sidebar-link" href="sub/agenda.html"><span class="nav-icon" aria-hidden="true">▣</span><span>Agenda</span></a>
-				<a class="sidebar-link" href="sub/estadisticas.html"><span class="nav-icon" aria-hidden="true">↗</span><span>Estadísticas</span></a>
-				<a class="sidebar-link" href="sub/finanzas.html"><span class="nav-icon" aria-hidden="true">$</span><span>Finanzas</span></a>
-				<a class="sidebar-link" href="sub/ajustes.html"><span class="nav-icon" aria-hidden="true">⚙</span><span>Ajustes</span></a>
+				<a class="sidebar-link active" href="pacientes.html" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="10" cy="7" r="4"></circle><path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><span>Pacientes</span></a>
+				<a class="sidebar-link" href="sub/agenda.html"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 11h18"></path></svg></span><span>Agenda</span></a>
+				<a class="sidebar-link" href="sub/estadisticas.html"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"></path><path d="M18 17V9M13 17V5M8 17v-3"></path></svg></span><span>Estadísticas</span></a>
+				<a class="sidebar-link" href="sub/finanzas.html"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 10h20M6 15h4"></path></svg></span><span>Finanzas</span></a>
+				<a class="sidebar-link" href="sub/ajustes.html"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.7 1l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.7-1l-1.7.7-1.4-2.4L7.3 15a8 8 0 0 1 0-2l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.7-1l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.7 1l1.7-.7 1.4 2.4L19.4 13a8 8 0 0 1 0 2Z"></path></svg></span><span>Ajustes</span></a>
 			</nav>
 			<div class="sidebar-spacer"></div>
 			<div class="sidebar-section-label">Soporte</div>
-			<a class="sidebar-link" href="sub/soporte.html"><span class="nav-icon" aria-hidden="true">?</span><span>Ayuda</span></a>
+			<a class="sidebar-link" href="sub/soporte.html"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"></path></svg></span><span>Ayuda</span></a>
 			<div class="profile">
 				<div class="avatar" id="profile-avatar" aria-hidden="true">?</div>
 				<div class="profile-copy"><strong id="profile-name">Cargando...</strong><small>Administrador</small></div>
 			</div>
-			<button class="logout-button" id="logout-button" type="button"><span class="nav-icon" aria-hidden="true">↪</span><span>Cerrar sesión</span></button>
+			<button class="logout-button" id="logout-button" type="button"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="m16 17 5-5-5-5M21 12H9"></path></svg></span><span>Cerrar sesión</span></button>
 		</aside>
 
 		<main class="dashboard-main">
@@ -592,6 +597,7 @@
 		</div>
 	</div>
 
+	<script src="mobile-navigation.js" defer></script>
 	<script type="module">
 		import { clearClientStorage, requireAuthenticatedUser, supabase } from './supabase.js'
 		import { registrarPaciente, actualizarContadorPacientes } from './nuevo-paciente.js'
