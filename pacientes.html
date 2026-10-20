@@ -63,6 +63,7 @@
 		}
 
 		.letter-header {
+			grid-column: 1 / -1;
 			background-color: #f3f7f4;
 			border-top: 1px solid #dce9e3;
 			border-bottom: 1px solid #dce9e3;
@@ -111,6 +112,155 @@
 			flex-direction: column;
 			gap: 2px;
 			min-width: 0;
+		}
+
+		.patient-list-columns,
+		.patient-item {
+			display: grid;
+			grid-template-columns: minmax(240px, 2fr) minmax(180px, 1.2fr) minmax(150px, 1fr) 110px;
+			align-items: center;
+			gap: 16px;
+		}
+
+		.patient-list-columns {
+			padding: 10px 16px;
+			border-bottom: 1px solid var(--line);
+			color: var(--muted);
+			font-size: .72rem;
+			font-weight: 700;
+			letter-spacing: .05em;
+			text-transform: uppercase;
+		}
+
+		.patient-list-columns span:nth-child(2),
+		.patient-finance-cell {
+			justify-self: center;
+		}
+
+		.patient-item {
+			position: relative;
+			z-index: 0;
+			padding: 14px 16px;
+			border-bottom: 1px solid #edf3ef;
+			cursor: default;
+			transition: background-color .2s ease;
+		}
+
+		.patient-item:hover,
+		.patient-item:focus-within {
+			z-index: 2;
+			background-color: #f8fbfa;
+		}
+
+		.patient-data-cell {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			min-width: 0;
+		}
+
+		.patient-avatar {
+			display: grid;
+			flex: 0 0 auto;
+			width: 44px;
+			height: 44px;
+			place-items: center;
+			border-radius: 50%;
+			color: #fff;
+			background: var(--green);
+			font-size: .95rem;
+			font-weight: 700;
+		}
+
+		.patient-finance-cell,
+		.patient-attention-cell {
+			color: var(--muted);
+			font-size: .84rem;
+		}
+
+		.patient-muted {
+			color: #91a19a;
+			font-size: .8rem;
+		}
+
+		.badge-debt,
+		.badge-clean {
+			display: inline-flex;
+			align-items: center;
+			width: fit-content;
+			padding: 6px 10px;
+			border-radius: 999px;
+			font-size: .78rem;
+			font-weight: 700;
+		}
+
+		.badge-debt {
+			border: 1px solid #f2c6b5;
+			color: #a63d21;
+			background: #fff1eb;
+		}
+
+		.badge-clean {
+			border: 1px solid #c8e7d7;
+			color: #287451;
+			background: #effaf4;
+		}
+
+		.patient-profile-action {
+			justify-self: start;
+			padding: 7px 10px;
+			border: 1px solid #c8d9d2;
+			border-radius: 7px;
+			color: var(--ink);
+			font-size: .8rem;
+			font-weight: 700;
+			text-decoration: none;
+			white-space: nowrap;
+		}
+
+		.patient-profile-action:hover {
+			border-color: var(--green);
+			color: var(--green);
+		}
+
+		.patient-hover-card {
+			position: absolute;
+			top: calc(100% - 2px);
+			left: 72px;
+			z-index: 5;
+			width: min(360px, calc(100vw - 100px));
+			box-sizing: border-box;
+			padding: 14px 16px;
+			border: 1px solid #dce9e3;
+			border-radius: 10px;
+			background: #fff;
+			box-shadow: 0 14px 32px rgba(23, 53, 50, .18);
+			opacity: 0;
+			visibility: hidden;
+			transform: translateY(-5px);
+			transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+			pointer-events: none;
+		}
+
+		.patient-item:hover .patient-hover-card,
+		.patient-item:focus-within .patient-hover-card {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+		}
+
+		.patient-hover-card strong {
+			display: block;
+			margin-bottom: 7px;
+			color: var(--ink);
+			font-size: .82rem;
+		}
+
+		.patient-hover-card p {
+			margin: 4px 0 0;
+			color: var(--muted);
+			font-size: .8rem;
+			line-height: 1.45;
 		}
 
 		.patient-name-text {
@@ -276,6 +426,11 @@
 			.primary-action { width: 100%; }
 			.toolbar { grid-template-columns: 1fr; }
 			.search-button { width: 100%; }
+			.patient-list-columns { display: none; }
+			.patient-item { grid-template-columns: minmax(0, 1fr) minmax(130px, auto); gap: 12px; padding-inline: 10px; }
+			.patient-data-cell { grid-column: 1 / -1; }
+			.patient-profile-action { justify-self: end; }
+			.patient-hover-card { left: 10px; width: min(360px, calc(100vw - 110px)); }
 		}
 	</style>
 </head>
@@ -316,6 +471,7 @@
 					<button class="status-option" id="archived-patients-tab" type="button" role="tab" aria-selected="false">Archivados (<span id="archived-patient-count">0</span>)</button>
 				</div>
 				<div class="list-heading"><h2>Todos los pacientes</h2><span id="patient-count">0 registros</span></div>
+				<div class="patient-list-columns" aria-hidden="true"><span>Datos del paciente</span><span>Estado financiero</span><span>Última atención</span><span>Acciones</span></div>
 				<div class="lista-pacientes" id="lista-pacientes">
 					<div class="empty-state" id="empty-state" style="text-align: center; padding: 40px; color: #888;">
 						<p style="font-size: 1rem; margin-bottom: 10px;">No hay pacientes registrados aún</p>
@@ -496,6 +652,96 @@
 			return (palabras[0].charAt(0) + palabras[palabras.length - 1].charAt(0)).toUpperCase()
 		}
 
+		function escapeHtml(value = '') {
+			return String(value).replace(/[&<>'"]/g, character => ({
+				'&': '&amp;',
+				'<': '&lt;',
+				'>': '&gt;',
+				"'": '&#39;',
+				'"': '&quot;',
+			})[character])
+		}
+
+		function formatearFecha(fecha) {
+			if (!fecha) return ''
+			const date = new Date(`${String(fecha).slice(0, 10)}T12:00:00`)
+			return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString('es-PE')
+		}
+
+		function formatearHora(hora) {
+			if (!hora) return ''
+			const [hours, minutes] = String(hora).slice(0, 5).split(':').map(Number)
+			if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return hora
+			return new Date(2000, 0, 1, hours, minutes).toLocaleTimeString('es-PE', { hour: 'numeric', minute: '2-digit' })
+		}
+
+		function resumirSaldos(saldos) {
+			return [...saldos.entries()]
+				.filter(([, total]) => total > 0)
+				.map(([moneda, total]) => {
+					const symbol = moneda === 'USD' ? '$' : 'S/.'
+					return `${symbol} ${total.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+				})
+				.join(' · ')
+		}
+
+		let pacientesGlobal = []
+
+		function renderizarPacientes(pacientes) {
+			listaContainer.replaceChildren()
+			if (!pacientes.length) {
+				listaContainer.innerHTML = searchInput.value.trim()
+					? '<p style="padding: 16px; color: #888;">No hay pacientes que coincidan con tu búsqueda.</p>'
+					: '<div class="empty-state" style="text-align: center; padding: 40px; color: #888;"><p style="font-size: 1rem; margin-bottom: 10px;">No hay pacientes registrados aún</p><p style="font-size: 0.9rem; color: #aaa;">Crea tu primer paciente haciendo clic en "+ Nuevo paciente"</p></div>'
+				return
+			}
+
+			let letraActual = ''
+			pacientes.forEach(paciente => {
+				const nombreCompleto = String(paciente.nombre_completo || 'Sin nombre')
+				const primeraLetra = nombreCompleto.trim().charAt(0).toUpperCase()
+				if (primeraLetra !== letraActual) {
+					letraActual = primeraLetra
+					const headerLetra = document.createElement('div')
+					headerLetra.className = 'letter-header'
+					headerLetra.textContent = letraActual
+					listaContainer.appendChild(headerLetra)
+				}
+
+				const edad = calcularEdad(paciente.fecha_nacimiento)
+				const detallesTexto = [paciente.genero, edad].filter(Boolean).join(', ')
+				const siguienteCita = paciente.proximaCita
+					? `${formatearFecha(paciente.proximaCita.fecha)} a las ${formatearHora(paciente.proximaCita.hora_inicio)}`
+					: 'Sin próxima cita agendada'
+				const ultimoDiagnostico = paciente.ultimoDiagnostico || 'Sin diagnóstico registrado'
+				const filaPaciente = document.createElement('article')
+				filaPaciente.className = 'patient-item'
+				filaPaciente.innerHTML = `
+					<div class="patient-data-cell">
+						<div class="patient-avatar" aria-hidden="true">${escapeHtml(obtenerIniciales(nombreCompleto))}</div>
+						<div class="patient-info-container">
+							<span class="patient-name-text">${escapeHtml(nombreCompleto)}</span>
+							<span class="patient-detail-text">${escapeHtml(detallesTexto || 'Sin datos adicionales')}</span>
+							${mostrarArchivados ? '<span class="archived-badge">Archivado</span>' : ''}
+						</div>
+					</div>
+					<div class="patient-finance-cell">${paciente.saldosPendientes.size
+						? `<span class="badge-debt">⚠️ Debe: ${escapeHtml(resumirSaldos(paciente.saldosPendientes))}</span>`
+						: '<span class="badge-clean">✓ Al día</span>'}</div>
+					<div class="patient-attention-cell">${paciente.ultimaAtencion
+						? escapeHtml(formatearFecha(paciente.ultimaAtencion))
+						: '<span class="patient-muted">Sin atenciones</span>'}</div>
+					<a class="patient-profile-action" href="paciente-detalle.html?id=${encodeURIComponent(paciente.id)}">Ver perfil</a>
+					<aside class="patient-hover-card" aria-label="Vista previa de ${escapeHtml(nombreCompleto)}">
+						<strong>Vista previa</strong>
+						<p>📅 Próx. cita: ${escapeHtml(siguienteCita)}</p>
+						<p>Último diagnóstico: ${escapeHtml(ultimoDiagnostico)}</p>
+					</aside>
+				`
+				listaContainer.appendChild(filaPaciente)
+			})
+		}
+
 		// ==================== CARGAR PACIENTES ORDENADOS ====================
 		async function cargarPacientesOrdenados() {
 			const user = await requireAuthenticatedUser()
@@ -509,58 +755,88 @@
 
 			if (error) {
 				console.error('Error al consultar pacientes:', error.message)
+				pacientesGlobal = []
+				document.getElementById('patient-count').textContent = 'No disponible'
 				listaContainer.innerHTML = '<p style="padding: 16px; color: #888;">Error al cargar la lista.</p>'
 				return
 			}
 
-			document.getElementById('patient-count').textContent = `${pacientes?.length || 0} ${(pacientes?.length || 0) === 1 ? 'registro' : 'registros'}`
+			const pacientesActivos = pacientes || []
+			pacientesGlobal = pacientesActivos.map(paciente => ({
+				...paciente,
+				ultimaAtencion: null,
+				ultimoDiagnostico: null,
+				proximaCita: null,
+				saldosPendientes: new Map(),
+			}))
 
-			if (!pacientes || pacientes.length === 0) {
-				listaContainer.innerHTML = '<div class="empty-state" style="text-align: center; padding: 40px; color: #888;"><p style="font-size: 1rem; margin-bottom: 10px;">No hay pacientes registrados aún</p><p style="font-size: 0.9rem; color: #aaa;">Crea tu primer paciente haciendo clic en "+ Nuevo paciente"</p></div>'
-				return
-			}
-
-			listaContainer.innerHTML = ''
-			let letraActual = ''
-
-			pacientes.forEach(paciente => {
-				const primeraLetra = paciente.nombre_completo.trim().charAt(0).toUpperCase()
-
-				// Insertar divisor de letra
-				if (primeraLetra !== letraActual) {
-					letraActual = primeraLetra
-					const headerLetra = document.createElement('div')
-					headerLetra.className = 'letter-header'
-					headerLetra.textContent = letraActual
-					listaContainer.appendChild(headerLetra)
+			if (pacientesGlobal.length) {
+				const patientIds = pacientesGlobal.map(paciente => paciente.id)
+				const now = new Date()
+				const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+				const [attentionsResult, receiptsResult, appointmentsResult] = await Promise.all([
+					supabase.from('atenciones')
+						.select('paciente_id, created_at, atencion_diagnosticos(descripcion, cie10)')
+						.eq('registrado_por', user.id)
+						.in('paciente_id', patientIds)
+						.order('created_at', { ascending: false }),
+					supabase.from('comprobantes')
+						.select('paciente_id, pendiente, importe_total, total_cancelado, moneda, estado')
+						.eq('registrado_por', user.id)
+						.in('paciente_id', patientIds)
+						.in('estado', ['activo', 'Activo', 'Pendiente', 'pendiente']),
+					supabase.from('citas')
+						.select('paciente_id, fecha, hora_inicio')
+						.eq('registrado_por', user.id)
+						.in('paciente_id', patientIds)
+						.in('estado', ['Pendiente', 'pendiente'])
+						.gte('fecha', today)
+						.order('fecha', { ascending: true })
+						.order('hora_inicio', { ascending: true }),
+				])
+				const relatedErrors = [attentionsResult, receiptsResult, appointmentsResult].filter(result => result.error)
+				if (relatedErrors.length) {
+					const message = relatedErrors.map(result => result.error.message).join('; ')
+					console.error('Error al cargar el resumen de pacientes:', message)
+					pacientesGlobal = []
+					document.getElementById('patient-count').textContent = 'No disponible'
+					listaContainer.innerHTML = '<p style="padding: 16px; color: #888;">No se pudo cargar el resumen de los pacientes.</p>'
+					return
 				}
 
-				// Crear fila del paciente
-				const edad = calcularEdad(paciente.fecha_nacimiento)
-				const detallesTexto = [paciente.genero, edad].filter(Boolean).join(', ')
-
-				const filaPaciente = document.createElement('div')
-				filaPaciente.className = 'patient-item'
-				filaPaciente.innerHTML = `
-					<div class="avatar-circle">${obtenerIniciales(paciente.nombre_completo)}</div>
-					<div class="patient-info-container">
-						<span class="patient-name-text">${paciente.nombre_completo}</span>
-						<span class="patient-detail-text">${detallesTexto || 'Sin datos adicionales'}</span>
-						${mostrarArchivados ? '<span class="archived-badge">Archivado</span>' : ''}
-					</div>
-				`
-
-				filaPaciente.addEventListener('click', () => {
-					window.location.href = `paciente-detalle.html?id=${paciente.id}`
+				const patientsById = new Map(pacientesGlobal.map(paciente => [String(paciente.id), paciente]))
+				;(attentionsResult.data || []).forEach(attention => {
+					const paciente = patientsById.get(String(attention.paciente_id))
+					if (!paciente) return
+					if (!paciente.ultimaAtencion && attention.created_at) paciente.ultimaAtencion = attention.created_at
+					if (!paciente.ultimoDiagnostico) {
+						const diagnoses = (attention.atencion_diagnosticos || [])
+							.filter(diagnosis => diagnosis.descripcion || diagnosis.cie10)
+							.map(diagnosis => diagnosis.cie10
+								? `${diagnosis.descripcion || 'Sin descripción'} (${diagnosis.cie10})`
+								: diagnosis.descripcion)
+						if (diagnoses.length) paciente.ultimoDiagnostico = [...new Set(diagnoses)].join('; ')
+					}
 				})
+				;(receiptsResult.data || []).forEach(receipt => {
+					const paciente = patientsById.get(String(receipt.paciente_id))
+					if (!paciente) return
+					const balance = Number(receipt.pendiente ?? (Number(receipt.importe_total || 0) - Number(receipt.total_cancelado || 0)))
+					if (balance <= 0) return
+					const currency = receipt.moneda === 'USD' ? 'USD' : 'PEN'
+					paciente.saldosPendientes.set(currency, (paciente.saldosPendientes.get(currency) || 0) + balance)
+				})
+				;(appointmentsResult.data || []).forEach(appointment => {
+					const paciente = patientsById.get(String(appointment.paciente_id))
+					if (paciente && !paciente.proximaCita) paciente.proximaCita = appointment
+				})
+			}
 
-				listaContainer.appendChild(filaPaciente)
-			})
+			document.getElementById('patient-count').textContent = `${pacientesGlobal.length} ${pacientesGlobal.length === 1 ? 'registro' : 'registros'}`
+			renderizarPacientes(pacientesGlobal)
 		}
 
 		// ==================== BÚSQUEDA DE PACIENTES ====================
-		let pacientesGlobal = []
-
 		function actualizarSelectorEstado() {
 			activePatientsTab.classList.toggle('active', !mostrarArchivados)
 			archivedPatientsTab.classList.toggle('active', mostrarArchivados)
@@ -586,8 +862,6 @@
 			searchInput.value = ''
 			actualizarSelectorEstado()
 			await cargarPacientesOrdenados()
-			const { data: pacientes } = await supabase.from('pacientes').select('*').eq('registrado_por', user.id).eq('activo', !mostrarArchivados).order('nombre_completo', { ascending: true })
-			pacientesGlobal = pacientes || []
 		}
 
 		activePatientsTab.addEventListener('click', () => cambiarEstadoLista(false))
@@ -602,69 +876,18 @@
 				return
 			}
 
-			// Filtrar pacientes que coincidan con la búsqueda
-			const pacientesFiltrados = pacientesGlobal.filter(p =>
-				p.nombre_completo.toLowerCase().includes(query) ||
-				(p.documento_identidad && p.documento_identidad.toLowerCase().includes(query))
+			const pacientesFiltrados = pacientesGlobal.filter(paciente =>
+				String(paciente.nombre_completo || '').toLowerCase().includes(query) ||
+				String(paciente.documento_identidad || '').toLowerCase().includes(query)
 			)
-
-			// Mostrar resultados filtrados
-			listaContainer.innerHTML = ''
-			let letraActual = ''
-
-			if (pacientesFiltrados.length === 0) {
-				listaContainer.innerHTML = '<p style="padding: 16px; color: #888;">No hay pacientes que coincidan con tu búsqueda.</p>'
-				return
-			}
-
-			pacientesFiltrados.forEach(paciente => {
-				const primeraLetra = paciente.nombre_completo.trim().charAt(0).toUpperCase()
-
-				if (primeraLetra !== letraActual) {
-					letraActual = primeraLetra
-					const headerLetra = document.createElement('div')
-					headerLetra.className = 'letter-header'
-					headerLetra.textContent = letraActual
-					listaContainer.appendChild(headerLetra)
-				}
-
-				const edad = calcularEdad(paciente.fecha_nacimiento)
-				const detallesTexto = [paciente.genero, edad].filter(Boolean).join(', ')
-
-				const filaPaciente = document.createElement('div')
-				filaPaciente.className = 'patient-item'
-				filaPaciente.innerHTML = `
-					<div class="avatar-circle">${obtenerIniciales(paciente.nombre_completo)}</div>
-					<div class="patient-info-container">
-						<span class="patient-name-text">${paciente.nombre_completo}</span>
-						<span class="patient-detail-text">${detallesTexto || 'Sin datos adicionales'}</span>
-							${mostrarArchivados ? '<span class="archived-badge">Archivado</span>' : ''}
-					</div>
-				`
-
-				filaPaciente.addEventListener('click', () => {
-					window.location.href = `paciente-detalle.html?id=${paciente.id}`
-				})
-
-				listaContainer.appendChild(filaPaciente)
-			})
+			document.getElementById('patient-count').textContent = `${pacientesFiltrados.length} ${pacientesFiltrados.length === 1 ? 'registro' : 'registros'}`
+			renderizarPacientes(pacientesFiltrados)
 		})
 
 		// ==================== ACTUALIZAR CONTADOR Y CARGAR LISTA ====================
 		await actualizarContadorPacientes()
 		await cargarPacientesOrdenados()
 
-		// Guardar pacientes globalmente para búsqueda
-		const currentUser = await requireAuthenticatedUser()
-		if (currentUser) {
-			const { data: pacientes } = await supabase
-				.from('pacientes')
-				.select('*')
-				.eq('registrado_por', currentUser.id)
-				.eq('activo', !mostrarArchivados)
-				.order('nombre_completo', { ascending: true })
-			if (pacientes) pacientesGlobal = pacientes
-		}
 		await cargarConteosEstado()
 
 		// ==================== MODAL DE NUEVO PACIENTE ====================
@@ -744,19 +967,6 @@
 				closeModal()
 				await actualizarContadorPacientes()
 				await cargarPacientesOrdenados()
-				await cargarConteosEstado()
-				
-				// Actualizar lista global
-				const currentUser = await requireAuthenticatedUser()
-				if (currentUser) {
-					const { data: pacientes } = await supabase
-						.from('pacientes')
-						.select('*')
-						.eq('registrado_por', currentUser.id)
-						.eq('activo', true)
-						.order('nombre_completo', { ascending: true })
-					if (pacientes) pacientesGlobal = pacientes
-				}
 				await cargarConteosEstado()
 			} else {
 				alert('Error al registrar el paciente: ' + resultado.error)
