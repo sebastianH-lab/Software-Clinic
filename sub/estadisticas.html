@@ -28,6 +28,13 @@
 		.statistics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 		.statistics-card { min-height: 270px; padding: 20px 24px; border: 1px solid var(--agenda-line); border-radius: 12px; background: #fff; box-shadow: var(--agenda-shadow); }
 		.statistics-card.full-width { grid-column: 1 / -1; }
+		.financial-summary-card { grid-column: 1 / -1; }
+		.financial-kpi-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:16px 0; }
+		.financial-kpi { display:grid; gap:7px; padding:14px 16px; border:1px solid var(--agenda-line); border-radius:9px; background:#f8fbf9; }
+		.financial-kpi span { color:var(--agenda-muted); font-size:.76rem; font-weight:700; }
+		.financial-kpi strong { color:var(--agenda-ink); font:800 1.25rem Manrope,sans-serif; overflow-wrap:anywhere; }
+		.financial-chart { position:relative; min-height:260px; }
+		.financial-chart canvas { width:100% !important; height:250px !important; }
 		.statistics-card-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--agenda-line); }
 		.statistics-card-header h2 { margin: 0; color: var(--agenda-ink); font: 700 1rem Manrope, sans-serif; }
 		.download-button { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--agenda-line); border-radius: 7px; color: var(--agenda-muted); background: #f8fbf9; font-size: 1rem; cursor: pointer; }
@@ -92,6 +99,9 @@
 		.date-filter-wrap { position: relative; }
 		@media (max-width: 850px) { .statistics-main { width: calc(100% - 74px); margin-left: 0; padding: 24px 16px; }.statistics-header { flex-direction: column; }.statistics-action { width: 100%; justify-content: center; }.filters-bar { align-items: stretch; flex-direction: column; }.date-range-control { min-width: 0; }.advanced-filter-button { width: 100%; }.kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.statistics-grid { grid-template-columns: 1fr; }.statistics-card.full-width { grid-column: auto; }.patient-section { padding: 18px 16px; }.patient-section-header { align-items: flex-start; }.table-tools { flex-wrap: wrap; }.table-search { min-width: 100%; }.table-tool-button { flex: 1; }.date-fields { grid-template-columns: 1fr; } }
 		@media (max-width: 560px) { .statistics-main { padding: 16px 12px; }.statistics-card { padding: 18px 16px; }.patient-section-header { flex-direction: column; }.pagination button { padding: 0 9px; } }
+		@media (max-width: 768px) { .statistics-main { width:100%; margin:0; padding:16px; }.kpi-grid,.financial-kpi-grid { grid-template-columns:1fr; } }
+		@media (max-width: 480px) { .statistics-main { padding:14px 12px; } }
+		@media (max-width: 768px) { .statistics-main { width:100%; margin:0; padding:16px; }.kpi-grid { grid-template-columns:1fr; } }
 	</style>
 </head>
 <body class="agenda-page statistics-page">
@@ -99,13 +109,13 @@
 		<aside class="agenda-sidebar" aria-label="Navegación principal">
 			<a class="agenda-brand" href="../pacientes.html"><span class="brand-mark">+</span><span>RENE <em>health</em></span></a>
 			<nav class="agenda-nav" aria-label="Navegación principal">
-				<a href="../pacientes.html"><span>◉</span> Pacientes</a>
-				<a href="agenda.html"><span>▣</span> Agenda</a>
-				<a class="is-active" href="estadisticas.html" aria-current="page"><span>↗</span> Estadísticas</a>
-				<a href="finanzas.html"><span>$</span> Finanzas</a>
-				<a href="ajustes.html"><span>⚙</span> Ajustes</a>
+				<a href="../pacientes.html"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="10" cy="7" r="4"></circle><path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span> Pacientes</a>
+				<a href="agenda.html"><span aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 11h18"></path></svg></span> Agenda</a>
+				<a class="is-active" href="estadisticas.html" aria-current="page"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"></path><path d="M18 17V9M13 17V5M8 17v-3"></path></svg></span> Estadísticas</a>
+				<a href="finanzas.html"><span aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 10h20M6 15h4"></path></svg></span> Finanzas</a>
+				<a href="ajustes.html"><span aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.7 1l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.7-1l-1.7.7-1.4-2.4L7.3 15a8 8 0 0 1 0-2l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.7-1l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.7 1l1.7-.7 1.4 2.4L19.4 13a8 8 0 0 1 0 2Z"></path></svg></span> Ajustes</a>
 			</nav>
-			<div class="agenda-sidebar-bottom"><small>SOPORTE</small><a href="soporte.html"><span>?</span> Ayuda</a><div class="agenda-user"><span id="sidebar-avatar">?</span><div><strong id="sidebar-name">Cargando...</strong><small>Administrador</small></div></div><button class="agenda-logout" id="sidebar-logout" type="button"><span>↪</span> Cerrar sesión</button></div>
+			<div class="agenda-sidebar-bottom"><small>SOPORTE</small><a href="soporte.html"><span aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"></path></svg></span> Ayuda</a><div class="agenda-user"><span id="sidebar-avatar">?</span><div><strong id="sidebar-name">Cargando...</strong><small>Administrador</small></div></div><button class="agenda-logout" id="sidebar-logout" type="button"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="m16 17 5-5-5-5M21 12H9"></path></svg></span> Cerrar sesión</button></div>
 		</aside>
 
 		<main class="statistics-main">
@@ -137,6 +147,18 @@
 				<article class="statistics-card full-width" data-report="diagnoses"><header class="statistics-card-header"><h2>Diagnósticos más comunes</h2><button class="download-button" type="button" data-export-report="diagnoses" aria-label="Descargar Diagnósticos más comunes">📥</button></header><div class="chart-placeholder" id="chart-diagnoses"></div></article>
 			</section>
 
+			<section class="statistics-grid" aria-label="Resumen financiero">
+				<article class="statistics-card financial-summary-card" data-report="financial-summary">
+					<header class="statistics-card-header"><h2>Resumen Financiero del Período</h2><button class="download-button" type="button" data-export-report="financial-summary" aria-label="Descargar resumen financiero">📥</button></header>
+					<div class="financial-kpi-grid">
+						<div class="financial-kpi"><span>Total Cobrado (S/.)</span><strong id="financial-collected">S/. 0.00</strong></div>
+						<div class="financial-kpi"><span>Total Pendiente (S/.)</span><strong id="financial-pending">S/. 0.00</strong></div>
+						<div class="financial-kpi"><span>Proformas Cotizadas (S/.)</span><strong id="financial-proformas">S/. 0.00</strong></div>
+					</div>
+					<div class="financial-chart" id="chart-financial-summary"></div>
+				</article>
+			</section>
+
 			<section class="patient-section" aria-labelledby="patients-heading">
 				<header class="patient-section-header"><div class="patient-section-title"><h2 id="patients-heading">Lista de pacientes</h2><span class="record-badge" id="patient-count">0 registros</span></div><button class="download-button" id="export-patients" type="button" aria-label="Descargar lista de pacientes">📥</button></header>
 				<div class="table-tools"><label class="table-search"><select id="patient-search-field" aria-label="Campo de búsqueda"><option value="nombre_completo">Nombre completo</option><option value="documento_identidad">Documento</option><option value="correo">Correo</option></select><input id="patient-search" type="search" placeholder="Buscar..." aria-label="Buscar pacientes"></label><button class="table-tool-button" id="patient-search-button" type="button" aria-label="Buscar">⌕</button><button class="table-tool-button" id="patient-filter-button" type="button" aria-label="Abrir filtros avanzados">☰</button></div>
@@ -148,12 +170,13 @@
 
 	<div class="modal-backdrop" id="advanced-filter-modal" hidden><section class="statistics-modal" role="dialog" aria-modal="true" aria-labelledby="advanced-filter-title"><header class="modal-title-row"><h2 id="advanced-filter-title">Filtros</h2><button class="modal-close" id="close-advanced-filter" type="button" aria-label="Cerrar">×</button></header><div class="age-section"><h3>Edad</h3><div class="age-field"><label for="age-from">Desde</label><button class="stepper" data-step-target="age-from" data-step="-1" type="button">−</button><input class="age-input" id="age-from" type="number" min="0" max="120" placeholder="0"><button class="stepper" data-step-target="age-from" data-step="1" type="button">+</button></div><div class="age-field"><label for="age-to">Hasta</label><button class="stepper" data-step-target="age-to" data-step="-1" type="button">−</button><input class="age-input" id="age-to" type="number" min="0" max="120" placeholder="120"><button class="stepper" data-step-target="age-to" data-step="1" type="button">+</button></div></div><div class="modal-actions"><button class="clear-button" id="clear-advanced-filter" type="button">Limpiar</button><button class="apply-button" id="apply-advanced-filter" type="button">Filtrar</button></div></section></div>
 
+	<script src="../mobile-navigation.js" defer></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 	<script type="module">
 		import { clearClientStorage, requireAuthenticatedUser, supabase } from '../supabase.js'
 
-		const state = { appointments: [], patients: [], diagnoses: [], attentionRecords: [], filteredPatients: [], charts: {}, dateFrom: null, dateTo: null, totalAppointments: 0, attendedAppointments: 0, noShowAppointments: 0, newPatients: 0, ageFrom: null, ageTo: null, sortAscending: true }
+		const state = { appointments: [], patients: [], diagnoses: [], attentionRecords: [], filteredPatients: [], financialData: { receipts: [], payments: [], expenses: [], proformas: [], services: [], proformaDetails: [] }, charts: {}, dateFrom: null, dateTo: null, totalAppointments: 0, attendedAppointments: 0, noShowAppointments: 0, newPatients: 0, ageFrom: null, ageTo: null, sortAscending: true }
 		const $ = (selector) => document.querySelector(selector)
 		const $$ = (selector) => [...document.querySelectorAll(selector)]
 		const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
@@ -172,6 +195,107 @@
 			const endDate = dateTo ? new Date(`${dateTo}T00:00:00`) : null
 			if (endDate) endDate.setDate(endDate.getDate() + 1)
 			return { start, end: endDate?.toISOString() || null }
+		}
+
+		function applyDateRange(query, column, dateFrom, dateTo) {
+			if (dateFrom) query = query.gte(column, dateFrom)
+			if (dateTo) query = query.lte(column, dateTo)
+			return query
+		}
+
+		async function loadFinancialData(user, dateFrom, dateTo) {
+			const receiptsQuery = applyDateRange(
+				supabase.from('comprobantes').select('*, comprobante_detalles(*)')
+					.eq('registrado_por', user.id).eq('estado', 'activo'),
+				'fecha', dateFrom, dateTo,
+			)
+			const paymentsQuery = applyDateRange(
+				supabase.from('comprobante_pagos')
+					.select('monto, fecha, comprobante:comprobantes!inner(registrado_por, moneda)')
+					.eq('comprobante.registrado_por', user.id),
+				'fecha', dateFrom, dateTo,
+			)
+			const expensesQuery = applyDateRange(
+				supabase.from('egresos').select('monto, moneda, fecha')
+					.eq('registrado_por', user.id),
+				'fecha', dateFrom, dateTo,
+			)
+			const proformasQuery = applyDateRange(
+				supabase.from('proformas').select('*').eq('registrado_por', user.id),
+				'fecha', dateFrom, dateTo,
+			)
+			const servicesQuery = supabase.from('service_catalog')
+				.select('name, price, currency').eq('registrado_por', user.id)
+			const [receiptsResult, paymentsResult, expensesResult, proformasResult, servicesResult] = await Promise.all([
+				receiptsQuery, paymentsQuery, expensesQuery, proformasQuery, servicesQuery,
+			])
+			const errors = [receiptsResult, paymentsResult, expensesResult, proformasResult, servicesResult]
+				.filter((result) => result.error)
+			if (errors.length) throw new Error(errors.map((result) => result.error.message).join('; '))
+
+			const proformas = proformasResult.data || []
+			let proformaDetails = []
+			if (proformas.length) {
+				const { data, error } = await supabase.from('proforma_detalles').select('*')
+					.in('proforma_id', proformas.map((item) => item.id))
+				if (error) throw error
+				proformaDetails = data || []
+			}
+			return {
+				receipts: receiptsResult.data || [],
+				payments: paymentsResult.data || [],
+				expenses: expensesResult.data || [],
+				proformas,
+				services: servicesResult.data || [],
+				proformaDetails,
+			}
+		}
+
+		function isUsd(currency) {
+			return currency === 'USD' || currency === 'Dólares' || currency === 'D�lares'
+		}
+
+		function sumPen(items, getAmount, getCurrency = (item) => item.moneda) {
+			return items.reduce((total, item) => total + (isUsd(getCurrency(item)) ? 0 : Number(getAmount(item) || 0)), 0)
+		}
+
+		function financialTotals(financialData = state.financialData) {
+			const collected = sumPen(financialData.payments, (payment) => payment.monto, (payment) => payment.comprobante?.moneda)
+			const pending = sumPen(financialData.receipts, (receipt) =>
+				receipt.pendiente ?? Math.max(0, Number(receipt.importe_total || 0) - Number(receipt.total_cancelado || 0)),
+			)
+			const invoiced = sumPen(financialData.receipts, (receipt) => receipt.importe_total)
+			const proformas = sumPen(financialData.proformas, (proforma) => proforma.importe_total)
+			const expenses = sumPen(financialData.expenses, (expense) => expense.monto)
+			return { collected, pending, invoiced, proformas, expenses }
+		}
+
+		function formatSoles(value) {
+			return `S/. ${Number(value || 0).toFixed(2)}`
+		}
+
+		function renderFinancialSummary() {
+			const totals = financialTotals()
+			$('#financial-collected').textContent = formatSoles(totals.collected)
+			$('#financial-pending').textContent = formatSoles(totals.pending)
+			$('#financial-proformas').textContent = formatSoles(totals.proformas)
+			state.charts.financialSummary?.destroy()
+			delete state.charts.financialSummary
+			const values = [totals.collected, totals.pending, totals.expenses]
+			if (!hasData(values) || !window.Chart) return showEmpty('chart-financial-summary')
+			const context = prepareChart('chart-financial-summary')
+			state.charts.financialSummary = new Chart(context, {
+				type: 'bar',
+				data: {
+					labels: ['Ingresos cobrados', 'Pendientes de cobro', 'Egresos'],
+					datasets: [{ data: values, backgroundColor: ['#08764f', '#d97706', '#c94f5e'], borderRadius: 5 }],
+				},
+				options: {
+					...chartOptions(),
+					plugins: { legend: { display: false }, tooltip: { callbacks: { label: (item) => formatSoles(item.raw) } } },
+					scales: { x: { beginAtZero: true }, y: { beginAtZero: true, ticks: { callback: (value) => `S/. ${value}` } } },
+				},
+			})
 		}
 
 		function destroyCharts() { Object.values(state.charts).forEach((chart) => chart.destroy()); state.charts = {} }
@@ -194,9 +318,58 @@
 			if (report === 'appointment-types') return appointments.map((appointment) => ({ Fecha: getDateValue(appointment), 'Tipo de cita': appointment.tipo_cita || appointment.tipo || 'Sin tipo', Paciente: appointment.pacientes?.nombre_completo || 'Sin paciente', Estado: appointment.estado || '' }))
 			if (report === 'appointment-status') return appointments.map((appointment) => ({ Fecha: getDateValue(appointment), Estado: appointment.estado || 'Pendiente', Paciente: appointment.pacientes?.nombre_completo || 'Sin paciente' }))
 			if (report === 'diagnoses') return selectedDiagnoses().map((item) => ({ Fecha: item.date, Diagnóstico: item.descripcion, Frecuencia: item.count }))
+			if (report === 'financial-summary') {
+				const totals = financialTotals()
+				return [
+					{ Métrica: 'Total Facturado (S/.)', Monto: totals.invoiced.toFixed(2) },
+					{ Métrica: 'Total Recibido (S/.)', Monto: totals.collected.toFixed(2) },
+					{ Métrica: 'Total Pendiente (S/.)', Monto: totals.pending.toFixed(2) },
+					{ Métrica: 'Proformas Cotizadas (S/.)', Monto: totals.proformas.toFixed(2) },
+					{ Métrica: 'Egresos (S/.)', Monto: totals.expenses.toFixed(2) },
+				]
+			}
 			return []
 		}
 		function downloadExcel(rows, filename) { if (!window.XLSX) { alert('No se pudo cargar el exportador de Excel.'); return } const sheet = XLSX.utils.json_to_sheet(rows.length ? rows : [{ Información: 'No hay datos para el rango seleccionado' }]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, sheet, 'Estadísticas'); XLSX.writeFile(workbook, filename) }
+
+		function appointmentAmount(appointment, financialData) {
+			const patientId = String(appointment.paciente_id || appointment.pacientes?.id || '')
+			const appointmentDate = getDateValue(appointment)
+			const patientReceipts = financialData.receipts.filter((receipt) => String(receipt.paciente_id || '') === patientId)
+			const receipt = financialData.receipts.find((item) => String(item.cita_id || '') === String(appointment.id))
+				|| patientReceipts.find((item) => String(item.fecha || '').slice(0, 10) === appointmentDate)
+				|| (patientReceipts.length === 1 ? patientReceipts[0] : null)
+			if (receipt) {
+				const detailsTotal = (receipt.comprobante_detalles || []).reduce((total, detail) =>
+					total + Number(detail.cantidad || 1) * Number(detail.precio ?? detail.monto_base ?? 0), 0)
+				const receiptTotal = Number(receipt.importe_total || 0)
+				if (receiptTotal > 0) return receiptTotal.toFixed(2)
+				if (detailsTotal > 0) return detailsTotal.toFixed(2)
+			}
+
+			const explicitAmount = Number(appointment.monto_atencion ?? appointment.importe_total ?? appointment.precio ?? appointment.monto ?? 0)
+			if (explicitAmount > 0) return explicitAmount.toFixed(2)
+
+			const serviceName = normalize(appointment.tipo_cita || appointment.tipo || '')
+			const service = financialData.services.find((item) => normalize(item.name || '') === serviceName)
+			if (service && Number(service.price) > 0) return Number(service.price).toFixed(2)
+
+			const matchingProforma = financialData.proformas.find((proforma) => {
+				if (String(proforma.paciente_id || '') !== patientId) return false
+				return financialData.proformaDetails.some((detail) =>
+					String(detail.proforma_id) === String(proforma.id)
+					&& normalize(detail.concepto || '') === serviceName)
+			})
+			if (matchingProforma) {
+				const matchingDetails = financialData.proformaDetails.filter((detail) =>
+					String(detail.proforma_id) === String(matchingProforma.id)
+					&& normalize(detail.concepto || '') === serviceName)
+				const proformaAmount = matchingDetails.reduce((total, detail) =>
+					total + Number(detail.cantidad || 1) * Number(detail.precio ?? detail.monto_base ?? 0), 0)
+				if (proformaAmount > 0) return proformaAmount.toFixed(2)
+			}
+			return '0.00'
+		}
 
 		async function exportAllAttentions() {
 			if (!window.XLSX) { alert('No se pudo cargar el exportador de Excel.'); return }
@@ -245,6 +418,8 @@
 				const results = [appointmentsResult, attendedResult, noShowResult, newPatientsResult]
 				const errors = results.filter((result) => result.error)
 				if (errors.length) throw new Error(errors.map((result) => result.error.message).join('; '))
+				const financialData = await loadFinancialData(user, state.dateFrom, state.dateTo)
+				const totals = financialTotals(financialData)
 
 				const appointments = appointmentsResult.data || []
 				const patientIds = [...new Set(appointments.map((appointment) => appointment.paciente_id).filter(Boolean))]
@@ -299,7 +474,7 @@
 						status,
 						appointment.motivo?.trim() || '-',
 						diagnosis || '-',
-						appointment.monto_atencion ?? appointment.importe_total ?? appointment.precio ?? appointment.monto ?? '',
+						appointmentAmount(appointment, financialData),
 					]
 				})
 				const rows = [
@@ -309,6 +484,8 @@
 					['Tasa de Ausentismo (%)', `${noShowRate.toFixed(2)}%`],
 					['Pacientes Nuevos', newPatientsResult.count || 0],
 					['Citas Atendidas', attendedResult.count || 0],
+					['Total Facturado (S/.)', totals.invoiced.toFixed(2)],
+					['Total Recibido (S/.)', totals.collected.toFixed(2)],
 					[],
 					[],
 					['FECHA', 'HORA', 'PACIENTE', 'DNI / DOCUMENTO', 'TELÉFONO', 'MÉDICO', 'TIPO DE CITA', 'ESTADO', 'MOTIVO DE CONSULTA', 'DIAGNÓSTICO CIE-10', 'MONTO'],
@@ -357,12 +534,12 @@
 			const context = prepareChart('chart-diagnoses'); state.charts.diagnoses = new Chart(context, { type: 'bar', data: { labels, datasets: [{ data: values, backgroundColor: '#2f8068', borderRadius: 4 }] }, options: { ...chartOptions('y'), plugins: { legend: { display: false }, tooltip: { callbacks: { title: (items) => diagnoses[items[0].dataIndex].descripcion } } } } })
 		}
 
-		function refreshDateDependentReports() { const appointments = state.appointments.filter(inSelectedRange); destroyCharts(); renderKpis(); $('#attention-count').textContent = state.totalAppointments; renderDoctorChart(appointments); renderTypeChart(appointments); renderStatusChart(appointments); renderDiagnosesChart() }
+		function refreshDateDependentReports() { const appointments = state.appointments.filter(inSelectedRange); destroyCharts(); renderKpis(); $('#attention-count').textContent = state.totalAppointments; renderDoctorChart(appointments); renderTypeChart(appointments); renderStatusChart(appointments); renderDiagnosesChart(); renderFinancialSummary() }
 
 		async function loadData() {
 			const user = await requireAuthenticatedUser('../ingresar.html')
 			if (!user) return
-			state.appointments = []; state.patients = []; state.diagnoses = []; state.attentionRecords = []; state.filteredPatients = []
+			state.appointments = []; state.patients = []; state.diagnoses = []; state.attentionRecords = []; state.filteredPatients = []; state.financialData = { receipts: [], payments: [], expenses: [], proformas: [], services: [], proformaDetails: [] }
 			state.totalAppointments = 0; state.attendedAppointments = 0; state.noShowAppointments = 0; state.newPatients = 0
 			renderPatients(); refreshDateDependentReports()
 			if (state.dateFrom && state.dateTo && state.dateFrom > state.dateTo) {
@@ -410,7 +587,14 @@
 			state.newPatients = newPatientsResult.count || 0
 			state.attentionRecords = diagnosesResult.data || []
 			state.diagnoses = (diagnosesResult.data || []).flatMap((attention) => (attention.atencion_diagnosticos || []).map((diagnosis) => ({ date: attention.created_at?.slice(0, 10) || '', descripcion: diagnosis.descripcion || 'Sin descripción' }))).reduce((groups, item) => { const key = normalize(item.descripcion); groups[key] ??= { ...item, count: 0 }; groups[key].count++; return groups }, {})
-			state.diagnoses = Object.values(state.diagnoses); renderPatients(); refreshDateDependentReports()
+			state.diagnoses = Object.values(state.diagnoses)
+			try {
+				state.financialData = await loadFinancialData(user, state.dateFrom, state.dateTo)
+			} catch (error) {
+				console.error('Error al cargar el resumen financiero:', error)
+				alert(`No se pudo cargar el resumen financiero: ${error.message}`)
+			}
+			renderPatients(); refreshDateDependentReports()
 		}
 		async function logout() { const { error } = await supabase.auth.signOut(); if (error) { console.error('No se pudo cerrar la sesión:', error.message); return } state.appointments = []; state.patients = []; state.diagnoses = []; state.attentionRecords = []; state.filteredPatients = []; state.dateFrom = null; state.dateTo = null; state.totalAppointments = 0; state.attendedAppointments = 0; state.noShowAppointments = 0; state.newPatients = 0; state.ageFrom = null; state.ageTo = null; state.sortAscending = true; Object.values(state.charts).forEach((chart) => chart?.destroy()); state.charts = {}; document.body.replaceChildren(); clearClientStorage(); window.location.href = '../ingresar.html' }
 		function bindEvents() {
