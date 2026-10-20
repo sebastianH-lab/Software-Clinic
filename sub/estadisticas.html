@@ -237,17 +237,21 @@
 		function refreshDateDependentReports() { const appointments = state.appointments.filter(inSelectedRange); destroyCharts(); renderKpis(); $('#attention-count').textContent = state.totalAppointments; renderDoctorChart(appointments); renderTypeChart(appointments); renderStatusChart(appointments); renderDiagnosesChart() }
 
 		async function loadData() {
-			if (!await requireAuthenticatedUser('../ingresar.html')) return
+			const user = await requireAuthenticatedUser('../ingresar.html')
+			if (!user) return
+			state.appointments = []; state.patients = []; state.diagnoses = []; state.filteredPatients = []
+			state.totalAppointments = 0; state.attendedAppointments = 0; state.noShowAppointments = 0; state.newPatients = 0
+			renderPatients(); refreshDateDependentReports()
 			if (state.dateFrom && state.dateTo && state.dateFrom > state.dateTo) {
 				alert('La fecha inicial no puede ser posterior a la fecha final.')
 				return
 			}
 			const { start, end } = timestampRange(state.dateFrom, state.dateTo)
-			let appointmentsQuery = supabase.from('citas').select('*, pacientes(*), doctor:profiles!citas_doctor_id_fkey(full_name)', { count: 'exact' })
-			let attendedQuery = supabase.from('citas').select('id', { count: 'exact', head: true }).in('estado', ['Atendida', 'atendida'])
-			let noShowQuery = supabase.from('citas').select('id', { count: 'exact', head: true }).in('estado', ['No asistió', 'No Asistió', 'No asistio', 'no asistio', 'no_asistio', 'no_asistió', 'no-asistio', 'no-asistió'])
-			let newPatientsQuery = supabase.from('pacientes').select('id', { count: 'exact', head: true })
-			let diagnosesQuery = supabase.from('atenciones').select('created_at, atencion_diagnosticos(descripcion)').order('created_at')
+			let appointmentsQuery = supabase.from('citas').select('*, pacientes(*), doctor:profiles!citas_doctor_id_fkey(full_name)', { count: 'exact' }).eq('registrado_por', user.id)
+			let attendedQuery = supabase.from('citas').select('id', { count: 'exact', head: true }).eq('registrado_por', user.id).in('estado', ['Atendida', 'atendida'])
+			let noShowQuery = supabase.from('citas').select('id', { count: 'exact', head: true }).eq('registrado_por', user.id).in('estado', ['No asistió', 'No Asistió', 'No asistio', 'no asistio', 'no_asistio', 'no_asistió', 'no-asistio', 'no-asistió'])
+			let newPatientsQuery = supabase.from('pacientes').select('id', { count: 'exact', head: true }).eq('registrado_por', user.id)
+			let diagnosesQuery = supabase.from('atenciones').select('created_at, atencion_diagnosticos(descripcion)').eq('registrado_por', user.id).order('created_at')
 			if (state.dateFrom) {
 				appointmentsQuery = appointmentsQuery.gte('fecha', state.dateFrom)
 				attendedQuery = attendedQuery.gte('fecha', state.dateFrom)
@@ -264,7 +268,7 @@
 			}
 			const [appointmentsResult, patientsResult, diagnosesResult, attendedResult, noShowResult, newPatientsResult] = await Promise.all([
 				appointmentsQuery.order('fecha').order('hora_inicio'),
-				supabase.from('pacientes').select('*').order('nombre_completo'),
+				supabase.from('pacientes').select('*').eq('registrado_por', user.id).order('nombre_completo'),
 				diagnosesQuery,
 				attendedQuery,
 				noShowQuery,
