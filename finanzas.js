@@ -12,11 +12,10 @@ const money = (value, currency) => `${currency === 'USD' || currency === 'Dólar
 const dateDisplay = (value) => value ? new Date(`${String(value).slice(0, 10)}T12:00:00`).toLocaleDateString('es-PE') : '-'
 const showToast = (message) => { const toast = $('#toast'); toast.textContent = message; toast.classList.add('is-visible'); window.setTimeout(() => toast.classList.remove('is-visible'), 3200) }
 
-async function loadPatients() { if (!await requireAuthenticatedUser('../ingresar.html')) return; const { data, error } = await supabase.from('pacientes').select('*').eq('activo', true).order('nombre_completo'); if (error) { console.error(error); showToast('No se pudieron cargar los pacientes'); return } state.patients = data || []; renderPatientPicker() }
+async function loadPatients() { const user = await requireAuthenticatedUser('../ingresar.html'); if (!user) return; const { data, error } = await supabase.from('pacientes').select('*').eq('registrado_por', user.id).eq('activo', true).order('nombre_completo'); if (error) { console.error(error); showToast('No se pudieron cargar los pacientes'); return } state.patients = data || []; renderPatientPicker() }
 async function loadDoctors() { const user = await requireAuthenticatedUser('../ingresar.html'); if (!user) return; const { data, error } = await supabase.from('profiles').select('id, full_name').order('full_name'); if (error) { console.error('No se pudieron cargar los médicos:', error); showToast(`No se pudieron cargar los médicos: ${error.message}`) } state.doctors = data || []; const doctorOptions = `<option value="">Sin asignar</option>${state.doctors.map((doctor) => `<option value="${escapeHtml(doctor.id)}">${escapeHtml(doctor.full_name || 'Doctor')}</option>`).join('')}`; $('#receipt-doctor').innerHTML = doctorOptions; $('#proforma-doctor').innerHTML = doctorOptions; const profile = state.doctors.find((doctor) => doctor.id === user.id); const name = profile?.full_name || user.user_metadata?.full_name || user.email || 'Usuario activo'; $('#sidebar-name').textContent = name; $('#sidebar-avatar').textContent = initials(name) }
 async function loadServiceCatalog() {
-	const { data: { user }, error: authError } = await supabase.auth.getUser()
-	if (authError) throw authError
+	const user = await requireAuthenticatedUser('../ingresar.html')
 	if (!user) return
 	const { data, error } = await supabase.from('service_catalog')
 		.select('id, name, category, currency, price')
@@ -39,7 +38,7 @@ function applyCatalogPrice(concept, input, currency) {
 	updateTotals()
 	updateProformaTotals()
 }
-async function loadReceipts() { try { if (!await requireAuthenticatedUser('../ingresar.html')) return; let query = supabase.from('comprobantes').select('*, paciente:pacientes(nombre_completo, documento_identidad, genero, fecha_nacimiento), doctor:profiles(full_name)').eq('estado', state.showDeleted ? 'eliminado' : 'activo').order('fecha', { ascending: false }); if (state.filters.from) query = query.gte('fecha', state.filters.from); if (state.filters.to) query = query.lte('fecha', state.filters.to); const { data, error } = await query; if (error) throw error; if (!await requireAuthenticatedUser('../ingresar.html')) return; state.receipts = await Promise.all((data || []).map(async (receipt) => { const [{ data: details }, { data: payments }] = await Promise.all([supabase.from('comprobante_detalles').select('*').eq('comprobante_id', receipt.id), supabase.from('comprobante_pagos').select('*').eq('comprobante_id', receipt.id)]); return { ...receipt, details: details || [], payments: payments || [] } })); applyReceiptFilters() } catch (error) { console.error('Error al cargar comprobantes:', error); showToast(`No se pudieron cargar los comprobantes: ${error.message}`) } }
+async function loadReceipts() { try { const user = await requireAuthenticatedUser('../ingresar.html'); if (!user) return; let query = supabase.from('comprobantes').select('*, paciente:pacientes(nombre_completo, documento_identidad, genero, fecha_nacimiento), doctor:profiles(full_name)').eq('registrado_por', user.id).eq('estado', state.showDeleted ? 'eliminado' : 'activo').order('fecha', { ascending: false }); if (state.filters.from) query = query.gte('fecha', state.filters.from); if (state.filters.to) query = query.lte('fecha', state.filters.to); const { data, error } = await query; if (error) throw error; state.receipts = await Promise.all((data || []).map(async (receipt) => { const [{ data: details }, { data: payments }] = await Promise.all([supabase.from('comprobante_detalles').select('*').eq('comprobante_id', receipt.id), supabase.from('comprobante_pagos').select('*').eq('comprobante_id', receipt.id)]); return { ...receipt, details: details || [], payments: payments || [] } })); applyReceiptFilters() } catch (error) { console.error('Error al cargar comprobantes:', error); showToast(`No se pudieron cargar los comprobantes: ${error.message}`) } }
 
 function proformaStatus(proforma) {
 	if (['pendiente', 'aprobada'].includes(proforma.estado) && proforma.fecha && proforma.validez_dias) {
@@ -52,9 +51,11 @@ function proformaStatus(proforma) {
 
 async function loadProformas() {
 	try {
-		if (!await requireAuthenticatedUser('../ingresar.html')) return
+		const user = await requireAuthenticatedUser('../ingresar.html')
+		if (!user) return
 		let query = supabase.from('proformas')
 			.select('*, paciente:pacientes(nombre_completo, documento_identidad), medico:profiles(full_name)')
+			.eq('registrado_por', user.id)
 			.order('fecha', { ascending: false })
 		if (state.proformaFilters.from) query = query.gte('fecha', state.proformaFilters.from)
 		if (state.proformaFilters.to) query = query.lte('fecha', state.proformaFilters.to)
@@ -67,7 +68,7 @@ async function loadProformas() {
 		}))
 		const expired = state.proformas.filter((proforma) => ['pendiente', 'aprobada'].includes(proforma.estado) && proformaStatus(proforma) === 'vencida')
 		if (expired.length) {
-			const { error: expiryError } = await supabase.from('proformas').update({ estado: 'vencida' }).in('id', expired.map((item) => item.id)).in('estado', ['pendiente', 'aprobada'])
+			const { error: expiryError } = await supabase.from('proformas').update({ estado: 'vencida' }).eq('registrado_por', user.id).in('id', expired.map((item) => item.id)).in('estado', ['pendiente', 'aprobada'])
 			if (expiryError) throw expiryError
 			expired.forEach((item) => { item.estado = 'vencida' })
 		}
@@ -279,9 +280,8 @@ async function saveProforma() {
 		setProformaStage(1)
 		return
 	}
-	const { data: { user }, error: authError } = await supabase.auth.getUser()
-	if (authError) { showToast(`No se pudo verificar la sesión: ${authError.message}`); return }
-	if (!user) { window.location.href = '../ingresar.html'; return }
+	const user = await requireAuthenticatedUser('../ingresar.html')
+	if (!user) return
 	const button = $('#next-proforma-stage')
 	button.disabled = true
 	const subtotal = proformaSubtotal()
@@ -307,7 +307,7 @@ async function saveProforma() {
 		if (error) throw error
 		const { error: detailsError } = await supabase.from('proforma_detalles').insert(details.map((item) => ({ ...item, proforma_id: proforma.id })))
 		if (detailsError) {
-			const { error: cleanupError } = await supabase.from('proformas').delete().eq('id', proforma.id)
+			const { error: cleanupError } = await supabase.from('proformas').delete().eq('id', proforma.id).eq('registrado_por', user.id)
 			if (cleanupError) throw new Error(`No se guardaron los conceptos (${detailsError.message}) y no se pudo limpiar la proforma incompleta (${cleanupError.message})`)
 			throw detailsError
 		}
@@ -323,7 +323,9 @@ async function saveProforma() {
 }
 
 async function updateProformaStatus(id, status) {
-	const { error } = await supabase.from('proformas').update({ estado: status }).eq('id', id)
+	const user = await requireAuthenticatedUser('../ingresar.html')
+	if (!user) return
+	const { error } = await supabase.from('proformas').update({ estado: status }).eq('id', id).eq('registrado_por', user.id)
 	if (error) { showToast(`No se pudo actualizar la proforma: ${error.message}`); return }
 	await loadProformas()
 }
@@ -362,10 +364,9 @@ async function convertProforma(id) {
 	const buttons = $$('[data-convert-proforma], [data-detail-convert]').filter((button) => button.dataset.convertProforma === String(id) || button.hasAttribute('data-detail-convert'))
 	buttons.forEach((button) => { button.disabled = true })
 	try {
-		const { data: { user }, error: authError } = await supabase.auth.getUser()
-		if (authError) throw authError
-		if (!user) { window.location.href = '../ingresar.html'; return }
-		let { data: receipt, error } = await supabase.from('comprobantes').select('id').eq('proforma_id', proforma.id).maybeSingle()
+		const user = await requireAuthenticatedUser('../ingresar.html')
+		if (!user) return
+		let { data: receipt, error } = await supabase.from('comprobantes').select('id').eq('proforma_id', proforma.id).eq('registrado_por', user.id).maybeSingle()
 		if (error) throw error
 		if (!receipt) {
 			const receiptPayload = {
@@ -387,7 +388,7 @@ async function convertProforma(id) {
 			}
 			const inserted = await supabase.from('comprobantes').insert(receiptPayload).select('id').single()
 			if (inserted.error?.code === '23505') {
-				const existing = await supabase.from('comprobantes').select('id').eq('proforma_id', proforma.id).single()
+				const existing = await supabase.from('comprobantes').select('id').eq('proforma_id', proforma.id).eq('registrado_por', user.id).single()
 				if (existing.error) throw existing.error
 				receipt = existing.data
 			} else {
@@ -407,7 +408,7 @@ async function convertProforma(id) {
 			})))
 			if (detailError) throw detailError
 		}
-		const { error: updateError } = await supabase.from('proformas').update({ estado: 'convertida', comprobante_id: receipt.id }).eq('id', proforma.id)
+		const { error: updateError } = await supabase.from('proformas').update({ estado: 'convertida', comprobante_id: receipt.id }).eq('id', proforma.id).eq('registrado_por', user.id)
 		if (updateError) throw updateError
 		showToast('Proforma convertida a Comprobante de pago exitosamente')
 		await Promise.all([loadProformas(), loadReceipts()])
@@ -441,12 +442,72 @@ function renderConcepts() { $('#concept-list').innerHTML = `<div class="concepts
 function renderPayments() { $('#payment-list').innerHTML = `<div class="payment-head"><span>Monto</span><span>Fecha</span><span>Método de pago</span><span></span></div>${state.payments.map((payment, index) => `<div class="payment-row" data-index="${index}"><input data-payment-field="monto" type="number" min="0" step="0.01" value="${payment.monto || ''}" placeholder="Monto"><input data-payment-field="fecha" type="date" value="${payment.fecha || today()}"><select data-payment-field="metodo_pago"><option ${payment.metodo_pago === 'Efectivo' ? 'selected' : ''}>Efectivo</option><option ${payment.metodo_pago === 'Tarjeta' ? 'selected' : ''}>Tarjeta</option><option ${payment.metodo_pago === 'Yape/Plin' ? 'selected' : ''}>Yape/Plin</option><option ${payment.metodo_pago === 'Transferencia' ? 'selected' : ''}>Transferencia</select><button class="delete-row" data-remove-payment="${index}" type="button" aria-label="Eliminar pago">⌫</button></div>`).join('')}`; updateTotals() }
 function updateTotals() { const subtotal = state.concepts.reduce((sum, concept) => sum + Number(concept.cantidad || 0) * Number(concept.precio || 0), 0); const total = Math.max(0, subtotal - Number($('#discount-base').value || 0) + Number($('#tax-value').value || 0) - Number($('#discount-total').value || 0)); const paid = state.payments.reduce((sum, payment) => sum + Number(payment.monto || 0), 0); $('#subtotal-value').textContent = subtotal.toFixed(2); $('#total-value').textContent = total.toFixed(2); $('#paid-value').textContent = paid.toFixed(2); $('#balance-value').textContent = Math.max(0, total - paid).toFixed(2) }
 
-async function saveReceipt() { try { const { data: { user }, error: authError } = await supabase.auth.getUser(); if (authError) throw authError; if (!user) { window.location.href = '../ingresar.html'; return } const subtotal = Number($('#subtotal-value').textContent); const importeTotal = Number($('#total-value').textContent); const totalCancelado = state.payments.reduce((sum, payment) => sum + Number(payment.monto || 0), 0); const payload = { paciente_id: state.selectedPatient.id, doctor_id: $('#receipt-doctor').value || null, motivo: $('#receipt-reason').value.trim() || null, fecha: $('#receipt-date').value || today(), moneda: $('#receipt-currency').value, descuento_base: Number($('#discount-base').value || 0), subtotal, igv: Number($('#tax-value').value || 0), descuento_total: Number($('#discount-total').value || 0), importe_total: importeTotal, total_cancelado: totalCancelado, pendiente: Math.max(0, importeTotal - totalCancelado), estado: 'activo' }; let receipt = state.selectedReceipt; if (state.editing) { const { error } = await supabase.from('comprobantes').update(payload).eq('id', receipt.id); if (error) throw error; await supabase.from('comprobante_detalles').delete().eq('comprobante_id', receipt.id); await supabase.from('comprobante_pagos').delete().eq('comprobante_id', receipt.id) } else { const { data, error } = await supabase.from('comprobantes').insert({ ...payload, registrado_por: user.id }).select().single(); if (error) throw error; receipt = data } const details = state.concepts.filter((concept) => concept.concepto || Number(concept.precio)).map((concept) => ({ comprobante_id: receipt.id, concepto: concept.concepto || 'Servicio', cantidad: Number(concept.cantidad || 1), monto_base: Number(concept.monto_base || 0), precio: Number(concept.precio || 0) })); if (details.length) { const { error } = await supabase.from('comprobante_detalles').insert(details); if (error) throw error } const payments = state.payments.filter((payment) => Number(payment.monto) > 0).map((payment) => ({ comprobante_id: receipt.id, monto: Number(payment.monto), fecha: payment.fecha || today(), metodo_pago: payment.metodo_pago })); if (payments.length) { const { error } = await supabase.from('comprobante_pagos').insert(payments); if (error) throw error } showToast(state.editing ? 'Comprobante actualizado' : 'Comprobante guardado'); closeDrawer(); await loadReceipts(); receipt = state.receipts.find((item) => String(item.id) === String(receipt.id)) || (await loadSingleReceipt(receipt.id)); if (receipt) printReceipt(receipt); if (state.editing) await openDetail(receipt.id) } catch (error) { console.error(error); showToast(`No se pudo guardar: ${error.message}`) } }
-async function deleteReceipt() { if (!state.selectedReceipt) return; try { const { error } = await supabase.from('comprobantes').update({ estado: 'eliminado' }).eq('id', state.selectedReceipt.id); if (error) throw error; closeDrawer(); window.history.back(); showToast('Comprobante eliminado'); await loadReceipts() } catch (error) { showToast(`No se pudo eliminar: ${error.message}`) } }
+async function saveReceipt() {
+	try {
+		const user = await requireAuthenticatedUser('../ingresar.html')
+		if (!user) return
+		const subtotal = Number($('#subtotal-value').textContent)
+		const importeTotal = Number($('#total-value').textContent)
+		const totalCancelado = state.payments.reduce((sum, payment) => sum + Number(payment.monto || 0), 0)
+		const payload = { paciente_id: state.selectedPatient.id, doctor_id: $('#receipt-doctor').value || null, motivo: $('#receipt-reason').value.trim() || null, fecha: $('#receipt-date').value || today(), moneda: $('#receipt-currency').value, descuento_base: Number($('#discount-base').value || 0), subtotal, igv: Number($('#tax-value').value || 0), descuento_total: Number($('#discount-total').value || 0), importe_total: importeTotal, total_cancelado: totalCancelado, pendiente: Math.max(0, importeTotal - totalCancelado), estado: 'activo' }
+		let receipt = state.selectedReceipt
+		if (state.editing) {
+			const { error } = await supabase.from('comprobantes').update(payload).eq('id', receipt.id).eq('registrado_por', user.id)
+			if (error) throw error
+			await supabase.from('comprobante_detalles').delete().eq('comprobante_id', receipt.id)
+			await supabase.from('comprobante_pagos').delete().eq('comprobante_id', receipt.id)
+		} else {
+			const { data, error } = await supabase.from('comprobantes').insert({ ...payload, registrado_por: user.id }).select().single()
+			if (error) throw error
+			receipt = data
+		}
+		const details = state.concepts.filter((concept) => concept.concepto || Number(concept.precio)).map((concept) => ({ comprobante_id: receipt.id, concepto: concept.concepto || 'Servicio', cantidad: Number(concept.cantidad || 1), monto_base: Number(concept.monto_base || 0), precio: Number(concept.precio || 0) }))
+		if (details.length) {
+			const { error } = await supabase.from('comprobante_detalles').insert(details)
+			if (error) throw error
+		}
+		const payments = state.payments.filter((payment) => Number(payment.monto) > 0).map((payment) => ({ comprobante_id: receipt.id, monto: Number(payment.monto), fecha: payment.fecha || today(), metodo_pago: payment.metodo_pago }))
+		if (payments.length) {
+			const { error } = await supabase.from('comprobante_pagos').insert(payments)
+			if (error) throw error
+		}
+		showToast(state.editing ? 'Comprobante actualizado' : 'Comprobante guardado')
+		closeDrawer()
+		await loadReceipts()
+		receipt = state.receipts.find((item) => String(item.id) === String(receipt.id)) || (await loadSingleReceipt(receipt.id))
+		if (receipt) printReceipt(receipt)
+		if (state.editing && receipt) await openDetail(receipt.id)
+	} catch (error) {
+		console.error(error)
+		showToast(`No se pudo guardar: ${error.message}`)
+	}
+}
+async function deleteReceipt() {
+	if (!state.selectedReceipt) return
+	try {
+		const user = await requireAuthenticatedUser('../ingresar.html')
+		if (!user) return
+		const { error } = await supabase.from('comprobantes').update({ estado: 'eliminado' }).eq('id', state.selectedReceipt.id).eq('registrado_por', user.id)
+		if (error) throw error
+		closeDrawer()
+		window.history.back()
+		showToast('Comprobante eliminado')
+		await loadReceipts()
+	} catch (error) {
+		showToast(`No se pudo eliminar: ${error.message}`)
+	}
+}
 
 function renderDetail(receipt) { const status = receiptStatus(receipt); $('#detail-receipt-number').textContent = `Comprobante #${receipt.id}`; $('#receipt-detail-card').innerHTML = `<section class="detail-section"><header><h2>Recibo</h2><span class="receipt-status ${status.toLowerCase()}">${status}</span></header><div class="detail-table detail-table-head"><span>Concepto</span><span>Cantidad</span><span>Monto base</span><span>Precio</span></div>${receipt.details.length ? receipt.details.map((detail) => `<div class="detail-table"><span>${escapeHtml(detail.concepto)}</span><span>${detail.cantidad}</span><span>${money(detail.monto_base, receipt.moneda)}</span><span>${money(detail.precio, receipt.moneda)}</span></div>`).join('') : '<p class="detail-empty">No hay conceptos registrados.</p>'}<div class="detail-totals"><span>Descuento base <b>${money(receipt.descuento_base, receipt.moneda)}</b></span><span>Subtotal <b>${money(receipt.subtotal, receipt.moneda)}</b></span><span>IGV <b>${money(receipt.igv, receipt.moneda)}</b></span><span>Descuento total <b>${money(receipt.descuento_total, receipt.moneda)}</b></span><strong>Importe total <b>${money(receipt.importe_total, receipt.moneda)}</b></strong></div></section><section class="detail-section"><header><h2>Pagos</h2></header><div class="detail-table detail-table-head"><span>Método</span><span>Fecha</span><span>Monto</span><span></span></div>${receipt.payments.length ? receipt.payments.map((payment) => `<div class="detail-table"><span>${escapeHtml(payment.metodo_pago)}</span><span>${dateDisplay(payment.fecha)}</span><span>${money(payment.monto, receipt.moneda)}</span><span></span></div>`).join('') : '<p class="detail-empty">No hay pagos registrados.</p>'}<div class="payment-summary"><div><span>Pendiente</span><strong>${money(receipt.pendiente, receipt.moneda)}</strong></div><div><span>Pagado</span><strong>${money(receipt.total_cancelado, receipt.moneda)}</strong></div></div></section><section class="detail-section"><h2>Observaciones</h2><p>${escapeHtml(receipt.motivo || 'Sin observaciones.')}</p></section><section class="detail-section"><header><h2>Documentos</h2><span class="record-badge">1 registro</span></header><div class="document-row"><span>Nota de venta</span><button class="link-button" id="download-detail-pdf" type="button">PDF</button></div></section>`; $('#receipt-info-sidebar').innerHTML = `<div class="info-block"><h2>Información</h2><p>♙ <strong>${escapeHtml(receipt.paciente?.nombre_completo || 'Paciente')}</strong></p><p>♙ ${escapeHtml(receipt.doctor?.full_name || 'Sin atendido por')}</p><p>▣ ${dateDisplay(receipt.fecha)}</p><p>◉ ${receipt.moneda === 'USD' ? 'Dólares' : 'Soles'}</p><span class="receipt-status ${status.toLowerCase()}">${status}</span></div><button class="download-receipt" id="download-sidebar-pdf" type="button">Descargar recibo →</button><div class="activity-block"><h2>Actividad</h2><p><strong>${escapeHtml(receipt.registrador?.full_name || receipt.registrado_por || 'Usuario')}</strong> creó el recibo.<small>${dateDisplay(receipt.created_at || receipt.fecha)}</small></p></div>`; $('#download-detail-pdf').addEventListener('click', () => printReceipt(receipt)); $('#download-sidebar-pdf').addEventListener('click', () => printReceipt(receipt)) }
 async function openDetail(id) { const receipt = state.receipts.find((item) => String(item.id) === String(id)) || (await loadSingleReceipt(id)); if (!receipt) return; state.selectedReceipt = receipt; hideFinanceViews(); $('#receipt-detail-view').hidden = false; renderDetail(receipt); window.history.replaceState({}, '', `finanzas.html?id=${encodeURIComponent(id)}`) }
-async function loadSingleReceipt(id) { if (!await requireAuthenticatedUser('../ingresar.html')) return null; const { data, error } = await supabase.from('comprobantes').select('*, paciente:pacientes(nombre_completo, documento_identidad, genero, fecha_nacimiento), doctor:profiles(full_name)').eq('id', id).single(); if (error) { showToast('No se encontró el comprobante'); return null } if (!await requireAuthenticatedUser('../ingresar.html')) return null; const [{ data: details }, { data: payments }] = await Promise.all([supabase.from('comprobante_detalles').select('*').eq('comprobante_id', id), supabase.from('comprobante_pagos').select('*').eq('comprobante_id', id)]); return { ...data, details: details || [], payments: payments || [] } }
+async function loadSingleReceipt(id) {
+	const user = await requireAuthenticatedUser('../ingresar.html')
+	if (!user) return null
+	const { data, error } = await supabase.from('comprobantes').select('*, paciente:pacientes(nombre_completo, documento_identidad, genero, fecha_nacimiento), doctor:profiles(full_name)').eq('id', id).eq('registrado_por', user.id).single()
+	if (error) { showToast('No se encontró el comprobante'); return null }
+	const [{ data: details }, { data: payments }] = await Promise.all([supabase.from('comprobante_detalles').select('*').eq('comprobante_id', id), supabase.from('comprobante_pagos').select('*').eq('comprobante_id', id)])
+	return { ...data, details: details || [], payments: payments || [] }
+}
 function printReceipt(receipt) { const JsPdf = window.jspdf?.jsPDF; if (!JsPdf) { showToast('No se pudo cargar el generador PDF'); return } const doc = new JsPdf(); const currency = receipt.moneda; let y = 18; const line = (text, x = 16, size = 9) => { doc.setFontSize(size); doc.text(String(text), x, y); y += 6 }; doc.setFontSize(20); doc.text('Nota de venta', 16, y); doc.setFontSize(13); doc.text('Consultorio Médico', 145, y); y += 8; line(`# ${String(receipt.id).slice(0, 16)}`); line(`Fecha de emisión : ${String(receipt.fecha || '').slice(0, 10)}`); doc.setFontSize(8); doc.text('Este documento no está validado ante SUNAT.', 16, y); y += 12; line(`Paciente: ${receipt.paciente?.nombre_completo || '-'}`, 16, 10); line(`DNI: ${receipt.paciente?.documento_identidad || '-'}`); line(`Edad: ${calculateAge(receipt.paciente?.fecha_nacimiento)}`); y += 4; line('Cuenta', 16, 12); doc.setFontSize(8); doc.text('#', 16, y); doc.text('Concepto', 27, y); doc.text('Precio Unit.', 105, y); doc.text('Cant.', 133, y); doc.text('Monto base', 149, y); doc.text('Precio', 179, y); y += 5; receipt.details.forEach((detail, index) => { doc.text(String(index + 1), 16, y); doc.text(String(detail.concepto || 'Servicio').slice(0, 34), 27, y); doc.text(money(detail.precio, currency), 105, y); doc.text(String(detail.cantidad), 133, y); doc.text(money(detail.monto_base, currency), 149, y); doc.text(money(Number(detail.cantidad || 0) * Number(detail.precio || 0), currency), 179, y); y += 6 }); y += 3; ['Descuento base', 'Subtotal', 'IGV', 'Descuento total', 'Total'].forEach((label) => { const value = label === 'Descuento base' ? receipt.descuento_base : label === 'Subtotal' ? receipt.subtotal : label === 'IGV' ? receipt.igv : label === 'Descuento total' ? receipt.descuento_total : receipt.importe_total; doc.text(`${label}: ${money(value, currency)}`, 125, y); y += 6 }); y += 5; line('Pagos', 16, 12); doc.setFontSize(8); doc.text('Método de pago', 16, y); doc.text('Fecha', 100, y); doc.text('Monto', 150, y); y += 5; receipt.payments.forEach((payment) => { doc.text(String(payment.metodo_pago || '-'), 16, y); doc.text(String(payment.fecha || '-'), 100, y); doc.text(money(payment.monto, currency), 150, y); y += 6 }); y += 4; doc.text(`Pagado: ${money(receipt.total_cancelado, currency)}`, 125, y); y += 6; doc.text(`Pendiente: ${money(receipt.pendiente, currency)}`, 125, y); doc.save(`Nota_de_venta_${String(receipt.id).slice(0, 8)}.pdf`) }
 
 function exportReceipts() { const headers = ['FECHA DE ATENCIÓN', 'FECHA DE REGISTRO', 'REGISTRADO POR', 'NOMBRES', 'APELLIDOS', 'TIPO DE DOCUMENTO', '# DE DOCUMENTO', 'EMPRESA', 'RUC', 'MOTIVO DE ATENCIÓN', 'MONEDA', 'DESCUENTO BASE', 'DESCUENTO TOTAL', 'CONCEPTOS SIN IGV', 'CONCEPTOS CON IGV', 'TOTAL A PAGAR SOLES', 'TOTAL A PAGAR DOLARES', 'PAGADO SOLES', 'PAGADO DÓLARES', 'PENDIENTE SOLES', 'PENDIENTE DÓLARES', 'CANTIDAD', 'CONCEPTOS', 'CATEGORÍAS', 'ATENDIDO POR', 'ESTADO', 'NRO DE COMPROBANTE INTERNO', 'TIPO DE COMPORBANTE', 'FECHA DE EMISIÓN', 'NRO. CPE', 'NRO.NC', 'DOC RELAC', 'ESTADO SUNAT']; const rows = state.filteredReceipts.map((receipt) => { const name = String(receipt.paciente?.nombre_completo || '').trim().split(/\s+/); const paid = Number(receipt.total_cancelado || 0); const pending = Number(receipt.pendiente || 0); const isUsd = receipt.moneda === 'USD'; return { 'FECHA DE ATENCIÓN': receipt.fecha || '', 'FECHA DE REGISTRO': receipt.created_at || '', 'REGISTRADO POR': receipt.registrador?.full_name || receipt.registrado_por || '', NOMBRES: name.slice(0, 2).join(' '), APELLIDOS: name.slice(2).join(' '), 'TIPO DE DOCUMENTO': 'DNI', '# DE DOCUMENTO': receipt.paciente?.documento_identidad || '', EMPRESA: receipt.empresa || '', RUC: receipt.ruc || '', 'MOTIVO DE ATENCIÓN': receipt.motivo || '', MONEDA: isUsd ? 'Dólares' : 'Soles', 'DESCUENTO BASE': receipt.descuento_base || 0, 'DESCUENTO TOTAL': receipt.descuento_total || 0, 'CONCEPTOS SIN IGV': receipt.subtotal || 0, 'CONCEPTOS CON IGV': Number(receipt.subtotal || 0) + Number(receipt.igv || 0), 'TOTAL A PAGAR SOLES': isUsd ? 0 : receipt.importe_total || 0, 'TOTAL A PAGAR DOLARES': isUsd ? receipt.importe_total || 0 : 0, 'PAGADO SOLES': isUsd ? 0 : paid, 'PAGADO DÓLARES': isUsd ? paid : 0, 'PENDIENTE SOLES': isUsd ? 0 : pending, 'PENDIENTE DÓLARES': isUsd ? pending : 0, CANTIDAD: receipt.details.reduce((sum, detail) => sum + Number(detail.cantidad || 0), 0), CONCEPTOS: receipt.details.map((detail) => detail.concepto).join(', '), 'CATEGORÍAS': receipt.categorias || '', 'ATENDIDO POR': receipt.doctor?.full_name || '', ESTADO: receiptStatus(receipt), 'NRO DE COMPROBANTE INTERNO': receipt.numero_comprobante || receipt.nro_comprobante || '', 'TIPO DE COMPORBANTE': receipt.tipo_comprobante || 'Nota de venta', 'FECHA DE EMISIÓN': receipt.fecha || '', 'NRO. CPE': receipt.nro_cpe || '', 'NRO.NC': receipt.nro_nc || '', 'DOC RELAC': receipt.doc_relac || '', 'ESTADO SUNAT': receipt.estado_sunat || '' } }); if (window.XLSX) { const worksheet = XLSX.utils.json_to_sheet(rows, { header: headers }); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, 'Comprobantes'); XLSX.writeFile(workbook, `Comprobantes_${today()}.xlsx`) } else showToast('No se pudo cargar el exportador Excel') }
@@ -467,8 +528,15 @@ const range = (prefix) => ({ from: get(`#${prefix}-date-from`).value, to: get(`#
 
 async function loadIncomeData() {
 	try {
-		if (!await requireAuthenticatedUser('../ingresar.html')) return
-		let query = supabase.from('comprobante_pagos').select('*, comprobante:comprobantes(*, paciente:pacientes(nombre_completo, documento_identidad), doctor:profiles(full_name))').order('fecha', { ascending: false })
+		const user = await requireAuthenticatedUser('../ingresar.html')
+		if (!user) {
+			subState.incomes = []
+			renderIncome()
+			return
+		}
+		subState.incomes = []
+		renderIncome()
+		let query = supabase.from('comprobante_pagos').select('*, comprobante:comprobantes!inner(*, paciente:pacientes(nombre_completo, documento_identidad), doctor:profiles(full_name))').eq('comprobante.registrado_por', user.id).order('fecha', { ascending: false })
 		const dates = range('income'); if (dates.from) query = query.gte('fecha', dates.from); if (dates.to) query = query.lte('fecha', dates.to)
 		const { data, error } = await query; if (error) throw error
 		subState.incomes = data || []; renderIncome()
@@ -535,7 +603,7 @@ function renderIncome() {
 }
 function exportIncome() { const headers = ['FECHA DE ATENCIÓN', 'FECHA DE REGISTRO', 'FECHA DE PAGO', 'REGISTRADO POR', 'NOMBRES', 'APELLIDOS', 'TIPO DE DOCUMENTO', '# DE DOCUMENTO', 'EMPRESA', 'RUC', 'MEDIO DE PAGO', 'OPERACIÓN', 'MOTIVO DE ATENCIÓN', 'SOLES', 'DÓLARES', 'CANTIDAD', 'CONCEPTOS', 'CATEGORÍAS', 'ATENDIDO POR', 'NRO DE COMPROBANTE INTERNO', 'TIPO DE COMPROBANTE', 'FECHA DE EMISIÓN', 'NRO. CPE', 'NRO. NC', 'DOC RELAC']; const rows = subState.incomes.map((payment) => { const receipt = payment.comprobante || {}; const patientName = String(receipt.paciente?.nombre_completo || '').split(/\s+/); const usd = receipt.moneda === 'USD'; return { 'FECHA DE ATENCIÓN': receipt.fecha || '', 'FECHA DE REGISTRO': receipt.created_at || '', 'FECHA DE PAGO': payment.fecha || '', 'REGISTRADO POR': '', NOMBRES: patientName.slice(0, 2).join(' '), APELLIDOS: patientName.slice(2).join(' '), 'TIPO DE DOCUMENTO': 'DNI', '# DE DOCUMENTO': receipt.paciente?.documento_identidad || '', EMPRESA: '', RUC: '', 'MEDIO DE PAGO': payment.metodo_pago || '', OPERACIÓN: payment.id || '', 'MOTIVO DE ATENCIÓN': receipt.motivo || '', SOLES: usd ? 0 : payment.monto, 'DÓLARES': usd ? payment.monto : 0, CANTIDAD: receipt.details?.length || '', CONCEPTOS: '', 'CATEGORÍAS': '', 'ATENDIDO POR': receipt.doctor?.full_name || '', 'NRO DE COMPROBANTE INTERNO': receipt.numero_comprobante || '', 'TIPO DE COMPROBANTE': 'Nota de venta', 'FECHA DE EMISIÓN': receipt.fecha || '', 'NRO. CPE': receipt.nro_cpe || '', 'NRO. NC': receipt.nro_nc || '', 'DOC RELAC': receipt.doc_relac || '' } }); if (!window.XLSX) { toast('No se pudo cargar el exportador Excel'); return } const sheet = XLSX.utils.json_to_sheet(rows, { header: headers }); const book = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(book, sheet, 'Ingresos'); XLSX.writeFile(book, `Ingresos_${dateNow()}.xlsx`) }
 
-async function loadExpenses() { try { if (!await requireAuthenticatedUser('../ingresar.html')) return; let query = supabase.from('egresos').select('*').order('fecha', { ascending: false }); const dates = range('expense'); if (dates.from) query = query.gte('fecha', dates.from); if (dates.to) query = query.lte('fecha', dates.to); const { data, error } = await query; if (error) throw error; subState.expenses = data || []; applyExpenseSearch() } catch (error) { console.error('Error al cargar egresos:', error); toast(`No se pudieron cargar los egresos: ${error.message}`) } }
+async function loadExpenses() { try { const user = await requireAuthenticatedUser('../ingresar.html'); if (!user) return; let query = supabase.from('egresos').select('*').eq('registrado_por', user.id).order('fecha', { ascending: false }); const dates = range('expense'); if (dates.from) query = query.gte('fecha', dates.from); if (dates.to) query = query.lte('fecha', dates.to); const { data, error } = await query; if (error) throw error; subState.expenses = data || []; applyExpenseSearch() } catch (error) { console.error('Error al cargar egresos:', error); toast(`No se pudieron cargar los egresos: ${error.message}`) } }
 function applyExpenseSearch() { const term = (get('#expense-search').value || '').trim().toLowerCase(); const field = get('#expense-search-field').value; subState.expenseFiltered = subState.expenses.filter((expense) => !term || String(expense[field] || '').toLowerCase().includes(term)); renderExpenses() }
 function exportExpenses() { const headers = ['Concepto', 'Fecha', 'Categoría', 'Medio de pago', 'Registrado por', 'Moneda', 'Monto']; const rows = subState.expenseFiltered.map((expense) => ({ Concepto: expense.concepto || '', Fecha: expense.fecha || '', 'Categoría': expense.categoria || 'Sin categoría', 'Medio de pago': expense.medio_pago || '', 'Registrado por': expense.registrado_por_nombre || '', Moneda: expense.moneda === 'USD' || expense.moneda === 'Dólares' || expense.moneda === 'D�lares' ? 'Dólares' : 'Soles', Monto: Number(expense.monto || 0) })); if (!window.XLSX) { toast('No se pudo cargar el exportador Excel'); return } const sheet = XLSX.utils.json_to_sheet(rows, { header: headers }); const book = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(book, sheet, 'Egresos'); XLSX.writeFile(book, `Egresos_${dateNow()}.xlsx`) }
 function renderExpenses() {
@@ -601,8 +669,8 @@ function renderExpenses() {
 function ensureExpenseSelect(id, options) { const current = get(`#${id}`); if (current.tagName !== 'SELECT') { const select = document.createElement('select'); select.className = current.className; select.id = id; current.replaceWith(select) } get(`#${id}`).innerHTML = options }
 function resetExpenseForm() { subState.expenseEditing = null; get('#expense-drawer-title').textContent = 'Nuevo egreso'; get('#expense-drawer-date').textContent = dateNow(); get('#expense-concept').value = ''; ensureExpenseSelect('expense-category', '<option value="">Seleccione</option><option value="Sin categoría">Sin categoría</option><option value="Insumos">Insumos</option><option value="Servicios">Servicios</option><option value="Personal">Personal</option>'); get('#expense-category').value = ''; get('#expense-date').value = dateNow(); get('#expense-money').innerHTML = '<option value="PEN">Soles</option><option value="USD">Dólares</option>'; get('#expense-money').value = 'PEN'; get('#expense-amount').value = ''; ensureExpenseSelect('expense-method', '<option value="">Seleccione</option><option>Efectivo</option><option>Tarjeta</option><option>Yape/Plin</option><option>Transferencia</option>'); get('#expense-method').value = ''; get('#expense-danger-zone').hidden = true }
 function openExpenseDrawer(expense = null) { resetExpenseForm(); if (expense) { subState.expenseEditing = expense; get('#expense-drawer-title').textContent = 'Editar egreso'; get('#expense-drawer-date').textContent = expense.fecha; get('#expense-concept').value = expense.concepto || ''; get('#expense-category').value = expense.categoria || ''; get('#expense-date').value = String(expense.fecha || dateNow()).slice(0, 10); get('#expense-money').value = expense.moneda === 'USD' || expense.moneda === 'Dólares' || expense.moneda === 'D�lares' ? 'USD' : 'PEN'; get('#expense-amount').value = expense.monto || ''; get('#expense-method').value = expense.medio_pago || ''; get('#expense-danger-zone').hidden = false } get('#expense-drawer').hidden = false }
-async function saveExpense() { const concept = get('#expense-concept').value.trim(); const amountValue = Number(get('#expense-amount').value); if (!concept || !amountValue) { toast('Completa el concepto y el monto'); return } try { const { data: { user }, error: authError } = await supabase.auth.getUser(); if (authError) throw authError; if (!user) { window.location.href = '../ingresar.html'; return } const payload = { concepto: concept, categoria: get('#expense-category').value || null, fecha: get('#expense-date').value || dateNow(), moneda: get('#expense-money').value === 'USD' ? 'USD' : 'PEN', monto: amountValue, medio_pago: get('#expense-method').value || null, registrado_por: user.id, registrado_por_nombre: user.email || null }; const result = subState.expenseEditing ? await supabase.from('egresos').update(payload).eq('id', subState.expenseEditing.id) : await supabase.from('egresos').insert(payload); if (result.error) throw result.error; get('#expense-drawer').hidden = true; toast(subState.expenseEditing ? 'Egreso actualizado' : 'Egreso guardado'); await loadExpenses() } catch (error) { console.error(error); toast(`No se pudo guardar el egreso: ${error.message}`) } }
-async function deleteExpense() { if (!subState.expenseEditing) return; const { error } = await supabase.from('egresos').delete().eq('id', subState.expenseEditing.id); if (error) { toast(`No se pudo eliminar: ${error.message}`); return } get('#expense-drawer').hidden = true; await loadExpenses(); toast('Egreso eliminado') }
+async function saveExpense() { const concept = get('#expense-concept').value.trim(); const amountValue = Number(get('#expense-amount').value); if (!concept || !amountValue) { toast('Completa el concepto y el monto'); return } try { const user = await requireAuthenticatedUser('../ingresar.html'); if (!user) return; const payload = { concepto: concept, categoria: get('#expense-category').value || null, fecha: get('#expense-date').value || dateNow(), moneda: get('#expense-money').value === 'USD' ? 'USD' : 'PEN', monto: amountValue, medio_pago: get('#expense-method').value || null, registrado_por: user.id, registrado_por_nombre: user.email || null }; const result = subState.expenseEditing ? await supabase.from('egresos').update(payload).eq('id', subState.expenseEditing.id).eq('registrado_por', user.id) : await supabase.from('egresos').insert(payload); if (result.error) throw result.error; get('#expense-drawer').hidden = true; toast(subState.expenseEditing ? 'Egreso actualizado' : 'Egreso guardado'); await loadExpenses() } catch (error) { console.error(error); toast(`No se pudo guardar el egreso: ${error.message}`) } }
+async function deleteExpense() { if (!subState.expenseEditing) return; const user = await requireAuthenticatedUser('../ingresar.html'); if (!user) return; const { error } = await supabase.from('egresos').delete().eq('id', subState.expenseEditing.id).eq('registrado_por', user.id); if (error) { toast(`No se pudo eliminar: ${error.message}`); return } get('#expense-drawer').hidden = true; await loadExpenses(); toast('Egreso eliminado') }
 function renderExpenseDetail(expense) { const isUsd = expense.moneda === 'USD' || expense.moneda === 'Dólares' || expense.moneda === 'D�lares'; get('#expense-detail-title').textContent = expense.concepto; get('#expense-detail-number').textContent = `Egreso #${expense.id}`; get('#expense-detail-card').innerHTML = `<section class="detail-section"><header><h2>Egreso</h2></header><div class="detail-table expense-detail-table"><span>Concepto</span><span>Fecha</span><span>Monto</span></div><div class="detail-table expense-detail-table"><strong>${escapeValue(expense.concepto)}</strong><span>${displayDate(expense.fecha)}</span><strong>${amount(expense.monto, expense.moneda)}</strong></div></section>`; get('#expense-info-sidebar').innerHTML = `<div class="info-block"><h2>Detalles</h2><p>▣ ${displayDate(expense.fecha)}</p><p>ⓘ ${escapeValue(expense.medio_pago || 'Sin medio de pago')}</p><p>◉ ${isUsd ? 'Dólares' : 'Soles'}</p></div><div class="activity-block"><h2>Actividad</h2><p><strong>${escapeValue(expense.registrado_por_nombre || 'Usuario')}</strong> creó el egreso.<small>${displayDate(expense.created_at || expense.fecha)}</small></p></div>` }
 function openExpenseDetail(id) { const expense = subState.expenses.find((item) => String(item.id) === String(id)); if (!expense) return; subState.expenseEditing = expense; hideFinanceViews(); get('#expense-detail-view').hidden = false; renderExpenseDetail(expense); window.history.replaceState({}, '', `finanzas.html?egreso=${encodeURIComponent(id)}`) }
 const financeViewIds = ['tab-comprobantes', 'receipt-detail-view', 'expense-detail-view', 'tab-ingresos', 'tab-egresos', 'tab-proformas', 'proforma-detail-view']
