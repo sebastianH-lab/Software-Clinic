@@ -197,6 +197,9 @@
 .patient-appointment-date { color: var(--ink); font-weight: 700; }
 .patient-appointment-date small { display: block; margin-top: 3px; color: var(--muted); font-size: .78rem; font-weight: 500; }
 .patient-appointment-type { color: var(--muted); font-size: .88rem; }
+.patient-appointment-actions { display: flex; align-items: center; gap: 8px; }
+.patient-appointment-edit { padding: 7px 10px; border: 1px solid #c7dfd2; border-radius: 6px; color: #18794e; background: #f4faf6; font: 600 .76rem "DM Sans",sans-serif; white-space: nowrap; cursor: pointer; }
+.patient-appointment-edit:hover { background: #e5f4eb; }
 .appointment-status { display: inline-flex; padding: 5px 9px; border-radius: 999px; font-size: .75rem; font-weight: 700; white-space: nowrap; }
 .appointment-status.pendiente { color: #946200; background: #fff4d6; }.appointment-status.atendida { color: #18794e; background: #dff7e9; }.appointment-status.no-asistio, .appointment-status.cancelada { color: #a13d3d; background: #fde5e5; }.appointment-status.reprogramada { color: #4966a1; background: #e6edff; }
 .patient-finance-panel { display:grid; gap:18px; padding:24px; border:1px solid #dce9e3; border-radius:10px; background:#fff; }
@@ -216,7 +219,10 @@
 .patient-receipt-status.pendiente { color:#946200; background:#fff4d6; }
 .patient-receipt-pdf { padding:7px 10px; border:1px solid #c7dfd2; border-radius:6px; color:#18794e; background:#f4faf6; font:600 .76rem "DM Sans",sans-serif; white-space:nowrap; cursor:pointer; }
 .patient-receipt-pdf:hover { background:#e5f4eb; }
-@media (max-width: 600px) { .patient-appointment { grid-template-columns: 1fr; gap: 8px; } }
+.patient-receipt-actions { display:flex; flex-wrap:wrap; gap:6px; }
+.patient-receipt-view { padding:7px 10px; border:1px solid #dce9e3; border-radius:6px; color:var(--ink); background:#fff; font:600 .76rem "DM Sans",sans-serif; white-space:nowrap; cursor:pointer; }
+.patient-receipt-view:hover { background:#f3f8f5; }
+@media (max-width: 600px) { .patient-appointment { grid-template-columns: 1fr; gap: 8px; }.patient-appointment-actions { justify-content:space-between; } }
 @media (max-width: 700px) { .patient-finance-summary { grid-template-columns:1fr; }.patient-finance-panel { padding:16px; } }
 
 /* Grid de tarjetas */
@@ -458,6 +464,10 @@ body.drawer-open { overflow: hidden; }
 .detail-list li { padding: 10px 12px; border-left: 3px solid #9bcab4; color: var(--ink); background: #f7faf8; font-size: .84rem; }
 .detail-modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 30px; border-top: 1px solid #e2ece7; }
 .detail-modal-footer .btn-primary { min-width: 150px; }
+.appointment-edit-fields { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.appointment-edit-fields .attention-edit-field:first-of-type { grid-column:1 / -1; }
+.appointment-edit-fields select,.appointment-edit-fields input { width:100%; min-height:40px; padding:9px 10px; border:1px solid #cbdcd4; border-radius:6px; color:var(--ink); background:#fff; font:inherit; font-weight:400; }
+.appointment-edit-fields select:focus,.appointment-edit-fields input:focus { outline:2px solid #b9e8d2; border-color:var(--green); }
 .attention-edit-field { display: grid; gap: 6px; color: var(--muted); font-size: .78rem; font-weight: 700; }
 .attention-edit-field input, .attention-edit-field textarea { width: 100%; min-width: 0; padding: 9px 10px; border: 1px solid #cbdcd4; border-radius: 6px; color: var(--ink); background: #fff; font: inherit; font-weight: 400; }
 .attention-edit-field textarea { min-height: 82px; resize: vertical; }
@@ -468,7 +478,7 @@ body.drawer-open { overflow: hidden; }
 .attention-edit-row-heading { display: flex; grid-column: 1 / -1; justify-content: space-between; align-items: center; }
 .attention-edit-row-heading strong { color: var(--ink); font-size: .82rem; }
 .attention-edit-row .attention-edit-field:has(input[type="checkbox"]) { display: flex; align-items: center; }
-@media (max-width: 600px) { .latest-attention-meta, .detail-vitals { grid-template-columns: 1fr 1fr; } .detail-modal-header, .detail-modal-content { padding-left: 20px; padding-right: 20px; } }
+@media (max-width: 600px) { .latest-attention-meta, .detail-vitals { grid-template-columns: 1fr 1fr; } .detail-modal-header, .detail-modal-content { padding-left: 20px; padding-right: 20px; }.appointment-edit-fields { grid-template-columns:1fr; }.appointment-edit-fields .attention-edit-field:first-of-type { grid-column:auto; } }
 @media (max-width: 600px) { .danger-zone-panel, .recovery-zone-panel { align-items: stretch; flex-direction: column; }.danger-zone-button, .recovery-zone-button { width: 100%; } }
 @media (max-width: 600px) { .attention-drawer-header, .attention-steps, .attention-form, .attention-footer { padding-left: 20px; padding-right: 20px; } .vitals-grid, .dynamic-row-grid { grid-template-columns: 1fr; } }
 
