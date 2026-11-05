@@ -46,9 +46,11 @@ export async function registrarPaciente(datosFormulario) {
 		.insert([
 			{
 				nombre_completo: datosFormulario.nombre_completo,
+				fecha_ingreso: datosFormulario.fecha_ingreso || null,
 				genero: datosFormulario.genero || null,
 				documento_identidad: datosFormulario.documento_identidad || null,
 				fecha_nacimiento: datosFormulario.fecha_nacimiento || null,
+				domicilio: datosFormulario.domicilio || null,
 				telefono: datosFormulario.telefono || null,
 				correo: datosFormulario.correo || null,
 				peso: datosFormulario.peso || null,
@@ -61,8 +63,8 @@ export async function registrarPaciente(datosFormulario) {
 				frecuencia_cardiaca: datosFormulario.frecuencia_cardiaca || null,
 				presion_arterial: datosFormulario.presion_arterial || null,
 				antecedentes_patologicos: datosFormulario.antecedentes_patologicos || [],
-				antecedentes_oftalmologicos: datosFormulario.antecedentes_oftalmologicos || [],
-				antecedentes_quirurgicos: datosFormulario.antecedentes_quirurgicos || [],
+				antecedentes_quirurgicos: datosFormulario.antecedentes_quirurgicos || null,
+				antecedentes_familiares: datosFormulario.antecedentes_familiares || null,
 				alergias: datosFormulario.alergias || [],
 				medicacion_habitual: datosFormulario.medicacion_habitual || [],
 				notas_adicionales: datosFormulario.notas_adicionales || null,
