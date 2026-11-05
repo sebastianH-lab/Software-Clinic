@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Pacientes | RENE Health</title>
+	<title>Pacientes | Clinicasync</title>
 	<meta name="description" content="Gestiona los pacientes de tu clínica.">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -442,7 +442,7 @@
 <body class="dashboard-page">
 	<div class="dashboard-shell">
 		<aside class="sidebar" aria-label="Navegación principal">
-			<a class="agenda-brand" href="pacientes.html"><span class="brand-mark">+</span><span>RENE <em>health</em></span></a>
+			<a class="agenda-brand" href="pacientes.html"><span class="brand-mark">+</span><span>Clinicasync</span></a>
 			<nav class="sidebar-nav">
 				<a class="sidebar-link active" href="pacientes.html" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="10" cy="7" r="4"></circle><path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><span>Pacientes</span></a>
 				<a class="sidebar-link" href="sub/agenda.html"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 11h18"></path></svg></span><span>Agenda</span></a>
@@ -504,16 +504,27 @@
 			<form id="formNuevoPaciente" style="margin-top: 20px;">
 				<!-- Datos básicos -->
 				<div style="margin-bottom: 20px;">
-					<h3 style="font-size: 1rem; margin-bottom: 12px; color: var(--ink);">Datos básicos</h3>
+					<h3 style="font-size: 1rem; margin-bottom: 12px; color: var(--ink);">Filiación e ingreso</h3>
+
+					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+						<div class="field">
+							<label for="fecha_ingreso">Fecha de ingreso</label>
+							<input type="date" id="fecha_ingreso" name="fecha_ingreso" required style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;">
+						</div>
+						<div class="field">
+							<label for="edad_paciente">Edad</label>
+							<input type="number" id="edad_paciente" name="edad_paciente" readonly aria-label="Edad calculada automáticamente" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit; background: #f3f7f4;">
+						</div>
+					</div>
 					
 					<div class="field" style="margin-bottom: 12px;">
-						<label>Nombre completo *</label>
+						<label for="nombre_completo">Nombre completo *</label>
 						<input type="text" id="nombre_completo" name="nombre_completo" required placeholder="Nombre y Apellidos" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;">
 					</div>
 
 					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
 						<div class="field">
-							<label>Género</label>
+							<label for="genero">Sexo / Género</label>
 							<select id="genero" name="genero" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;">
 								<option value="">Seleccionar</option>
 								<option value="Masculino">Masculino</option>
@@ -523,24 +534,29 @@
 						</div>
 
 						<div class="field">
-							<label>Documento de identidad</label>
+							<label for="documento_identidad">Documento de identidad</label>
 							<input type="text" id="documento_identidad" name="documento_identidad" inputmode="numeric" minlength="8" maxlength="8" pattern="[0-9]{8}" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 8)" placeholder="Ej: 00000000" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;">
 						</div>
 					</div>
 
 					<div class="field" style="margin-top: 12px;">
-						<label>Fecha de nacimiento</label>
+						<label for="fecha_nacimiento">Fecha de nacimiento</label>
 						<input type="date" id="fecha_nacimiento" name="fecha_nacimiento" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;">
+					</div>
+
+					<div class="field" style="margin-top: 12px;">
+						<label for="domicilio">Domicilio</label>
+						<input type="text" id="domicilio" name="domicilio" autocomplete="street-address" placeholder="Dirección de residencia" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;">
 					</div>
 
 					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;">
 						<div class="field">
-							<label>Teléfono</label>
+							<label for="telefono">Teléfono de contacto</label>
 							<input type="text" id="telefono" name="telefono" inputmode="numeric" minlength="9" maxlength="9" pattern="[0-9]{9}" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 9)" placeholder="Ej: 999999999" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;">
 						</div>
 
 						<div class="field">
-							<label>Correo electrónico</label>
+							<label for="correo">Correo electrónico</label>
 							<input type="email" id="correo" name="correo" placeholder="Ej: paciente@correo.com" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;">
 						</div>
 					</div>
@@ -565,25 +581,35 @@
 
 				<!-- Antecedentes -->
 				<div style="margin-bottom: 20px;">
-					<h3 style="font-size: 1rem; margin-bottom: 12px; color: var(--ink);">Antecedentes y Alergias</h3>
+					<h3 style="font-size: 1rem; margin-bottom: 12px; color: var(--ink);">Antecedentes médicos</h3>
 					
 					<div class="field" style="margin-bottom: 12px;">
-						<label>Alergias (separadas por coma)</label>
+						<label for="antecedentes_patologicos">Antecedentes personales / patológicos</label>
+						<textarea id="antecedentes_patologicos" name="antecedentes_patologicos" rows="2" placeholder="Enfermedades y antecedentes personales relevantes" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;"></textarea>
+					</div>
+
+					<div class="field" style="margin-bottom: 12px;">
+						<label for="antecedentes_quirurgicos">Antecedentes quirúrgicos</label>
+						<textarea id="antecedentes_quirurgicos" name="antecedentes_quirurgicos" rows="2" placeholder="Cirugías previas y fechas aproximadas" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;"></textarea>
+					</div>
+
+					<div class="field" style="margin-bottom: 12px;">
+						<label for="antecedentes_familiares">Antecedentes familiares</label>
+						<textarea id="antecedentes_familiares" name="antecedentes_familiares" rows="2" placeholder="Antecedentes familiares relevantes" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;"></textarea>
+					</div>
+
+					<div class="field" style="margin-bottom: 12px;">
+						<label for="alergias">Alergias</label>
 						<input type="text" id="alergias" name="alergias" placeholder="Ej: Penicilina, Polvo" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;">
 					</div>
 
 					<div class="field" style="margin-bottom: 12px;">
-						<label>Antecedentes patológicos (separados por coma)</label>
-						<input type="text" id="antecedentes_patologicos" name="antecedentes_patologicos" placeholder="Ej: Diabetes, Hipertensión" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;">
-					</div>
-
-					<div class="field" style="margin-bottom: 12px;">
-						<label>Medicación habitual (separados por coma)</label>
+						<label for="medicacion_habitual">Medicación habitual</label>
 						<input type="text" id="medicacion_habitual" name="medicacion_habitual" placeholder="Ej: Aspirina, Metformina" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit;">
 					</div>
 
 					<div class="field">
-						<label>Notas adicionales</label>
+						<label for="notas_adicionales">Notas adicionales</label>
 						<textarea id="notas_adicionales" name="notas_adicionales" placeholder="Notas especiales del paciente" style="width: 100%; padding: 10px 12px; border: 1px solid #c8d9d2; border-radius: 6px; font: inherit; min-height: 80px;"></textarea>
 					</div>
 				</div>
@@ -604,6 +630,34 @@
 		import { obtenerFechaMaximaNacimiento, validarDatosClinicosPaciente } from './validaciones-clinicas.js'
 
 		document.getElementById('fecha_nacimiento').max = obtenerFechaMaximaNacimiento()
+		const fechaIngresoInput = document.getElementById('fecha_ingreso')
+		const fechaNacimientoInput = document.getElementById('fecha_nacimiento')
+		const edadPacienteInput = document.getElementById('edad_paciente')
+		function establecerFechaIngreso() {
+			const hoy = new Date()
+			const fechaHoy = [
+				hoy.getFullYear(),
+				String(hoy.getMonth() + 1).padStart(2, '0'),
+				String(hoy.getDate()).padStart(2, '0')
+			].join('-')
+			fechaIngresoInput.max = fechaHoy
+			fechaIngresoInput.value = fechaHoy
+		}
+		establecerFechaIngreso()
+
+		function actualizarEdadPaciente() {
+			if (!fechaNacimientoInput.value) {
+				edadPacienteInput.value = ''
+				return
+			}
+			const [year, month, day] = fechaNacimientoInput.value.split('-').map(Number)
+			const hoy = new Date()
+			let edad = hoy.getFullYear() - year
+			if (hoy.getMonth() + 1 < month || (hoy.getMonth() + 1 === month && hoy.getDate() < day)) edad--
+			edadPacienteInput.value = edad >= 0 ? String(edad) : ''
+		}
+		fechaNacimientoInput.addEventListener('input', actualizarEdadPaciente)
+		fechaNacimientoInput.addEventListener('change', actualizarEdadPaciente)
 
 		const logoutButton = document.getElementById('logout-button')
 		const searchInput = document.getElementById('patient-search')
@@ -905,6 +959,7 @@
 
 		// Abrir modal
 		openModalBtn.addEventListener('click', () => {
+			establecerFechaIngreso()
 			newPatientModal.classList.add('active')
 		})
 
@@ -931,9 +986,11 @@
 			// Capturar datos del formulario
 			const datosFormulario = {
 				nombre_completo: document.getElementById('nombre_completo').value,
+				fecha_ingreso: document.getElementById('fecha_ingreso').value,
 				genero: document.getElementById('genero').value || null,
 				documento_identidad: document.getElementById('documento_identidad').value || null,
 				fecha_nacimiento: document.getElementById('fecha_nacimiento').value || null,
+				domicilio: document.getElementById('domicilio').value.trim() || null,
 				telefono: document.getElementById('telefono').value.trim() || null,
 				correo: document.getElementById('correo').value.trim() || null,
 				peso: document.getElementById('peso').value ? parseFloat(document.getElementById('peso').value) : null,
@@ -944,11 +1001,12 @@
 				antecedentes_patologicos: document.getElementById('antecedentes_patologicos').value
 					? document.getElementById('antecedentes_patologicos').value.split(',').map(a => a.trim()).filter(a => a)
 					: [],
+				antecedentes_quirurgicos: document.getElementById('antecedentes_quirurgicos').value.trim() || null,
+				antecedentes_familiares: document.getElementById('antecedentes_familiares').value.trim() || null,
 				medicacion_habitual: document.getElementById('medicacion_habitual').value
 					? document.getElementById('medicacion_habitual').value.split(',').map(a => a.trim()).filter(a => a)
 					: [],
 				antecedentes_oftalmologicos: [],
-				antecedentes_quirurgicos: [],
 				notas_adicionales: document.getElementById('notas_adicionales').value || null,
 				imc: null,
 				porcentaje_grasa: null,
