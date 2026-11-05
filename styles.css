@@ -82,7 +82,7 @@
 .brand { 
   display: flex; 
   align-items: center; 
-  gap: 10px; /* Esto mantiene una separación bonita entre la imagen y el texto "RENE Health" */
+  gap: 10px; /* Esto mantiene una separación bonita entre la imagen y el texto "Clinicasync" */
   font-family: Manrope, sans-serif; 
   font-weight: 800; 
   font-size: 1.2rem; 
@@ -365,7 +365,7 @@ h2 {
 /* Grid para crear 3 columnas exactamente iguales (repeat(3, 1fr)) */
 .service-grid { 
   display: grid; 
-  grid-template-columns: repeat(3, 1fr); 
+  grid-template-columns: repeat(4, minmax(0, 1fr)); 
   gap: 30px; 
 }
 
@@ -447,8 +447,118 @@ h2 {
 
 .footer-content { 
   display: flex; 
-  justify-content: space-between; 
+  flex-direction: column;
+  gap: 20px;
+}
+
+.footer-main {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  gap: 20px;
+}
+
+.footer-legal {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+
+.footer-legal button {
+  padding: 0;
+  border: 0;
+  color: var(--green-dark);
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.footer-legal button:hover {
+  text-decoration: underline;
+}
+
+.footer-legal button:focus-visible,
+.legal-modal-close:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+
+.legal-modal {
+  width: min(620px, calc(100% - 32px));
+  max-height: min(85vh, 760px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  color: var(--ink);
+  background: var(--white);
+  box-shadow: 0 24px 70px rgba(23, 53, 50, .25);
+}
+
+.legal-modal::backdrop {
+  background: rgba(15, 35, 32, .58);
+  backdrop-filter: blur(3px);
+}
+
+.legal-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 28px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.legal-modal-header h2 {
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+}
+
+.legal-modal-close {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--muted);
+  background: var(--cream);
+  font: inherit;
+  font-size: 1.65rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.legal-modal-close:hover {
+  color: var(--ink);
+  background: var(--mint);
+}
+
+.legal-modal-body {
+  max-height: calc(min(85vh, 760px) - 80px);
+  padding: 22px 28px 28px;
+  overflow-y: auto;
+}
+
+.legal-modal-body h3 {
+  margin: 20px 0 8px;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.legal-modal-body p + p {
+  margin-top: 14px;
+}
+
+.legal-modal-body ul {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding-left: 22px;
+}
+
+.legal-modal-body li {
+  padding-left: 3px;
 }
 
 /* =========================================
@@ -535,8 +645,8 @@ h2 {
     box-shadow: 0px 20px 0px var(--mint); /* Ajustamos la sombra para móvil */
   }
 
-  .service-grid { 
-    grid-template-columns: 1fr; /* Las 3 tarjetas pasan a apilarse una debajo de otra */
+  .service-grid {
+    grid-template-columns: 1fr;
   }
 
   .contact-box { 
@@ -546,10 +656,35 @@ h2 {
     padding: 40px 20px; 
   }
 
-  .footer-content { 
-    flex-direction: column; 
-    gap: 16px; 
+  .footer-main {
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
     text-align: center;
+  }
+
+  .footer-legal {
+    gap: 20px;
+  }
+
+  .legal-modal-header {
+    padding: 20px 20px 16px;
+  }
+
+  .legal-modal-body {
+    padding: 18px 20px 22px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1050px) {
+  .service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .service-grid {
+    grid-template-columns: 1fr;
   }
 }
 
