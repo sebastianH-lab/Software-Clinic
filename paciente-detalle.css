@@ -442,6 +442,30 @@ body.drawer-open { overflow: hidden; }
 .latest-attention-meta div { padding: 10px; border-radius: 7px; background: #f3f7f4; }
 .latest-attention-meta small { display: block; margin-bottom: 4px; color: var(--muted); font-size: .72rem; font-weight: 700; text-transform: uppercase; }
 .latest-attention-meta strong { color: var(--ink); font-size: .9rem; }
+.clinical-record-card { margin-top: 20px; padding: 22px; border: 1px solid #dce9e3; border-radius: 10px; background: #fff; }
+.patient-medical-background { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 20px; }
+.patient-background-field { min-width: 0; padding: 12px; border-radius: 7px; background: #f3f7f4; }
+.patient-background-field small { display: block; margin-bottom: 5px; color: var(--muted); font-size: .72rem; font-weight: 800; text-transform: uppercase; }
+.patient-background-field p { margin: 0; color: var(--ink); font-size: .86rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.clinical-case-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.clinical-step-card { min-width: 0; padding: 16px; border: 1px solid #e1ece6; border-radius: 8px; background: #fbfdfb; }
+.clinical-step-card h3 { margin: 0 0 12px; color: var(--green-dark); font-family: var(--font-display); font-size: .95rem; }
+.clinical-step-field + .clinical-step-field { margin-top: 10px; }
+.clinical-step-field strong { display: block; margin-bottom: 3px; color: var(--ink); font-size: .78rem; }
+.clinical-step-field p { margin: 0; color: var(--muted); font-size: .84rem; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.clinical-evolution-list { display: grid; gap: 10px; margin-bottom: 18px; }
+.clinical-evolution-entry { padding: 12px 14px; border-left: 3px solid #9bcab4; border-radius: 4px; background: #f7faf8; }
+.clinical-evolution-entry time { display: block; margin-bottom: 7px; color: var(--green-dark); font-size: .78rem; font-weight: 800; }
+.clinical-evolution-entry p { margin: 5px 0 0; color: var(--muted); font-size: .84rem; line-height: 1.5; white-space: pre-wrap; }
+.clinical-evolution-entry p strong { color: var(--ink); }
+.evolution-followup-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-top: 18px; border-top: 1px solid #e2ece7; }
+.evolution-followup-form[hidden] { display: none; }
+.evolution-followup-form h3 { grid-column: 1 / -1; margin: 0; color: var(--ink); font-family: var(--font-display); font-size: 1rem; }
+.evolution-followup-form .attention-edit-field:nth-of-type(3),
+.evolution-followup-form .attention-edit-field:nth-of-type(4),
+.evolution-followup-form button { grid-column: 1 / -1; }
+.attention-step { flex-shrink: 0; }
+.drawer-section-heading h3 { font-size: 1rem; }
 .detail-modal-backdrop { position: fixed; inset: 0; z-index: 40; background: rgba(15, 35, 32, .45); backdrop-filter: blur(2px); }
 .detail-modal { position: fixed; top: 50%; left: 50%; z-index: 41; display: flex; width: min(720px, calc(100% - 32px)); max-height: min(760px, calc(100vh - 40px)); flex-direction: column; transform: translate(-50%, -50%) scale(.98); opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; border-radius: 12px; background: #fff; box-shadow: 0 24px 60px rgba(23, 53, 50, .25); }
 .detail-modal.is-open { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; }
@@ -478,7 +502,7 @@ body.drawer-open { overflow: hidden; }
 .attention-edit-row-heading { display: flex; grid-column: 1 / -1; justify-content: space-between; align-items: center; }
 .attention-edit-row-heading strong { color: var(--ink); font-size: .82rem; }
 .attention-edit-row .attention-edit-field:has(input[type="checkbox"]) { display: flex; align-items: center; }
-@media (max-width: 600px) { .latest-attention-meta, .detail-vitals { grid-template-columns: 1fr 1fr; } .detail-modal-header, .detail-modal-content { padding-left: 20px; padding-right: 20px; }.appointment-edit-fields { grid-template-columns:1fr; }.appointment-edit-fields .attention-edit-field:first-of-type { grid-column:auto; } }
+@media (max-width: 600px) { .latest-attention-meta, .detail-vitals { grid-template-columns: 1fr 1fr; } .clinical-record-card { padding: 16px; } .patient-medical-background, .clinical-case-summary, .evolution-followup-form { grid-template-columns: 1fr; } .evolution-followup-form h3, .evolution-followup-form .attention-edit-field, .evolution-followup-form button { grid-column: auto; } .detail-modal-header, .detail-modal-content { padding-left: 20px; padding-right: 20px; }.appointment-edit-fields { grid-template-columns:1fr; }.appointment-edit-fields .attention-edit-field:first-of-type { grid-column:auto; } }
 @media (max-width: 600px) { .danger-zone-panel, .recovery-zone-panel { align-items: stretch; flex-direction: column; }.danger-zone-button, .recovery-zone-button { width: 100%; } }
 @media (max-width: 600px) { .attention-drawer-header, .attention-steps, .attention-form, .attention-footer { padding-left: 20px; padding-right: 20px; } .vitals-grid, .dynamic-row-grid { grid-template-columns: 1fr; } }
 
