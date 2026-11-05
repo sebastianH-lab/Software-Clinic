@@ -7,6 +7,7 @@ const pacienteId = params.get('id')
 let comprobantesPaciente = []
 let citasPaciente = []
 let pacienteActual = null
+let ultimaAtencionActual = null
 
 // Verificar sesión
 const user = await requireAuthenticatedUser()
@@ -58,6 +59,125 @@ function mostrarValor(value, suffix = '') {
 	return value === null || value === undefined || value === '' ? '-' : `${value}${suffix}`
 }
 
+function extraerCampoSerializado(text, label) {
+	const prefix = `${label}:`
+	const line = String(text || '').split('\n').find(value => value.startsWith(prefix))
+	return line ? line.slice(prefix.length).trim() : ''
+}
+
+function agregarCampoExpediente(container, label, value) {
+	const field = document.createElement('div')
+	field.className = 'patient-background-field'
+	const title = document.createElement('small')
+	title.textContent = label
+	const text = document.createElement('p')
+	text.textContent = Array.isArray(value) ? value.join(', ') || 'Sin registro' : value || 'Sin registro'
+	field.append(title, text)
+	container.appendChild(field)
+}
+
+function crearBloqueCaso(container, step, title, fields) {
+	const section = document.createElement('section')
+	section.className = 'clinical-step-card'
+	const heading = document.createElement('h3')
+	heading.textContent = `${step} · ${title}`
+	section.appendChild(heading)
+	fields.forEach(([label, value]) => {
+		const field = document.createElement('div')
+		field.className = 'clinical-step-field'
+		const fieldTitle = document.createElement('strong')
+		fieldTitle.textContent = label
+		const text = document.createElement('p')
+		text.textContent = value || 'Sin registro'
+		field.append(fieldTitle, text)
+		section.appendChild(field)
+	})
+	container.appendChild(section)
+}
+
+function renderizarResumenCaso(atencion, diagnosticos, tratamientos) {
+	const container = document.getElementById('clinical-case-summary')
+	container.replaceChildren()
+	if (!atencion) {
+		container.innerHTML = '<p class="empty-text">Todavía no hay un caso clínico registrado.</p>'
+		return
+	}
+	const vitals = [
+		`P. arterial: ${mostrarValor(atencion.pa_presion, ' mmHg')}`,
+		`F. cardíaca: ${mostrarValor(atencion.f_cardiaca, ' lpm')}`,
+		`F. respiratoria: ${mostrarValor(atencion.f_respiratoria, ' rpm')}`,
+		`Saturación: ${mostrarValor(atencion.saturacion, ' %')}`,
+		`Temperatura: ${mostrarValor(atencion.temperatura, ' °C')}`,
+	].join(' · ')
+	const diagnosesText = diagnosticos.length
+		? diagnosticos.map(item => `${item.descripcion || 'Sin descripción'}${item.cie10 ? ` (${item.cie10})` : ''} · ${item.tipo || 'Sin tipo'}`).join('\n')
+		: ''
+	const treatmentText = tratamientos.map(item => [
+		item.medicamento_nombre,
+		item.dosis_cantidad,
+		item.dosis_unidad,
+		item.via,
+		item.frecuencia_horas ? `cada ${item.frecuencia_horas} h` : '',
+		item.duracion_dias ? `${item.duracion_dias} días` : '',
+	].filter(Boolean).join(' · ')).join('\n')
+	const stepFive = atencion.paso_5_evolucion || ''
+	const fechaControl = extraerCampoSerializado(stepFive, 'Fecha del próximo control')
+	const horaControl = extraerCampoSerializado(stepFive, 'Hora del próximo control')
+	const fechaControlText = fechaControl
+		? `${new Date(`${fechaControl}T12:00:00`).toLocaleDateString('es-PE')}${horaControl ? ` · ${horaControl}` : ''}`
+		: ''
+	crearBloqueCaso(container, 'Paso 1', 'Valoración e identificación del problema', [
+		['Motivo de consulta, examen físico y valoración por sistemas', atencion.paso_1_valoracion],
+		['Relato del caso', textoPlano(atencion.relato)],
+		['Funciones vitales', vitals],
+	])
+	crearBloqueCaso(container, 'Paso 2', 'Diagnóstico clínico', [
+		['Diagnósticos y CIE-10', diagnosesText],
+		['Juicio clínico', atencion.paso_2_diagnostico_notas],
+	])
+	crearBloqueCaso(container, 'Paso 3', 'Plan de trabajo con prioridades', [
+		['Objetivos y prioridades', atencion.paso_3_plan_prioridades],
+		['Plan de tratamiento', atencion.plan_tratamiento],
+		['Exámenes auxiliares', atencion.examenes_auxiliares],
+		['Prescripción médica', treatmentText],
+	])
+	crearBloqueCaso(container, 'Paso 4', 'Ejecución asistencial', [
+		['Procedimientos e indicaciones', atencion.paso_4_ejecucion],
+	])
+	crearBloqueCaso(container, 'Paso 5', 'Evolución y seguimiento', [
+		['Evolución SOAP y seguimiento', stepFive],
+		['Criterios de alta', extraerCampoSerializado(stepFive, 'Criterios de alta')],
+		['Próximo control', fechaControlText],
+	])
+}
+
+function renderizarEvoluciones(evoluciones) {
+	const list = document.getElementById('clinical-evolution-list')
+	list.replaceChildren()
+	if (!evoluciones.length) {
+		list.innerHTML = '<p class="empty-text">No hay notas de seguimiento adicionales.</p>'
+		return
+	}
+	evoluciones.forEach(item => {
+		const entry = document.createElement('article')
+		entry.className = 'clinical-evolution-entry'
+		const date = document.createElement('time')
+		date.textContent = item.fecha_evolucion ? new Date(item.fecha_evolucion).toLocaleString('es-PE') : 'Fecha no registrada'
+		const details = document.createElement('p')
+		details.textContent = item.nota_evolucion || 'Sin apreciación registrada'
+		entry.append(date, details)
+		;[['Subjetivo', item.subjetivo], ['Objetivo', item.objetivo], ['Plan ajustado', item.plan_ajustado]].forEach(([label, value]) => {
+			if (!value) return
+			const field = document.createElement('p')
+			const strong = document.createElement('strong')
+			strong.textContent = `${label}: `
+			field.append(strong, document.createTextNode(value))
+			entry.appendChild(field)
+		})
+		list.appendChild(entry)
+	})
+}
+
 async function cargarUltimaAtencion() {
 	const activeUser = await requireAuthenticatedUser()
 	if (!activeUser) return null
@@ -67,27 +187,51 @@ async function cargarUltimaAtencion() {
 		console.error('Error al cargar la última atención:', error.message)
 		return null
 	}
-	if (!atencion) return null
-	const [{ data: diagnosticos }, { data: tratamientos }] = await Promise.all([
+	if (!atencion) {
+		ultimaAtencionActual = null
+		renderizarResumenCaso(null, [], [])
+		renderizarEvoluciones([])
+		document.getElementById('evolution-followup-form').hidden = true
+		return null
+	}
+	const [{ data: diagnosticos, error: diagnosisError }, { data: tratamientos, error: treatmentError }, { data: evoluciones, error: evolutionError }] = await Promise.all([
 		supabase.from('atencion_diagnosticos').select('*').eq('atencion_id', atencion.id),
 		supabase.from('atencion_tratamientos').select('*').eq('atencion_id', atencion.id),
+		supabase.from('atencion_evoluciones').select('*').eq('atencion_id', atencion.id).eq('registrado_por', activeUser.id).order('fecha_evolucion', { ascending: false }),
 	])
+	const relationError = diagnosisError || treatmentError || evolutionError
+	if (relationError) {
+		console.error('Error al cargar los detalles clínicos de la atención:', relationError.message)
+		document.getElementById('clinical-case-summary').textContent = `No se pudo cargar el expediente clínico: ${relationError.message}`
+		return null
+	}
+	ultimaAtencionActual = atencion
 
 	document.getElementById('latest-attention-date').textContent = new Date(atencion.created_at).toLocaleDateString('es-ES')
 	const latestEditedBadge = document.getElementById('latest-attention-edited-badge')
 	latestEditedBadge.hidden = !atencion.editado
 	latestEditedBadge.title = atencion.fecha_edicion ? `Editado el ${new Date(atencion.fecha_edicion).toLocaleString('es-ES')}` : ''
-	document.getElementById('latest-attention-body').innerHTML = `
-		<p class="latest-attention-summary">${textoPlano(atencion.relato) || atencion.plan_tratamiento || 'Sin relato ni plan registrado.'}</p>
-		<div class="latest-attention-meta">
-			<div><small>P. arterial</small><strong>${mostrarValor(atencion.pa_presion, ' mmHg')}</strong></div>
-			<div><small>F. cardiaca</small><strong>${mostrarValor(atencion.f_cardiaca, ' lpm')}</strong></div>
-			<div><small>Saturación</small><strong>${mostrarValor(atencion.saturacion, ' %')}</strong></div>
-			<div><small>Temperatura</small><strong>${mostrarValor(atencion.temperatura, ' °C')}</strong></div>
-		</div>
-		${diagnosticos?.length ? `<p class="latest-attention-summary"><strong>Diagnósticos:</strong> ${diagnosticos.map(item => `${item.descripcion}${item.cie10 ? ` (${item.cie10})` : ''}`).join(', ')}</p>` : ''}
-		${atencion.plan_tratamiento ? `<p class="latest-attention-summary"><strong>Plan:</strong> ${atencion.plan_tratamiento}</p>` : ''}
-		${tratamientos?.length ? `<p class="latest-attention-summary"><strong>Tratamiento:</strong> ${tratamientos.map(item => `${item.medicamento_nombre} ${item.dosis_cantidad || ''} ${item.dosis_unidad || ''}`).join(', ')}</p>` : ''}`
+	const latestBody = document.getElementById('latest-attention-body')
+	latestBody.replaceChildren()
+	const summary = document.createElement('p')
+	summary.className = 'latest-attention-summary'
+	summary.textContent = textoPlano(atencion.relato) || atencion.plan_tratamiento || 'Sin relato ni plan registrado.'
+	latestBody.appendChild(summary)
+	const vitals = document.createElement('div')
+	vitals.className = 'latest-attention-meta'
+	;[['P. arterial', atencion.pa_presion, ' mmHg'], ['F. cardiaca', atencion.f_cardiaca, ' lpm'], ['Saturación', atencion.saturacion, ' %'], ['Temperatura', atencion.temperatura, ' °C']].forEach(([label, value, suffix]) => {
+		const item = document.createElement('div')
+		const title = document.createElement('small')
+		title.textContent = label
+		const detail = document.createElement('strong')
+		detail.textContent = mostrarValor(value, suffix)
+		item.append(title, detail)
+		vitals.appendChild(item)
+	})
+	latestBody.appendChild(vitals)
+	renderizarResumenCaso(atencion, diagnosticos || [], tratamientos || [])
+	renderizarEvoluciones(evoluciones || [])
+	document.getElementById('evolution-followup-form').hidden = false
 
 	return atencion
 }
@@ -136,6 +280,15 @@ async function cargarPerfil() {
 	document.getElementById('patient-gender-age').textContent = `${genero}, ${edad}`
 	document.getElementById('patient-dni').textContent = p.documento_identidad || 'Sin DNI'
 	document.getElementById('patient-email').textContent = p.correo || 'Sin correo'
+	const background = document.getElementById('patient-medical-background')
+	background.replaceChildren()
+	agregarCampoExpediente(background, 'Fecha de ingreso', p.fecha_ingreso ? new Date(`${p.fecha_ingreso}T12:00:00`).toLocaleDateString('es-PE') : '')
+	agregarCampoExpediente(background, 'Domicilio', p.domicilio)
+	agregarCampoExpediente(background, 'Antecedentes personales / patológicos', p.antecedentes_patologicos)
+	agregarCampoExpediente(background, 'Antecedentes quirúrgicos', p.antecedentes_quirurgicos)
+	agregarCampoExpediente(background, 'Antecedentes familiares', p.antecedentes_familiares)
+	agregarCampoExpediente(background, 'Alergias', p.alergias)
+	agregarCampoExpediente(background, 'Medicación habitual', p.medicacion_habitual)
 	document.getElementById('archive-patient-zone').hidden = p.activo === false
 	document.getElementById('restore-patient-zone').hidden = p.activo !== false
 
@@ -146,12 +299,51 @@ async function cargarPerfil() {
 
 cargarPerfil()
 
+document.getElementById('evolution-followup-form').addEventListener('submit', async event => {
+	event.preventDefault()
+	if (!ultimaAtencionActual) {
+		alert('Registra una atención antes de agregar una nota de seguimiento.')
+		return
+	}
+	const activeUser = await requireAuthenticatedUser()
+	if (!activeUser) return
+	const form = event.currentTarget
+	const formData = new FormData(form)
+	const apreciacion = String(formData.get('apreciacion') || '').trim()
+	if (!apreciacion) {
+		form.querySelector('[name="apreciacion"]').focus()
+		return
+	}
+	const submitButton = form.querySelector('button[type="submit"]')
+	submitButton.disabled = true
+	try {
+		const { error } = await supabase.from('atencion_evoluciones').insert({
+			atencion_id: ultimaAtencionActual.id,
+			paciente_id: pacienteId,
+			nota_evolucion: `Apreciación clínica: ${apreciacion}`,
+			subjetivo: String(formData.get('subjetivo') || '').trim() || null,
+			objetivo: String(formData.get('objetivo') || '').trim() || null,
+			plan_ajustado: String(formData.get('plan_ajustado') || '').trim() || null,
+			registrado_por: activeUser.id,
+		})
+		if (error) throw error
+		form.reset()
+		await cargarUltimaAtencion()
+	} catch (error) {
+		console.error('Error al guardar la evolución clínica:', error)
+		alert(`No se pudo guardar la evolución: ${error.message}`)
+	} finally {
+		submitButton.disabled = false
+	}
+})
+
 // ==================== PESTAÑAS DEL PERFIL ====================
 const tabBtns = document.querySelectorAll('.tab-btn')
 const tabPanes = document.querySelectorAll('.tab-pane')
 let atencionDetalleActual = null
 let diagnosticosDetalleActual = []
 let tratamientosDetalleActual = []
+let evolucionesDetalleActual = []
 let modoEdicionAtencion = false
 
 function mostrarPestana(tabId) {
@@ -466,9 +658,14 @@ const sections = document.querySelectorAll('.attention-section')
 const nextButton = document.getElementById('next-attention-button')
 const diagnosisList = document.getElementById('diagnosis-list')
 const treatmentList = document.getElementById('treatment-list')
+const objectivesList = document.getElementById('objectives-list')
 const validationToast = document.getElementById('attention-validation-toast')
+const nextControlDate = attentionForm.elements.fecha_proximo_control
+const nextControlTime = attentionForm.elements.hora_proximo_control
+const today = new Date()
+nextControlDate.min = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 let currentStep = 0
-const stepNames = ['anamnesis', 'examen', 'diagnostico', 'plan']
+const stepNames = ['valoracion', 'diagnostico', 'plan', 'ejecucion', 'evolucion']
 
 function limpiarErrorValidacion(control) {
 	control.classList.remove('field-invalid')
@@ -482,18 +679,32 @@ function marcarErrorValidacion(control) {
 
 function validarCamposObligatoriosAtencion() {
 	const relatoEditor = document.getElementById('relato-editor')
+	const motivoConsulta = attentionForm.elements.motivo_consulta
 	const planTratamiento = attentionForm.elements.plan_tratamiento
+	const apreciacion = attentionForm.elements.evolucion_apreciacion
 	const diagnosticos = [...document.querySelectorAll('.diagnosis-description')]
+	const objetivos = [...document.querySelectorAll('.objective-description')]
 	if (!diagnosticos.length) {
 		agregarDiagnostico()
 		diagnosticos.push(document.querySelector('.diagnosis-description'))
 	}
+	if (!objetivos.length) {
+		agregarObjetivo()
+		objetivos.push(document.querySelector('.objective-description'))
+	}
 	const diagnosticoValido = diagnosticos.some(control => control.value.trim())
+	const objetivoValido = objetivos.some(control => control.value.trim())
 	const invalidos = []
 
+	if (!motivoConsulta.value.trim()) invalidos.push(motivoConsulta)
 	if (!textoPlano(relatoEditor.innerHTML).trim()) invalidos.push(relatoEditor)
 	if (!diagnosticoValido) invalidos.push(diagnosticos[0])
+	if (!objetivoValido) invalidos.push(objetivos[0])
 	if (!planTratamiento.value.trim()) invalidos.push(planTratamiento)
+	if (!apreciacion.value.trim()) invalidos.push(apreciacion)
+	if (nextControlDate.value && !nextControlTime.value) invalidos.push(nextControlTime)
+	if (nextControlTime.value && !nextControlDate.value) invalidos.push(nextControlDate)
+	if (nextControlDate.value && nextControlDate.value < nextControlDate.min) invalidos.push(nextControlDate)
 
 	attentionForm.querySelectorAll('.field-invalid').forEach(limpiarErrorValidacion)
 	if (!invalidos.length) return true
@@ -502,7 +713,7 @@ function validarCamposObligatoriosAtencion() {
 	invalidos.forEach(marcarErrorValidacion)
 	const invalidSection = invalidos[0].closest('.attention-section')
 	if (invalidSection) mostrarPaso(stepNames.indexOf(invalidSection.dataset.section))
-	validationToast.textContent = 'Por favor, complete todos los campos obligatorios antes de registrar la atención.'
+	validationToast.textContent = 'Complete los campos requeridos y elija fecha y hora juntas para agendar el próximo control.'
 	validationToast.classList.add('is-visible')
 	window.clearTimeout(validationToast.hideTimeout)
 	validationToast.hideTimeout = window.setTimeout(() => validationToast.classList.remove('is-visible'), 4000)
@@ -511,6 +722,7 @@ function validarCamposObligatoriosAtencion() {
 }
 
 function mostrarPaso(index) {
+	index = Math.max(0, Math.min(index, stepNames.length - 1))
 	currentStep = index
 	stepButtons.forEach((button, buttonIndex) => button.classList.toggle('active', buttonIndex === index))
 	sections.forEach((section, sectionIndex) => {
@@ -537,6 +749,18 @@ attentionForm.addEventListener('input', event => {
 			marcarErrorValidacion(diagnoses[0])
 		}
 	}
+	if (target.classList.contains('objective-description')) {
+		const objectives = [...document.querySelectorAll('.objective-description')]
+		if (objectives.some(control => control.value.trim())) {
+			objectives.forEach(control => limpiarErrorValidacion(control))
+		} else if (attentionForm.dataset.validationAttempted) {
+			marcarErrorValidacion(objectives[0])
+		}
+	}
+	if (target.name === 'motivo_consulta' || target.name === 'evolucion_apreciacion') {
+		if (target.value.trim()) limpiarErrorValidacion(target)
+		else if (attentionForm.dataset.validationAttempted) marcarErrorValidacion(target)
+	}
 })
 
 function abrirDrawer() {
@@ -548,7 +772,9 @@ function abrirDrawer() {
 	backdrop.hidden = false
 	document.body.classList.add('drawer-open')
 	if (!diagnosisList.children.length) agregarDiagnostico()
+	if (!objectivesList.children.length) agregarObjetivo()
 	if (!treatmentList.children.length) agregarTratamiento()
+	mostrarPaso(0)
 }
 
 function cerrarDrawer() {
@@ -572,6 +798,14 @@ document.querySelectorAll('.editor-toolbar button').forEach(button => {
 	})
 })
 
+function agregarObjetivo() {
+	const row = document.createElement('div')
+	row.className = 'dynamic-row objective-row'
+	row.innerHTML = '<div class="row-top"><strong>Objetivo terapéutico</strong><button class="remove-row" type="button">Eliminar</button></div><div class="dynamic-row-grid"><label class="drawer-field">Objetivo<textarea class="objective-description" rows="2" placeholder="Resultado terapéutico esperado"></textarea></label><label class="drawer-field">Prioridad<select class="objective-priority"><option value="Alta">Alta</option><option value="Media" selected>Media</option><option value="Baja">Baja</option></select></label></div>'
+	row.querySelector('.remove-row').addEventListener('click', () => row.remove())
+	objectivesList.appendChild(row)
+}
+
 document.getElementById('attention-files').addEventListener('change', event => {
 	const selectedFiles = document.getElementById('selected-files')
 	selectedFiles.innerHTML = ''
@@ -587,7 +821,7 @@ function agregarDiagnostico() {
 	const row = document.createElement('div')
 	row.className = 'dynamic-row diagnosis-row'
 	const radioName = `diagnosis-${Date.now()}-${diagnosisList.children.length}`
-	row.innerHTML = `<div class="row-top"><strong>Diagnóstico</strong><button class="remove-row" type="button">Eliminar</button></div><div class="dynamic-row-grid"><label class="drawer-field">Descripción<input class="diagnosis-description" type="text" placeholder="Ej. Hipertensión arterial"></label><label class="drawer-field">Código CIE10<input class="diagnosis-code" type="text" placeholder="Ej. I10"></label></div><div class="radio-group"><label class="radio-option"><input type="radio" name="${radioName}" value="Presuntivo" checked> Presuntivo</label><label class="radio-option"><input type="radio" name="${radioName}" value="Definitivo"> Definitivo</label><label class="radio-option"><input type="radio" name="${radioName}" value="Recurrente"> Recurrente</label></div>`
+	row.innerHTML = `<div class="row-top"><strong>Diagnóstico</strong><button class="remove-row" type="button">Eliminar</button></div><div class="dynamic-row-grid"><label class="drawer-field">Descripción<input class="diagnosis-description" type="text" placeholder="Ej. Hipertensión arterial"></label><label class="drawer-field">Código CIE-10<input class="diagnosis-code" type="text" list="cie10-codes" placeholder="Buscar o ingresar código"></label></div><div class="radio-group"><label class="radio-option"><input type="radio" name="${radioName}" value="Presuntivo" checked> Presuntivo</label><label class="radio-option"><input type="radio" name="${radioName}" value="Definitivo"> Definitivo</label><label class="radio-option"><input type="radio" name="${radioName}" value="Recurrente"> Recurrente</label></div>`
 	row.querySelector('.remove-row').addEventListener('click', () => row.remove())
 	diagnosisList.appendChild(row)
 }
@@ -602,6 +836,15 @@ function agregarTratamiento() {
 
 document.getElementById('add-diagnosis-button').addEventListener('click', agregarDiagnostico)
 document.getElementById('add-treatment-button').addEventListener('click', agregarTratamiento)
+document.getElementById('add-objective-button').addEventListener('click', agregarObjetivo)
+
+function obtenerObjetivos() {
+	const prioridadOrden = { Alta: 0, Media: 1, Baja: 2 }
+	return Array.from(document.querySelectorAll('.objective-row')).map(row => ({
+		objetivo: row.querySelector('.objective-description').value.trim(),
+		prioridad: row.querySelector('.objective-priority').value,
+	})).filter(item => item.objetivo).sort((a, b) => prioridadOrden[a.prioridad] - prioridadOrden[b.prioridad])
+}
 
 function obtenerDiagnosticos() {
 	return Array.from(document.querySelectorAll('.diagnosis-row')).map(row => ({
@@ -627,6 +870,13 @@ function obtenerTratamientos() {
 
 function valorFormulario(nombre) {
 	return attentionForm.elements[nombre].value.trim() || null
+}
+
+function serializarCampos(etiquetas) {
+	return etiquetas
+		.filter(([, value]) => value)
+		.map(([label, value]) => `${label}: ${value}`)
+		.join('\n')
 }
 
 async function guardarAtencion() {
@@ -655,10 +905,37 @@ async function guardarAtencion() {
 	nextButton.disabled = true
 	nextButton.textContent = 'Guardando...'
 	const archivosUrls = Array.from(document.getElementById('attention-files').files).map(file => file.name)
+	const objectives = obtenerObjetivos()
+	const stepOne = serializarCampos([
+		['Motivo de consulta', valorFormulario('motivo_consulta')],
+		['Examen físico', valorFormulario('examen_fisico')],
+		['Valoración por sistemas', valorFormulario('valoracion_sistemas')],
+	])
+	const stepThree = objectives
+		.map(item => `${item.prioridad}: ${item.objetivo}`)
+		.join('\n')
+	const stepFour = serializarCampos([
+		['Procedimientos, curaciones e intervenciones ejecutadas', valorFormulario('procedimientos_ejecutados')],
+		['Indicaciones brindadas al paciente', valorFormulario('indicaciones_paciente')],
+	])
+	const stepFive = serializarCampos([
+		['Subjetivo', valorFormulario('evolucion_subjetiva')],
+		['Objetivo', valorFormulario('evolucion_objetiva')],
+		['Apreciación clínica', valorFormulario('evolucion_apreciacion')],
+		['Plan de seguimiento', valorFormulario('evolucion_plan')],
+		['Criterios de alta', valorFormulario('criterios_alta')],
+		['Fecha del próximo control', valorFormulario('fecha_proximo_control')],
+		['Hora del próximo control', valorFormulario('hora_proximo_control')],
+	])
 	const atencion = {
 		paciente_id: pacienteId,
 		relato: document.getElementById('relato-editor').innerHTML.trim() || null,
 		archivos_urls: archivosUrls.length ? archivosUrls : null,
+		paso_1_valoracion: stepOne || null,
+		paso_2_diagnostico_notas: valorFormulario('diagnostico_notas'),
+		paso_3_plan_prioridades: stepThree || null,
+		paso_4_ejecucion: stepFour || null,
+		paso_5_evolucion: stepFive || null,
 		pa_presion: valorFormulario('pa_presion'),
 		f_cardiaca: valorFormulario('f_cardiaca'),
 		f_respiratoria: valorFormulario('f_respiratoria'),
@@ -685,22 +962,62 @@ async function guardarAtencion() {
 		const result = await supabase.from('atencion_tratamientos').insert(treatments)
 		if (result.error) return manejarErrorGuardado(result.error)
 	}
+	const { error: evolutionError } = await supabase.from('atencion_evoluciones').insert({
+		atencion_id: savedAttention.id,
+		paciente_id: pacienteId,
+		nota_evolucion: `Apreciación clínica: ${valorFormulario('evolucion_apreciacion')}`,
+		subjetivo: valorFormulario('evolucion_subjetiva'),
+		objetivo: valorFormulario('evolucion_objetiva'),
+		plan_ajustado: valorFormulario('evolucion_plan'),
+		registrado_por: user.id,
+	})
+	if (evolutionError) return manejarErrorGuardado(evolutionError)
+	let appointmentSaveError = null
+	let appointmentSaved = false
+	if (valorFormulario('fecha_proximo_control') && valorFormulario('hora_proximo_control')) {
+		const hora = valorFormulario('hora_proximo_control')
+		const [hours, minutes] = hora.split(':').map(Number)
+		const endMinutes = (hours * 60 + minutes + 60) % (24 * 60)
+		const horaFin = `${String(Math.floor(endMinutes / 60)).padStart(2, '0')}:${String(endMinutes % 60).padStart(2, '0')}:00`
+		const { error: appointmentError } = await supabase.from('citas').insert({
+			paciente_id: pacienteId,
+			doctor_id: null,
+			fecha: valorFormulario('fecha_proximo_control'),
+			hora_inicio: `${hora}:00`,
+			hora_fin: horaFin,
+			tipo_cita: 'Seguimiento',
+			motivo: 'Control posterior a atención',
+			estado: 'Pendiente',
+			registrado_por: user.id,
+		})
+		if (appointmentError) {
+			appointmentSaveError = appointmentError
+			console.error('La atención se guardó, pero no se pudo agendar el próximo control:', appointmentError.message)
+		} else {
+			appointmentSaved = true
+		}
+	}
 	await actualizarFuncionesVitales(atencion)
-	alert('Atención guardada correctamente.')
+	alert(appointmentSaveError
+		? `La atención se guardó, pero no se pudo agendar el control. Regístralo desde Agenda. Detalle: ${appointmentSaveError.message}`
+		: 'Atención guardada correctamente.')
 	attentionForm.reset()
 	document.getElementById('relato-editor').innerHTML = ''
+	document.getElementById('selected-files').replaceChildren()
 	diagnosisList.innerHTML = ''
 	treatmentList.innerHTML = ''
+	objectivesList.innerHTML = ''
 	cerrarDrawer()
 	await cargarUltimaAtencion()
 	await cargarHistorial()
+	if (appointmentSaved) await cargarAgendaPaciente(pacienteId)
 	nextButton.disabled = false
 	nextButton.textContent = 'Siguiente'
 	mostrarPaso(0)
 }
 
 function manejarErrorGuardado(error) {
-	alert(`La atención se creó, pero no se pudieron guardar todos sus detalles: ${error.message}`)
+	alert(`La atención se creó, pero no se pudieron guardar todos sus detalles. Revise las tablas y columnas de Supabase y vuelva a cargar el historial. Detalle: ${error.message}`)
 	nextButton.disabled = false
 	nextButton.textContent = 'Guardar atención'
 }
@@ -772,13 +1089,14 @@ async function cargarHistorial() {
 async function abrirDetalleAtencion(atencionId) {
 	const activeUser = await requireAuthenticatedUser()
 	if (!activeUser) return
-	const [{ data: atencion, error: attentionError }, { data: diagnosticos, error: diagnosisError }, { data: tratamientos, error: treatmentError }] = await Promise.all([
+	const [{ data: atencion, error: attentionError }, { data: diagnosticos, error: diagnosisError }, { data: tratamientos, error: treatmentError }, { data: evoluciones, error: evolutionError }] = await Promise.all([
 		supabase.from('atenciones').select('*').eq('id', atencionId).eq('registrado_por', activeUser.id).single(),
 		supabase.from('atencion_diagnosticos').select('*').eq('atencion_id', atencionId),
 		supabase.from('atencion_tratamientos').select('*').eq('atencion_id', atencionId),
+		supabase.from('atencion_evoluciones').select('*').eq('atencion_id', atencionId).eq('registrado_por', activeUser.id).order('fecha_evolucion', { ascending: false }),
 	])
-	if (attentionError || diagnosisError || treatmentError || !atencion) {
-		const error = attentionError || diagnosisError || treatmentError
+	if (attentionError || diagnosisError || treatmentError || evolutionError || !atencion) {
+		const error = attentionError || diagnosisError || treatmentError || evolutionError
 		console.error('Error al cargar detalle de atención:', error)
 		alert(`No se pudo cargar el detalle de la consulta${error?.message ? `: ${error.message}` : '.'}`)
 		return
@@ -787,6 +1105,7 @@ async function abrirDetalleAtencion(atencionId) {
 	atencionDetalleActual = atencion
 	diagnosticosDetalleActual = diagnosticos || []
 	tratamientosDetalleActual = tratamientos || []
+	evolucionesDetalleActual = evoluciones || []
 	renderizarDetalleAtencion()
 	const modal = document.getElementById('detail-modal')
 	modal.classList.add('is-open')
@@ -811,55 +1130,70 @@ function renderizarDetalleAtencion() {
 		return
 	}
 
-	const blocks = [
-		['Anamnesis', textoPlano(atencion.relato) || 'Sin relato registrado.'],
-		['Plan de tratamiento', atencion.plan_tratamiento || 'Sin plan registrado.'],
-		['Exámenes auxiliares', atencion.examenes_auxiliares || 'Sin exámenes auxiliares registrados.'],
-	]
-	blocks.forEach(([title, text]) => {
-		const block = document.createElement('section')
-		block.className = 'detail-block'
-		block.innerHTML = `<h3>${title}</h3>`
-		const paragraph = document.createElement('p')
-		paragraph.textContent = text
-		block.appendChild(paragraph)
-		content.appendChild(block)
-	})
-
-	const vitalsBlock = document.createElement('section')
-	vitalsBlock.className = 'detail-block'
-	vitalsBlock.innerHTML = '<h3>Funciones vitales</h3>'
-	const vitals = document.createElement('div')
-	vitals.className = 'detail-vitals'
-	;[['P. arterial', atencion.pa_presion, 'mmHg'], ['F. cardiaca', atencion.f_cardiaca, 'lpm'], ['F. respiratoria', atencion.f_respiratoria, 'rpm'], ['Saturación', atencion.saturacion, '%'], ['Temperatura', atencion.temperatura, '°C']].forEach(([label, value, suffix]) => {
-		const vital = document.createElement('div')
-		vital.className = 'detail-vital'
-		vital.innerHTML = `<small>${label}</small><strong>${mostrarValor(value, ` ${suffix}`)}</strong>`
-		vitals.appendChild(vital)
-	})
-	vitalsBlock.appendChild(vitals)
-	content.appendChild(vitalsBlock)
-
-	const diagnosisBlock = document.createElement('section')
-	diagnosisBlock.className = 'detail-block'
-	diagnosisBlock.innerHTML = '<h3>Diagnósticos</h3>'
-	diagnosisBlock.appendChild(crearListaDetalle(diagnosticos, item => `${item.descripcion}${item.cie10 ? ` · ${item.cie10}` : ''} · ${item.tipo}`))
-	content.appendChild(diagnosisBlock)
-
-	const treatmentBlock = document.createElement('section')
-	treatmentBlock.className = 'detail-block'
-	treatmentBlock.innerHTML = '<h3>Tratamiento / Receta</h3>'
-	treatmentBlock.appendChild(crearListaDetalle(tratamientos, item => `${item.medicamento_nombre} · ${item.dosis_cantidad || '-'} ${item.dosis_unidad || ''} · ${item.via || '-'}`))
-	content.appendChild(treatmentBlock)
+	const diagnosesText = diagnosticos.map(item => `${item.descripcion || 'Sin descripción'}${item.cie10 ? ` · ${item.cie10}` : ''} · ${item.tipo || 'Sin tipo'}`).join('\n')
+	const treatmentsText = tratamientos.map(item => [
+		item.medicamento_nombre,
+		item.dosis_cantidad,
+		item.dosis_unidad,
+		item.via,
+		item.frecuencia_horas ? `cada ${item.frecuencia_horas} h` : '',
+		item.duracion_dias ? `${item.duracion_dias} días` : '',
+	].filter(Boolean).join(' · ')).join('\n')
+	const vitalsText = [
+		`P. arterial: ${mostrarValor(atencion.pa_presion, ' mmHg')}`,
+		`F. cardíaca: ${mostrarValor(atencion.f_cardiaca, ' lpm')}`,
+		`F. respiratoria: ${mostrarValor(atencion.f_respiratoria, ' rpm')}`,
+		`Saturación: ${mostrarValor(atencion.saturacion, ' %')}`,
+		`Temperatura: ${mostrarValor(atencion.temperatura, ' °C')}`,
+	].join(' · ')
+	crearBloqueDetalle(content, 'Paso 1 · Valoración e identificación del problema', serializarCampos([
+		['Valoración', atencion.paso_1_valoracion],
+		['Relato del caso', textoPlano(atencion.relato)],
+		['Funciones vitales', vitalsText],
+	]))
+	crearBloqueDetalle(content, 'Paso 2 · Diagnóstico clínico', serializarCampos([
+		['Diagnósticos y CIE-10', diagnosesText],
+		['Juicio clínico', atencion.paso_2_diagnostico_notas],
+	]))
+	crearBloqueDetalle(content, 'Paso 3 · Plan de trabajo con prioridades', serializarCampos([
+		['Objetivos y prioridades', atencion.paso_3_plan_prioridades],
+		['Plan de tratamiento', atencion.plan_tratamiento],
+		['Exámenes auxiliares', atencion.examenes_auxiliares],
+		['Prescripción médica', treatmentsText],
+	]))
+	crearBloqueDetalle(content, 'Paso 4 · Ejecución asistencial', atencion.paso_4_ejecucion)
+	crearBloqueDetalle(content, 'Paso 5 · Evolución y seguimiento', atencion.paso_5_evolucion)
+	if (evolucionesDetalleActual.length) {
+		const evolutionText = evolucionesDetalleActual.map(item => [
+			item.fecha_evolucion ? new Date(item.fecha_evolucion).toLocaleString('es-PE') : 'Fecha no registrada',
+			item.nota_evolucion,
+			item.subjetivo ? `Subjetivo: ${item.subjetivo}` : '',
+			item.objetivo ? `Objetivo: ${item.objetivo}` : '',
+			item.plan_ajustado ? `Plan ajustado: ${item.plan_ajustado}` : '',
+		].filter(Boolean).join('\n')).join('\n\n')
+		crearBloqueDetalle(content, 'Notas continuadas de evolución', evolutionText)
+	}
 }
 
-function crearCampoEdicion(labelText, value, { multiline = false, type = 'text', step } = {}) {
+function crearBloqueDetalle(container, title, text) {
+	const block = document.createElement('section')
+	block.className = 'detail-block'
+	const heading = document.createElement('h3')
+	heading.textContent = title
+	const paragraph = document.createElement('p')
+	paragraph.textContent = text || 'Sin registro.'
+	block.append(heading, paragraph)
+	container.appendChild(block)
+}
+
+function crearCampoEdicion(labelText, value, { multiline = false, type = 'text', step, list } = {}) {
 	const label = document.createElement('label')
 	label.className = 'attention-edit-field'
 	label.textContent = labelText
 	const input = document.createElement(multiline ? 'textarea' : 'input')
 	if (!multiline) input.type = type
 	if (step) input.step = step
+	if (list) input.setAttribute('list', list)
 	if (type === 'checkbox') input.checked = Boolean(value)
 	else input.value = value ?? ''
 	label.appendChild(input)
@@ -892,6 +1226,22 @@ function crearFilaEdicion(title, values, fields) {
 
 function renderizarFormularioEdicionAtencion(content) {
 	const atencion = atencionDetalleActual
+	;[
+		['Paso 1 · Valoración', 'Valoración, examen físico y sistemas', 'paso_1_valoracion'],
+		['Paso 1 · Relato del caso', 'Relato del caso', 'relato'],
+		['Paso 2 · Diagnóstico clínico', 'Juicio clínico', 'paso_2_diagnostico_notas'],
+		['Paso 3 · Plan de trabajo con prioridades', 'Objetivos y prioridades', 'paso_3_plan_prioridades'],
+		['Paso 4 · Ejecución asistencial', 'Procedimientos e indicaciones', 'paso_4_ejecucion'],
+		['Paso 5 · Evolución y seguimiento', 'Evolución SOAP y seguimiento', 'paso_5_evolucion'],
+	].forEach(([title, label, key]) => {
+		const section = document.createElement('section')
+		section.className = 'detail-block attention-edit-section'
+		section.appendChild(Object.assign(document.createElement('h3'), { textContent: title }))
+		const field = crearCampoEdicion(label, atencion[key], { multiline: true })
+		field.dataset.field = key
+		section.appendChild(field)
+		content.appendChild(section)
+	})
 	const plan = document.createElement('section')
 	plan.className = 'detail-block attention-edit-section'
 	plan.appendChild(Object.assign(document.createElement('h3'), { textContent: 'Plan de tratamiento' }))
@@ -932,7 +1282,7 @@ function renderizarFormularioEdicionAtencion(content) {
 	diagnoses.className = 'attention-edit-rows'
 	diagnosticosDetalleActual.forEach((item) => diagnoses.appendChild(crearFilaEdicion('Diagnóstico', item, [
 		['descripcion', 'Descripción'],
-		['cie10', 'Código CIE10'],
+		['cie10', 'Código CIE-10', { list: 'cie10-codes' }],
 		['tipo', 'Tipo'],
 	])))
 	const addDiagnosis = document.createElement('button')
@@ -941,7 +1291,7 @@ function renderizarFormularioEdicionAtencion(content) {
 	addDiagnosis.textContent = '＋ Agregar diagnóstico'
 	addDiagnosis.addEventListener('click', () => diagnoses.appendChild(crearFilaEdicion('Diagnóstico', { tipo: 'Presuntivo' }, [
 		['descripcion', 'Descripción'],
-		['cie10', 'Código CIE10'],
+		['cie10', 'Código CIE-10', { list: 'cie10-codes' }],
 		['tipo', 'Tipo'],
 	])))
 	diagnosesBlock.append(diagnoses, addDiagnosis)
@@ -1019,6 +1369,12 @@ async function guardarEdicionAtencion() {
 	const saveButton = document.getElementById('save-edit-attention')
 	saveButton.disabled = true
 	const payload = {
+		relato: valorCampoEdicion('relato'),
+		paso_1_valoracion: valorCampoEdicion('paso_1_valoracion'),
+		paso_2_diagnostico_notas: valorCampoEdicion('paso_2_diagnostico_notas'),
+		paso_3_plan_prioridades: valorCampoEdicion('paso_3_plan_prioridades'),
+		paso_4_ejecucion: valorCampoEdicion('paso_4_ejecucion'),
+		paso_5_evolucion: valorCampoEdicion('paso_5_evolucion'),
 		plan_tratamiento: valorCampoEdicion('plan_tratamiento'),
 		examenes_auxiliares: valorCampoEdicion('examenes_auxiliares'),
 		pa_presion: valorCampoEdicion('pa_presion'),
