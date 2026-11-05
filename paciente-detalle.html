@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Perfil de Paciente | RENE Health</title>
+	<title>Perfil de Paciente | Clinicasync</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
 <body class="dashboard-page">
 	<div class="dashboard-shell">
 		<aside class="sidebar" aria-label="Navegación principal">
-			<a class="agenda-brand" href="pacientes.html"><span class="brand-mark">+</span><span>RENE <em>health</em></span></a>
+			<a class="agenda-brand" href="pacientes.html"><span class="brand-mark">+</span><span>Clinicasync</span></a>
 			<nav class="sidebar-nav">
 				<a class="sidebar-link active" href="pacientes.html" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="10" cy="7" r="4"></circle><path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><span>Pacientes</span></a>
 				<a class="sidebar-link" href="sub/agenda.html"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 11h18"></path></svg></span><span>Agenda</span></a>
@@ -78,6 +78,23 @@
 								<div class="latest-attention-body" id="latest-attention-body"><p class="empty-text">Todavía no hay atenciones registradas.</p></div>
 							</div>
 						</div>
+						<section class="clinical-record-card">
+							<div class="history-heading"><div><span class="drawer-kicker">Expediente patrón-médico</span><h2>Resumen estructurado del caso</h2></div></div>
+							<div id="patient-medical-background" class="patient-medical-background"></div>
+							<div id="clinical-case-summary" class="clinical-case-summary"><p class="empty-text">Todavía no hay un caso clínico registrado.</p></div>
+						</section>
+						<section class="clinical-record-card evolution-followup-card">
+							<div class="history-heading"><div><span class="drawer-kicker">Paso 5 · Seguimiento</span><h2>Evolución continuada</h2></div></div>
+							<div id="clinical-evolution-list" class="clinical-evolution-list"><p class="empty-text">Registra una atención para iniciar el seguimiento.</p></div>
+							<form id="evolution-followup-form" class="evolution-followup-form" hidden>
+								<h3>Agregar nota de evolución</h3>
+								<label class="attention-edit-field">Subjetivo<textarea name="subjetivo" rows="2"></textarea></label>
+								<label class="attention-edit-field">Objetivo<textarea name="objetivo" rows="2"></textarea></label>
+								<label class="attention-edit-field">Apreciación clínica<textarea name="apreciacion" rows="2" required></textarea></label>
+								<label class="attention-edit-field">Plan ajustado<textarea name="plan_ajustado" rows="2"></textarea></label>
+								<button class="btn-primary" type="submit">Guardar evolución</button>
+							</form>
+						</section>
 					</div>
 
 					<div id="tab-historial" class="tab-pane" role="tabpanel" aria-labelledby="history-tab" hidden>
@@ -122,6 +139,13 @@
 	<div class="attention-validation-toast" id="attention-validation-toast" role="alert" aria-live="assertive"></div>
 	<div class="detail-modal-backdrop" id="detail-modal-backdrop" hidden></div>
 	<div class="detail-modal-backdrop" id="appointment-edit-backdrop" hidden></div>
+	<datalist id="cie10-codes">
+		<option value="I10" label="Hipertensión esencial (primaria)"></option>
+		<option value="E11.9" label="Diabetes mellitus tipo 2 sin complicaciones"></option>
+		<option value="J06.9" label="Infección aguda de vías respiratorias superiores, no especificada"></option>
+		<option value="R51" label="Cefalea"></option>
+		<option value="Z00.0" label="Examen médico general"></option>
+	</datalist>
 	<article class="detail-modal appointment-edit-modal" id="appointment-edit-modal" role="dialog" aria-modal="true" aria-labelledby="appointment-edit-title" aria-hidden="true">
 		<header class="detail-modal-header">
 			<div><span class="drawer-kicker">Agenda del paciente</span><h2 id="appointment-edit-title">Modificar cita</h2></div>
@@ -154,15 +178,17 @@
 			<button class="drawer-close" id="close-attention-button" type="button" aria-label="Cerrar">&times;</button>
 		</div>
 		<nav class="attention-steps" aria-label="Pasos de la atención">
-			<button class="attention-step active" type="button" data-step="anamnesis">Anamnesis</button>
-			<button class="attention-step" type="button" data-step="examen">EF</button>
-			<button class="attention-step" type="button" data-step="diagnostico">Dx</button>
-			<button class="attention-step" type="button" data-step="plan">PI</button>
+			<button class="attention-step active" type="button" data-step="valoracion">1. Valoración</button>
+			<button class="attention-step" type="button" data-step="diagnostico">2. Diagnóstico</button>
+			<button class="attention-step" type="button" data-step="plan">3. Plan</button>
+			<button class="attention-step" type="button" data-step="ejecucion">4. Ejecución</button>
+			<button class="attention-step" type="button" data-step="evolucion">5. Evolución</button>
 		</nav>
 		<form class="attention-form" id="attention-form">
-			<section class="attention-section active" data-section="anamnesis">
-				<div class="drawer-section-heading"><h3>Anamnesis</h3><span>01 / 04</span></div>
-				<label class="drawer-label" for="relato-editor">Relato</label>
+			<section class="attention-section active" data-section="valoracion">
+				<div class="drawer-section-heading"><h3>Paso 1 · Valoración e identificación del problema</h3><span>01 / 05</span></div>
+				<label class="drawer-field">Motivo de consulta<input name="motivo_consulta" type="text" placeholder="Motivo principal de la consulta" required></label>
+				<label class="drawer-label" for="relato-editor">Relato del caso</label>
 				<div class="rich-editor">
 					<div class="editor-toolbar" aria-label="Formato del relato">
 						<button type="button" data-command="bold"><strong>B</strong></button>
@@ -174,35 +200,54 @@
 					</div>
 					<div id="relato-editor" class="editor-content" contenteditable="true" role="textbox" aria-label="Relato de la consulta" data-placeholder="Describe el motivo de consulta, síntomas y antecedentes relevantes..."></div>
 				</div>
+				<label class="drawer-field">Examen físico<textarea name="examen_fisico" rows="3" placeholder="Hallazgos del examen físico"></textarea></label>
+				<label class="drawer-field">Valoración por sistemas<textarea name="valoracion_sistemas" rows="3" placeholder="Hallazgos relevantes por sistemas"></textarea></label>
+				<p class="drawer-hint">Funciones vitales tomadas durante la consulta.</p>
+				<div class="vitals-grid">
+					<label class="drawer-field">P. Arterial <span>mmHg</span><input name="pa_presion" type="text" inputmode="numeric" placeholder="Ej: 120/80"></label>
+					<label class="drawer-field">F. cardiaca <span>lpm</span><input name="f_cardiaca" type="number" min="0" placeholder="Ej: 72"></label>
+					<label class="drawer-field">F. respiratoria <span>rpm</span><input name="f_respiratoria" type="number" min="0" placeholder="Ej: 16"></label>
+					<label class="drawer-field">Saturación <span>%</span><input name="saturacion" type="number" min="0" max="100" placeholder="Ej: 98"></label>
+					<label class="drawer-field">Temperatura <span>°C</span><input name="temperatura" type="number" min="25" max="45" step="0.1" placeholder="Ej: 36.5"></label>
+				</div>
 				<label class="drawer-label" for="attention-files">Archivos</label>
 				<label class="file-dropzone" for="attention-files"><span class="dropzone-icon">＋</span><strong>Arrastra archivos aquí</strong><small>o haz clic para seleccionar imágenes y documentos</small><input id="attention-files" type="file" multiple></label>
 				<div class="selected-files" id="selected-files"></div>
 			</section>
 
-			<section class="attention-section" data-section="examen" hidden>
-				<div class="drawer-section-heading"><h3>Examen físico</h3><span>02 / 04</span></div>
-				<p class="drawer-hint">Registra las funciones vitales tomadas durante la consulta.</p>
-				<div class="vitals-grid">
-					<label class="drawer-field">P. Arterial <span>mmHg</span><input name="pa_presion" type="text" inputmode="numeric" placeholder="Ej:120/80"></label>
-					<label class="drawer-field">F. cardiaca <span>lpm</span><input name="f_cardiaca" type="number" min="0" placeholder="Ej:72"></label>
-					<label class="drawer-field">F. respiratoria <span>rpm</span><input name="f_respiratoria" type="number" min="0" placeholder="Ej:16"></label>
-					<label class="drawer-field">Saturación <span>%</span><input name="saturacion" type="number" min="0" max="100" placeholder="Ej:98"></label>
-					<label class="drawer-field">Temperatura <span>°C</span><input name="temperatura" type="number" min="25" max="45" step="0.1" placeholder="Ej:36.5"></label>
-				</div>
-			</section>
-
 			<section class="attention-section" data-section="diagnostico" hidden>
-				<div class="drawer-section-heading"><h3>Diagnósticos</h3><span>03 / 04</span></div>
+				<div class="drawer-section-heading"><h3>Paso 2 · Diagnóstico clínico</h3><span>02 / 05</span></div>
 				<div class="dynamic-list" id="diagnosis-list"></div>
 				<button class="add-row-button" id="add-diagnosis-button" type="button">＋ Agregar diagnóstico</button>
+				<label class="drawer-field">Descripción del juicio clínico<textarea name="diagnostico_notas" rows="4" placeholder="Razonamiento clínico y sustento del diagnóstico"></textarea></label>
 			</section>
 
 			<section class="attention-section" data-section="plan" hidden>
-				<div class="drawer-section-heading"><h3>Plan e indicaciones</h3><span>04 / 04</span></div>
+				<div class="drawer-section-heading"><h3>Paso 3 · Plan de trabajo con prioridades</h3><span>03 / 05</span></div>
+				<div class="subsection-heading"><h4>Objetivos terapéuticos por prioridad</h4><button class="add-row-button compact" id="add-objective-button" type="button">＋ Agregar objetivo</button></div>
+				<div class="dynamic-list" id="objectives-list"></div>
 				<label class="drawer-field">Plan de tratamiento<textarea name="plan_tratamiento" rows="3" placeholder="Indicaciones generales y objetivos del tratamiento..."></textarea></label>
-				<label class="drawer-field">Exámenes auxiliares<textarea name="examenes_auxiliares" rows="3" placeholder="Laboratorio, imágenes u otros estudios..."></textarea></label>
+				<label class="drawer-field">Exámenes auxiliares solicitados (laboratorio, imágenes)<textarea name="examenes_auxiliares" rows="3" placeholder="Laboratorio, imágenes u otros estudios..."></textarea></label>
 				<div class="subsection-heading"><h4>Tratamiento / Receta</h4><button class="add-row-button compact" id="add-treatment-button" type="button">＋ Agregar tratamiento</button></div>
 				<div class="dynamic-list" id="treatment-list"></div>
+			</section>
+
+			<section class="attention-section" data-section="ejecucion" hidden>
+				<div class="drawer-section-heading"><h3>Paso 4 · Ejecución asistencial</h3><span>04 / 05</span></div>
+				<label class="drawer-field">Procedimientos, curaciones e intervenciones ejecutadas<textarea name="procedimientos_ejecutados" rows="5" placeholder="Registra las intervenciones realizadas durante esta consulta"></textarea></label>
+				<label class="drawer-field">Indicaciones brindadas al paciente<textarea name="indicaciones_paciente" rows="5" placeholder="Cuidados, recomendaciones y señales de alarma explicadas"></textarea></label>
+			</section>
+
+			<section class="attention-section" data-section="evolucion" hidden>
+				<div class="drawer-section-heading"><h3>Paso 5 · Evolución y seguimiento del caso</h3><span>05 / 05</span></div>
+				<p class="drawer-hint">Registra la evolución SOAP de esta atención. Cada control posterior puede agregar una nueva nota.</p>
+				<label class="drawer-field">Subjetivo<textarea name="evolucion_subjetiva" rows="3" placeholder="Lo referido por el paciente"></textarea></label>
+				<label class="drawer-field">Objetivo<textarea name="evolucion_objetiva" rows="3" placeholder="Hallazgos observables y resultados"></textarea></label>
+				<label class="drawer-field">Apreciación clínica<textarea name="evolucion_apreciacion" rows="3" placeholder="Interpretación de la evolución" required></textarea></label>
+				<label class="drawer-field">Plan de seguimiento<textarea name="evolucion_plan" rows="3" placeholder="Plan ajustado para el seguimiento"></textarea></label>
+				<label class="drawer-field">Criterios de alta<textarea name="criterios_alta" rows="2" placeholder="Criterios clínicos para el alta, si corresponde"></textarea></label>
+				<label class="drawer-field">Fecha del próximo control en agenda<input name="fecha_proximo_control" type="date"></label>
+				<label class="drawer-field">Hora del próximo control<input name="hora_proximo_control" type="time"></label>
 			</section>
 		</form>
 		<div class="attention-footer"><button class="cancel-button" id="cancel-attention-button" type="button">Cancelar</button><button class="btn-primary drawer-action" id="next-attention-button" type="button">Siguiente</button></div>
